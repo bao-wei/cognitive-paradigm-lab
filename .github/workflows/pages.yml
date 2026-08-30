@@ -1,0 +1,51 @@
+name: Build catalog and deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Generate paradigm catalog
+        run: node tools/build-catalog.mjs
+
+      - name: Run self-checks
+        run: |
+          node tests/self-check.mjs
+          node tests/importer-self-check.mjs
+
+      - name: Prepare static site
+        run: |
+          mkdir _site
+          cp index.html app.js styles.css .nojekyll _site/
+          cp -R paradigms _site/
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
