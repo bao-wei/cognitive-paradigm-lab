@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <meta name="theme-color" content="#f4efe4" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>范式维护工作台｜知觉之间</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./paradigms/catalog.generated.js"></script>
+    <script src="./platform.js"></script>
+    <script src="./archive.js"></script>
+    <script src="./admin.js" defer></script>
+  </head>
+  <body class="admin-page">
+    <main>
+      <section class="admin-login" id="admin-login" aria-labelledby="login-title">
+        <a class="brand" href="./index.html">
+          <span class="brand-mark" aria-hidden="true">知</span>
+          <span><strong>知觉之间</strong><small>MAINTAINER DESK</small></span>
+        </a>
+        <div class="login-card">
+          <p class="eyebrow">RESTRICTED WORKSPACE</p>
+          <h1 id="login-title">范式维护工作台</h1>
+          <p>此密码仅用于防止普通学习者误入。材料解析和预览都在当前浏览器本地完成。</p>
+          <form id="login-form">
+            <label><span>管理员密码</span><input id="admin-password" type="password" autocomplete="current-password" required /></label>
+            <button class="button button-primary" type="submit">进入工作台</button>
+            <p class="form-error" id="login-error" role="alert"></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="admin-workspace" id="admin-workspace" hidden>
+        <header class="admin-header">
+          <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">知</span><span><strong>范式维护</strong><small>LOCAL VALIDATION</small></span></a>
+          <div><span>仅在本地处理</span><button class="text-button" id="admin-logout" type="button">退出</button></div>
+        </header>
+
+        <div class="admin-shell">
+          <aside class="admin-intro">
+            <p class="eyebrow">CHANGE PACK BUILDER</p>
+            <h1>先验证，再进入公开目录。</h1>
+            <p>添加、替换和删除不会直接修改 GitHub。完成检查后导出变更包，再由教材编写人员同步到仓库。</p>
+            <ol class="admin-steps">
+              <li class="active"><span>01</span>读取范式文件</li>
+              <li><span>02</span>补齐说明与配置</li>
+              <li><span>03</span>预览并完成试做</li>
+              <li><span>04</span>导出变更包</li>
+            </ol>
+          </aside>
+
+          <div class="admin-main">
+            <section class="admin-panel" aria-labelledby="upload-title">
+              <header><div><p class="eyebrow">ADD OR REPLACE</p><h2 id="upload-title">读取范式包</h2></div><span class="panel-status" id="package-status">尚未选择文件</span></header>
+              <div class="upload-options">
+                <label class="drop-choice"><input id="zip-input" type="file" accept=".zip,application/zip" /><strong>上传 ZIP</strong><span>读取完整压缩包，最大 100 MB</span></label>
+                <label class="drop-choice"><input id="folder-input" type="file" webkitdirectory multiple /><strong>选择文件夹</strong><span>适合已经解压的实验程序</span></label>
+              </div>
+              <p class="local-note">文件不会离开此设备。RAR 与 7z 暂不支持。</p>
+            </section>
+
+            <section class="admin-panel" id="metadata-panel" hidden aria-labelledby="metadata-title">
+              <header><div><p class="eyebrow">PACKAGE PROFILE</p><h2 id="metadata-title">范式信息</h2></div><span class="panel-status" id="file-summary"></span></header>
+              <div class="form-grid">
+                <label><span>范式 ID</span><input id="field-id" required pattern="[a-z0-9][a-z0-9-]*" placeholder="dot-probe" /></label>
+                <label><span>范式名称</span><input id="field-name" required placeholder="点探测任务" /></label>
+                <label><span>认知领域</span><input id="field-category" required placeholder="注意与执行控制" /></label>
+                <label><span>任务类型</span><input id="field-task" required placeholder="空间选择反应" /></label>
+                <label><span>预计时长</span><input id="field-duration" required placeholder="约 5 分钟" /></label>
+                <label><span>入口文件</span><input id="field-entry" required placeholder="index.html" /></label>
+                <label><span>许可证</span><input id="field-license" required placeholder="MIT 或见 LICENSE" /></label>
+                <label><span>结果模板</span><select id="field-profile"><option value="generic">通用行为指标</option><option value="difference">条件差异</option><option value="dot-probe">点探测注意偏向</option></select></label>
+                <label><span>正确字段</span><input id="field-correct" value="correct" /></label>
+                <label><span>反应时字段</span><input id="field-rt" value="rt" /></label>
+                <label><span>条件字段</span><input id="field-condition" value="condition" /></label>
+                <label><span>条件 A / B</span><input id="field-levels" placeholder="incongruent, congruent" /></label>
+                <label class="form-wide"><span>简短简介</span><textarea id="field-summary" rows="2" required></textarea></label>
+                <label class="form-wide"><span>来源链接（可选）</span><input id="field-source" type="url" placeholder="https://…" /></label>
+              </div>
+            </section>
+
+            <section class="admin-panel" id="description-panel" hidden aria-labelledby="description-title">
+              <header><div><p class="eyebrow">LEARNING NOTE</p><h2 id="description-title">范式说明</h2></div><label class="small-upload">载入 .md<input id="markdown-input" type="file" accept=".md,text/markdown,text/plain" /></label></header>
+              <div class="editor-grid">
+                <label><span>Markdown 文本</span><textarea id="description-editor" rows="18" spellcheck="false"></textarea></label>
+                <div><span class="field-label">页面预览</span><article class="markdown-body markdown-preview" id="description-preview"></article></div>
+              </div>
+            </section>
+
+            <section class="admin-panel" id="validation-panel" hidden aria-labelledby="validation-title">
+              <header><div><p class="eyebrow">QUALITY GATE</p><h2 id="validation-title">完整性与运行检查</h2></div><button class="button button-secondary" id="run-validation" type="button">重新检查</button></header>
+              <div class="validation-list" id="validation-list"></div>
+              <div class="preview-controls">
+                <button class="button button-secondary" id="open-preview" type="button">打开实验预览</button>
+                <label class="confirmation"><input id="manual-confirmation" type="checkbox" /> 我已完整试做，并确认实验结束后成功生成结果数据。</label>
+              </div>
+              <div class="experiment-preview" id="experiment-preview" hidden>
+                <header><strong>隔离运行预览</strong><button class="text-button" id="close-preview" type="button">关闭预览</button></header>
+                <iframe id="preview-frame" title="上传范式运行预览" sandbox="allow-scripts allow-forms allow-modals allow-pointer-lock" allow="fullscreen" allowfullscreen></iframe>
+                <p id="runtime-status">等待实验发送完成事件…</p>
+              </div>
+              <button class="button button-primary" id="stage-package" type="button" disabled>加入待导出清单</button>
+            </section>
+
+            <section class="admin-panel" aria-labelledby="library-title">
+              <header><div><p class="eyebrow">PUBLISHED PACKAGES</p><h2 id="library-title">现有范式与删除</h2></div><span class="panel-status">核心范式受保护</span></header>
+              <div class="library-list" id="library-list"></div>
+            </section>
+
+            <section class="admin-panel change-panel" aria-labelledby="changes-title">
+              <header><div><p class="eyebrow">EXPORT</p><h2 id="changes-title">待导出变更</h2></div><span class="change-count" id="change-count">0</span></header>
+              <div class="change-list" id="change-list"><p class="empty-copy">还没有添加、替换或删除操作。</p></div>
+              <button class="button button-primary" id="export-changes" type="button" disabled>导出范式库变更包</button>
+              <p class="local-note">导出后仍需将变更包应用到项目仓库并推送，公开网站才会更新。</p>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

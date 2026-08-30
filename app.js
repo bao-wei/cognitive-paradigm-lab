@@ -146,6 +146,8 @@ const EXPERIMENTS = {
   },
 };
 
+ensureExperimentShell();
+
 const elements = {
   dialog: document.querySelector("#experiment-dialog"),
   close: document.querySelector("#close-experiment"),
@@ -185,8 +187,6 @@ const elements = {
 
 let state = createEmptyState();
 
-renderImportedParadigms(window.IMPORTED_PARADIGMS ?? []);
-
 document.querySelectorAll("[data-experiment]").forEach((button) => {
   button.addEventListener("click", () => openExperiment(button.dataset.experiment));
 });
@@ -199,6 +199,73 @@ elements.dialog.addEventListener("cancel", (event) => {
   event.preventDefault();
   requestClose();
 });
+window.CognitionExperiment = Object.freeze({ open: openExperiment });
+
+function ensureExperimentShell() {
+  const shell = document.querySelector("#experiment-shell");
+  if (!shell || document.querySelector("#experiment-dialog")) return;
+  shell.innerHTML = `
+    <dialog class="experiment-dialog" id="experiment-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-shell">
+        <header class="dialog-header">
+          <a class="brand compact" href="#" tabindex="-1">
+            <span class="brand-mark" aria-hidden="true">知</span>
+            <span><strong>实验进行中</strong><small id="dialog-kicker">COGNITION LAB</small></span>
+          </a>
+          <div class="progress-wrap" id="progress-wrap" hidden>
+            <span id="progress-text">0 / 0</span>
+            <div class="progress-track" aria-hidden="true"><i id="progress-bar"></i></div>
+          </div>
+          <button class="icon-button" id="close-experiment" type="button" aria-label="退出实验">×</button>
+        </header>
+        <section class="dialog-content intro-screen" id="intro-screen">
+          <div class="intro-label" id="intro-number"></div>
+          <h2 id="dialog-title"></h2>
+          <p class="intro-question" id="intro-question"></p>
+          <div class="instruction-panel">
+            <div><p class="eyebrow">你的任务</p><p id="intro-instruction"></p></div>
+            <div class="key-guide" id="key-guide"></div>
+          </div>
+          <div class="intro-meta">
+            <span id="intro-trials"></span><span>先练习，后正式实验</span><span>请勿刷新页面</span>
+          </div>
+          <button class="button button-primary" id="start-practice" type="button">开始练习</button>
+        </section>
+        <section class="dialog-content task-screen" id="task-screen" hidden aria-live="polite">
+          <p class="phase-label" id="phase-label">练习</p>
+          <div class="stimulus-stage" id="stimulus-stage">
+            <div class="fixation" id="fixation" aria-hidden="true">+</div>
+            <div class="stimulus" id="stimulus" role="img" aria-label="实验刺激"></div>
+            <div class="feedback" id="feedback"></div>
+          </div>
+          <div class="task-key-guide" id="task-key-guide"></div>
+        </section>
+        <section class="dialog-content transition-screen" id="transition-screen" hidden>
+          <p class="eyebrow">PRACTICE COMPLETE</p>
+          <h2>练习完成，规则已经熟悉。</h2>
+          <p id="practice-summary"></p>
+          <button class="button button-primary" id="start-formal" type="button">进入正式实验</button>
+        </section>
+        <section class="dialog-content results-screen" id="results-screen" hidden>
+          <div class="result-heading">
+            <div><p class="eyebrow">YOUR RESULT</p><h2>这一次，你观察到了什么？</h2></div>
+            <p id="result-note"></p>
+          </div>
+          <div class="metric-grid">
+            <article><span>正确率</span><strong id="metric-accuracy">—</strong><small>全部正式试次</small></article>
+            <article><span>平均反应时</span><strong id="metric-rt">—</strong><small>仅统计正确反应</small></article>
+            <article><span id="metric-effect-label">条件差异</span><strong id="metric-effect">—</strong><small id="metric-effect-note">—</small></article>
+          </div>
+          <div class="result-explanation"><h3>如何理解</h3><p id="result-explanation"></p></div>
+          <div class="result-actions">
+            <button class="button button-primary" id="export-csv" type="button">导出本次 CSV</button>
+            <button class="button button-secondary" id="retry-experiment" type="button">再做一次</button>
+          </div>
+          <p class="ephemeral-warning">退出本页后，本次结果将被清除。请先导出需要保留的数据。</p>
+        </section>
+      </div>
+    </dialog>`;
+}
 
 function createEmptyState() {
   return {
@@ -216,6 +283,7 @@ function createEmptyState() {
 }
 
 function openExperiment(id) {
+  if (!EXPERIMENTS[id]) return;
   clearExperimentState();
   state.id = id;
   state.config = EXPERIMENTS[id];

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"><title>管理员上传演示</title></head>
+  <body>
+    <main><h1>管理员上传演示</h1><button id="finish">完成演示</button></main>
+    <script>
+      document.querySelector("#finish").addEventListener("click", () => {
+        window.parent.postMessage({
+          type: "cognition-lab:complete",
+          trials: [
+            { trial: 1, condition: "target", correct: true, rt: 420 },
+            { trial: 2, condition: "target", correct: true, rt: 510 }
+          ]
+        }, "*");
+      });
+    </script>
+  </body>
+</html>

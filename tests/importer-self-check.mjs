@@ -19,11 +19,15 @@ try {
   await writeFile(path.join(stroop, "experiment.js"), "const psychoJS = new PsychoJS(); fetch('https://example.test/session');");
   await writeFile(path.join(stroop, "README.md"), "# Stroop Demo\nA colour-word interference task for attention.");
   await writeFile(path.join(ready, "index.html"), "<title>Simple Reaction Time</title><button>Start</button>");
-  await writeFile(path.join(ready, "paradigm.json"), JSON.stringify({
+  await writeFile(path.join(ready, "bridge.js"), "parent.postMessage({type:'cognition-lab:complete', trials:[]}, '*');");
+  await writeFile(path.join(ready, "description.md"), "# Simple Reaction Time\n\n## Learning goal\n\nA teaching task.");
+  await writeFile(path.join(ready, "manifest.json"), JSON.stringify({
     name: "Simple Reaction Time",
+    shortDescription: "Press a key when the target appears.",
     approved: true,
     license: "MIT",
-    dataExport: "self",
+    dataExport: "adapter",
+    result: { profile: "generic", fields: { correct: "correct", rt: "rt", condition: "condition" }, levels: [] },
   }));
 
   const found = await buildCatalog({ packagesDir: packages, output });
@@ -43,7 +47,8 @@ try {
   const launchable = found.find((item) => item.id === "simple-reaction");
   assert.equal(launchable.status, "ready");
   assert.equal(launchable.category, "基础反应");
-  assert.equal(launchable.dataExport, "self");
+  assert.equal(launchable.dataExport, "adapter");
+  assert.equal(launchable.descriptionPath, "./paradigms/packages/simple-reaction/description.md");
   console.log("importer self-check passed: discovery, classification, and safety states");
 } finally {
   await rm(temporary, { recursive: true, force: true });

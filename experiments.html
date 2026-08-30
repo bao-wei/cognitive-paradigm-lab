@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="浏览和筛选知觉之间收录的认知心理学行为实验范式。" />
+    <meta name="theme-color" content="#f4efe4" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>实验目录｜知觉之间</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./paradigms/catalog.generated.js"></script>
+    <script src="./platform.js"></script>
+    <script src="./catalog-page.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#catalog-results">跳到实验列表</a>
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="返回知觉之间首页">
+        <span class="brand-mark" aria-hidden="true">知</span>
+        <span><strong>知觉之间</strong><small>COGNITION LAB</small></span>
+      </a>
+      <nav aria-label="主导航">
+        <a href="./experiments.html" aria-current="page">实验目录</a>
+        <a href="./index.html#how-it-works">如何使用</a>
+        <a href="./index.html#notice">使用须知</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="catalog-hero section-shell">
+        <p class="eyebrow">EXPERIMENT LIBRARY</p>
+        <div class="catalog-hero-grid">
+          <h1>找到你想亲手<br />验证的认知现象。</h1>
+          <p>按研究领域或任务形式浏览全部教学范式。每个范式都有独立说明页，你可以先了解原理，也可以直接开始体验。</p>
+        </div>
+      </section>
+
+      <section class="catalog-workspace section-shell" aria-labelledby="catalog-title">
+        <header class="catalog-toolbar">
+          <div>
+            <p class="eyebrow">FILTER &amp; DISCOVER</p>
+            <h2 id="catalog-title">全部实验</h2>
+            <p class="catalog-count" id="catalog-count" aria-live="polite"></p>
+          </div>
+          <div class="catalog-filters" role="search">
+            <label class="search-field">
+              <span>搜索范式</span>
+              <input id="catalog-search" type="search" placeholder="名称、原理或关键词" autocomplete="off" />
+            </label>
+            <label>
+              <span>认知领域</span>
+              <select id="category-filter"><option value="">全部领域</option></select>
+            </label>
+            <label>
+              <span>任务类型</span>
+              <select id="task-filter"><option value="">全部类型</option></select>
+            </label>
+            <button class="filter-reset" id="clear-filters" type="button">清除筛选</button>
+          </div>
+        </header>
+
+        <div class="catalog-grid" id="catalog-results"></div>
+        <div class="catalog-empty" id="catalog-empty" hidden>
+          <span aria-hidden="true">∅</span>
+          <h3>没有找到匹配的范式</h3>
+          <p>换一个关键词，或清除筛选条件后再看看。</p>
+          <button class="button button-secondary" type="button" data-clear-filters>查看全部实验</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div><strong>知觉之间</strong><p>认知心理学实验范式教学平台 · 内部测试版</p></div>
+      <p>本平台结果仅供教学体验，不构成任何心理评估或诊断。</p>
+    </footer>
+  </body>
+</html>

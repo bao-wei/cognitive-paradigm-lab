@@ -31,11 +31,13 @@ jobs:
         run: |
           node tests/self-check.mjs
           node tests/importer-self-check.mjs
+          node tests/platform-self-check.mjs
+          node tests/change-pack-self-check.mjs
 
       - name: Prepare static site
         run: |
           mkdir _site
-          cp index.html app.js styles.css .nojekyll _site/
+          cp *.html *.js styles.css favicon.svg .nojekyll _site/
           cp -R paradigms _site/
 
       - name: Configure Pages

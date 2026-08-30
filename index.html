@@ -8,13 +8,12 @@
       content="面向认知心理学学习者的经典行为实验范式体验平台。"
     />
     <meta name="theme-color" content="#f4efe4" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <title>知觉之间｜认知心理学实验范式平台</title>
     <link rel="stylesheet" href="./styles.css" />
-    <script src="./paradigms/catalog.generated.js"></script>
-    <script src="./app.js" defer></script>
   </head>
   <body>
-    <a class="skip-link" href="#experiment-list">跳到实验目录</a>
+    <a class="skip-link" href="#featured-experiments">跳到精选实验</a>
 
     <header class="site-header">
       <a class="brand" href="#top" aria-label="知觉之间首页">
@@ -25,9 +24,9 @@
         </span>
       </a>
       <nav aria-label="主导航">
-        <a href="#experiment-list">实验目录</a>
+        <a href="./experiments.html">实验目录</a>
         <a href="#how-it-works">如何使用</a>
-        <a href="#about">关于平台</a>
+        <a href="#notice">使用须知</a>
       </nav>
     </header>
 
@@ -40,7 +39,7 @@
             不只阅读实验结论。选择一个范式、完成一次任务，再从自己的正确率与反应时中观察认知过程。
           </p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#experiment-list">选择一个实验</a>
+            <a class="button button-primary" href="./experiments.html">选择一个实验</a>
             <a class="text-link" href="#how-it-works">先了解使用方式 <span aria-hidden="true">↘</span></a>
           </div>
         </div>
@@ -62,7 +61,7 @@
         <span><i aria-hidden="true"></i> 支持键盘操作</span>
       </section>
 
-      <section class="experiments section-shell" id="experiment-list" aria-labelledby="experiments-title">
+      <section class="experiments section-shell" id="featured-experiments" aria-labelledby="experiments-title">
         <header class="section-heading">
           <div>
             <p class="eyebrow">EXPERIMENT INDEX · 01—03</p>
@@ -84,9 +83,7 @@
               <div><dt>按键</dt><dd>1 / 2 / 3 / 4</dd></div>
               <div><dt>正式试次</dt><dd>24</dd></div>
             </dl>
-            <button class="button button-card" type="button" data-experiment="stroop">
-              进入实验 <span aria-hidden="true">→</span>
-            </button>
+            <a class="button button-card" href="./paradigm.html?id=stroop">查看说明 <span aria-hidden="true">→</span></a>
           </article>
 
           <article class="experiment-card card-flanker">
@@ -99,9 +96,7 @@
               <div><dt>按键</dt><dd>F / J</dd></div>
               <div><dt>正式试次</dt><dd>24</dd></div>
             </dl>
-            <button class="button button-card" type="button" data-experiment="flanker">
-              进入实验 <span aria-hidden="true">→</span>
-            </button>
+            <a class="button button-card" href="./paradigm.html?id=flanker">查看说明 <span aria-hidden="true">→</span></a>
           </article>
 
           <article class="experiment-card card-gonogo">
@@ -114,22 +109,10 @@
               <div><dt>按键</dt><dd>空格键</dd></div>
               <div><dt>正式试次</dt><dd>28</dd></div>
             </dl>
-            <button class="button button-card" type="button" data-experiment="gonogo">
-              进入实验 <span aria-hidden="true">→</span>
-            </button>
+            <a class="button button-card" href="./paradigm.html?id=gonogo">查看说明 <span aria-hidden="true">→</span></a>
           </article>
         </div>
-
-        <section class="imported-catalog" id="imported-catalog" hidden aria-labelledby="imported-title">
-          <header class="imported-heading">
-            <div>
-              <p class="eyebrow">DROP-IN LIBRARY</p>
-              <h3 id="imported-title">扩展范式库</h3>
-            </div>
-            <p>从公开实验包自动识别。状态为“待审核”的程序尚未确认许可证、联网行为或数据导出能力。</p>
-          </header>
-          <div class="imported-grid" id="imported-grid"></div>
-        </section>
+        <div class="section-cta"><a class="text-link" href="./experiments.html">浏览全部实验范式 <span aria-hidden="true">→</span></a></div>
       </section>
 
       <section class="method section-shell" id="how-it-works" aria-labelledby="method-title">
@@ -158,14 +141,19 @@
         </ol>
       </section>
 
-      <section class="privacy-note section-shell" id="about">
-        <div>
-          <span class="privacy-icon" aria-hidden="true">◎</span>
-          <h2>你的数据，只停留在这一次。</h2>
+      <section class="usage-notice section-shell" id="notice" aria-labelledby="notice-title">
+        <header>
+          <p class="eyebrow">BEFORE YOU BEGIN</p>
+          <h2 id="notice-title">使用须知</h2>
+          <p>这是一个把经典范式带进课堂的学习空间，不是正式的数据采集系统。</p>
+        </header>
+        <div class="notice-grid">
+          <article><span>01</span><h3>只用于教学体验</h3><p>实验经过缩短，用于理解实验操作、因变量和经典效应。结果不能作为心理评估、能力判断或科研结论。</p></article>
+          <article><span>02</span><h3>不保存任何数据</h3><p>结果只存在于当前页面，不上传服务器，也不写入浏览器持久化存储。刷新或关闭页面后无法找回。</p></article>
+          <article><span>03</span><h3>离开前及时导出</h3><p>如果课堂讨论或练习需要保留数据，请在结果页下载 CSV，并确认文件已经保存到自己的设备。</p></article>
+          <article><span>04</span><h3>不要用于正式实验</h3><p>平台不提供被试管理、服务器留存、实验版本锁定或科研级数据保障，请勿用于正式研究和真实被试采集。</p></article>
         </div>
-        <p>
-          本平台不要求登录，不向服务器发送实验结果，也不使用浏览器持久化存储。关闭或刷新页面后，本次实验记录即被清除；如需保留，请在结果页导出 CSV。
-        </p>
+        <aside class="notice-callout"><strong>开始前建议</strong><p>使用电脑键盘、关闭输入法干扰，在安静环境中完成，并避免在实验过程中切换窗口。</p></aside>
       </section>
     </main>
 
@@ -177,82 +165,5 @@
       <p>本平台结果仅供教学体验，不构成任何心理评估或诊断。</p>
     </footer>
 
-    <dialog class="experiment-dialog" id="experiment-dialog" aria-labelledby="dialog-title">
-      <div class="dialog-shell">
-        <header class="dialog-header">
-          <a class="brand compact" href="#" tabindex="-1">
-            <span class="brand-mark" aria-hidden="true">知</span>
-            <span><strong>实验进行中</strong><small id="dialog-kicker">COGNITION LAB</small></span>
-          </a>
-          <div class="progress-wrap" id="progress-wrap" hidden>
-            <span id="progress-text">0 / 0</span>
-            <div class="progress-track" aria-hidden="true"><i id="progress-bar"></i></div>
-          </div>
-          <button class="icon-button" id="close-experiment" type="button" aria-label="退出实验">×</button>
-        </header>
-
-        <section class="dialog-content intro-screen" id="intro-screen">
-          <div class="intro-label" id="intro-number">实验 01</div>
-          <h2 id="dialog-title">Stroop 色词干扰</h2>
-          <p class="intro-question" id="intro-question"></p>
-          <div class="instruction-panel">
-            <div>
-              <p class="eyebrow">你的任务</p>
-              <p id="intro-instruction"></p>
-            </div>
-            <div class="key-guide" id="key-guide"></div>
-          </div>
-          <div class="intro-meta">
-            <span id="intro-trials"></span>
-            <span>先练习，后正式实验</span>
-            <span>请勿刷新页面</span>
-          </div>
-          <button class="button button-primary" id="start-practice" type="button">开始练习</button>
-        </section>
-
-        <section class="dialog-content task-screen" id="task-screen" hidden aria-live="polite">
-          <p class="phase-label" id="phase-label">练习</p>
-          <div class="stimulus-stage" id="stimulus-stage">
-            <div class="fixation" id="fixation" aria-hidden="true">+</div>
-            <div class="stimulus" id="stimulus" role="img" aria-label="实验刺激"></div>
-            <div class="feedback" id="feedback"></div>
-          </div>
-          <div class="task-key-guide" id="task-key-guide"></div>
-        </section>
-
-        <section class="dialog-content transition-screen" id="transition-screen" hidden>
-          <p class="eyebrow">PRACTICE COMPLETE</p>
-          <h2>练习完成，规则已经熟悉。</h2>
-          <p id="practice-summary"></p>
-          <button class="button button-primary" id="start-formal" type="button">进入正式实验</button>
-        </section>
-
-        <section class="dialog-content results-screen" id="results-screen" hidden>
-          <div class="result-heading">
-            <div>
-              <p class="eyebrow">YOUR RESULT</p>
-              <h2>这一次，你观察到了什么？</h2>
-            </div>
-            <p id="result-note"></p>
-          </div>
-          <div class="metric-grid">
-            <article><span>正确率</span><strong id="metric-accuracy">—</strong><small>全部正式试次</small></article>
-            <article><span>平均反应时</span><strong id="metric-rt">—</strong><small>仅统计正确反应</small></article>
-            <article><span id="metric-effect-label">条件差异</span><strong id="metric-effect">—</strong><small id="metric-effect-note">—</small></article>
-          </div>
-          <div class="result-explanation">
-            <h3>如何理解</h3>
-            <p id="result-explanation"></p>
-          </div>
-          <div class="result-actions">
-            <button class="button button-primary" id="export-csv" type="button">导出本次 CSV</button>
-            <button class="button button-secondary" id="retry-experiment" type="button">再做一次</button>
-          </div>
-          <p class="ephemeral-warning">退出本页后，本次结果将被清除。请先导出需要保留的数据。</p>
-        </section>
-      </div>
-    </dialog>
-
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </body>
 </html>

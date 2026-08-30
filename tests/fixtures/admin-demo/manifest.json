@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "admin-demo",
+  "name": "管理员上传演示",
+  "shortDescription": "用于验证管理员上传、预览和结果回传流程。",
+  "category": "基础反应",
+  "taskType": "选择反应",
+  "duration": "约 1 分钟",
+  "entry": "index.html",
+  "license": "内部测试",
+  "approved": true,
+  "allowNetwork": false,
+  "dataExport": "adapter",
+  "description": "description.md",
+  "result": {
+    "profile": "generic",
+    "fields": { "correct": "correct", "rt": "rt", "condition": "condition" },
+    "levels": []
+  }
+}

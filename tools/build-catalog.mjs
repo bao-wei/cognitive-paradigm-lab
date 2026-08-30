@@ -41,9 +41,10 @@ async function inspectPackage(packagesDir, folder) {
   const normalized = files.map(toPosix);
   const manifest = await readManifest(root);
   const entryFile = resolveEntry(manifest.entry, normalized);
+  const descriptionFile = resolveDescription(manifest.description, normalized);
   const sample = await collectTextSample(root, files);
   const name = cleanText(manifest.name) || extractHeading(sample) || humanize(folder);
-  const description = cleanText(manifest.description) || extractDescription(sample);
+  const description = cleanText(manifest.shortDescription) || cleanText(manifest.descriptionText) || extractDescription(sample);
   const platform = cleanText(manifest.platform) || detectPlatform(sample, normalized);
   const category = cleanText(manifest.category) || inferCategory(`${name}\n${description}\n${folder}`);
   const networkFlags = detectNetworkFlags(sample);
@@ -51,25 +52,37 @@ async function inspectPackage(packagesDir, folder) {
   const approved = manifest.approved === true;
   const networkApproved = manifest.allowNetwork === true;
   const dataExport = ["adapter", "self", "none"].includes(manifest.dataExport) ? manifest.dataExport : detectDataExport(sample);
+  const result = normalizeResult(manifest.result);
+  const hasCompletionBridge = /cognition-lab:complete/i.test(sample);
 
   const issues = [];
   if (!entryFile) issues.push("未找到 index.html 或 manifest 指定入口");
+  if (!descriptionFile) issues.push("缺少 description.md 范式说明");
   if (!license) issues.push("未识别许可证");
   if (networkFlags.dataConnection && !networkApproved) issues.push("检测到可能的数据联网代码，尚未明确允许");
   if (networkFlags.remoteAssets && !networkApproved) issues.push("依赖远程资源，尚未明确允许");
+  if (!hasCompletionBridge) issues.push("未检测到 cognition-lab:complete 结果桥接事件");
+  if (!result) issues.push("缺少可用的结果模板与字段映射");
   if (!approved) issues.push("尚未在 paradigm.json 中确认 approved");
 
   const networkClear = (!networkFlags.dataConnection && !networkFlags.remoteAssets) || networkApproved;
-  const status = !entryFile ? "blocked" : approved && Boolean(license) && networkClear ? "ready" : "review";
+  const complete = entryFile && descriptionFile && result && hasCompletionBridge;
+  const status = !entryFile ? "blocked" : approved && Boolean(license) && networkClear && complete ? "ready" : "review";
   return {
     id: folder,
     name,
-    description,
+    shortDescription: description,
     category,
+    taskType: cleanText(manifest.taskType) || platform,
+    duration: cleanText(manifest.duration) || "时长见说明",
+    metrics: normalizeList(manifest.metrics).length ? normalizeList(manifest.metrics) : metricsForResult(result),
+    tags: normalizeList(manifest.tags),
     platform,
     entry: entryFile ? `./paradigms/packages/${encodePath(folder)}/${encodePath(entryFile)}` : null,
+    descriptionPath: descriptionFile ? `./paradigms/packages/${encodePath(folder)}/${encodePath(descriptionFile)}` : null,
     status,
     dataExport,
+    result,
     license: license || null,
     source: cleanText(manifest.source) || null,
     issues,
@@ -77,11 +90,14 @@ async function inspectPackage(packagesDir, folder) {
 }
 
 async function readManifest(root) {
-  try {
-    return JSON.parse(await readFile(path.join(root, "paradigm.json"), "utf8"));
-  } catch {
-    return {};
+  for (const file of ["manifest.json", "paradigm.json"]) {
+    try {
+      return JSON.parse(await readFile(path.join(root, file), "utf8"));
+    } catch {
+      // Try the legacy filename before treating the package as unconfigured.
+    }
   }
+  return {};
 }
 
 function resolveEntry(configured, files) {
@@ -89,6 +105,35 @@ function resolveEntry(configured, files) {
   return candidates.find((candidate) => files.includes(candidate))
     || files.find((file) => /(^|\/)index\.html?$/i.test(file))
     || null;
+}
+
+function resolveDescription(configured, files) {
+  const candidates = [configured, "description.md"].filter(Boolean).map(toPosix);
+  return candidates.find((candidate) => files.includes(candidate)) || null;
+}
+
+function normalizeResult(value) {
+  if (!value || typeof value !== "object") return null;
+  const profile = ["generic", "difference", "dot-probe"].includes(value.profile) ? value.profile : null;
+  const fields = value.fields && typeof value.fields === "object" ? {
+    correct: cleanText(value.fields.correct),
+    rt: cleanText(value.fields.rt),
+    condition: cleanText(value.fields.condition),
+  } : {};
+  const levels = normalizeList(value.levels);
+  if (!profile || !fields.correct || !fields.rt) return null;
+  if (["difference", "dot-probe"].includes(profile) && (!fields.condition || levels.length !== 2)) return null;
+  return { profile, fields, levels };
+}
+
+function metricsForResult(result) {
+  if (!result) return [];
+  const third = result.profile === "dot-probe" ? "注意偏向分数" : result.profile === "difference" ? "条件差异" : "有效试次";
+  return ["正确率", "平均反应时", third];
+}
+
+function normalizeList(value) {
+  return Array.isArray(value) ? value.map(cleanText).filter(Boolean) : [];
 }
 
 async function collectTextSample(root, files) {

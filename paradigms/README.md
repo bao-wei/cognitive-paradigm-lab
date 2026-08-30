@@ -21,31 +21,50 @@ node tools/build-catalog.mjs
 
 第三方 JavaScript 与普通软件一样具有完整执行能力，可能上传实验数据、加载外部资源或修改页面。因此，新解压的包默认显示“待审核”，不会直接提供运行按钮。
 
-审核后，在实验包根目录添加 `paradigm.json`：
+审核后，在实验包根目录添加 `manifest.json` 和 `description.md`。推荐使用网站隐藏的 `admin.html` 工作台生成和校验变更包。
 
 ```json
 {
+  "schemaVersion": 1,
+  "id": "stroop-demo",
   "name": "Stroop 色词干扰",
-  "description": "判断字体颜色，忽略文字含义。",
+  "shortDescription": "判断字体颜色，忽略文字含义。",
   "category": "注意与执行控制",
+  "taskType": "选择反应",
+  "duration": "约 4 分钟",
   "platform": "PsychoJS",
   "entry": "index.html",
+  "description": "description.md",
   "license": "MIT",
   "source": "https://example.org/source-project",
   "approved": true,
   "allowNetwork": false,
-  "dataExport": "self"
+  "dataExport": "adapter",
+  "result": {
+    "profile": "difference",
+    "fields": {
+      "correct": "correct",
+      "rt": "rt",
+      "condition": "condition"
+    },
+    "levels": ["incongruent", "congruent"]
+  }
 }
 ```
 
-`dataExport` 可取：
+实验结束时必须发送统一完成事件：
 
-- `adapter`：已接入本平台的统一结果接口；
-- `self`：原实验自己提供文件下载；
-- `none`：尚未确认导出能力。
+```js
+window.parent.postMessage({
+  type: "cognition-lab:complete",
+  trials: trialRows
+}, "*");
+```
 
-`approved: true` 代表维护者已经检查该包，且必须同时填写或提供许可证。`allowNetwork: true` 仅用于已经确认远程资源和数据去向的程序；默认值为 `false`。扫描器不会替维护者作出法律或隐私判断。
+其中 `trialRows` 是逐试次对象数组，至少包含 `result.fields` 声明的正确、反应时和所需条件字段。平台不会根据字段名称猜测特有效应。
+
+`approved: true` 代表维护者已经完成文件检查、运行预览和人工试做，且必须同时填写或提供许可证。当前教学平台不接受联网实验，`allowNetwork` 应保持 `false`。扫描器不会替维护者作出法律、材料质量或心理学计分判断。
 
 ## Pavlovia 包注意事项
 
-PsychoJS 导出通常不只有一个 JavaScript 文件，还包含 `index.html`、条件表、图片/音频和指定版本的 `lib/psychojs-*.js`。必须保留原目录结构。原程序如果仍连接 Pavlovia，需要先改成本地数据导出，或在 `paradigm.json` 中保持未批准状态。
+PsychoJS 导出通常不只有一个 JavaScript 文件，还包含 `index.html`、条件表、图片/音频和指定版本的 `lib/psychojs-*.js`。必须保留原目录结构。原程序如果仍连接 Pavlovia，需要先移除服务器连接并添加平台完成事件；否则工作台不会允许导出。

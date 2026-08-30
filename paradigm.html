@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="了解认知心理学实验范式并开始教学体验。" />
+    <meta name="theme-color" content="#f4efe4" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>范式说明｜知觉之间</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./paradigms/catalog.generated.js"></script>
+    <script src="./platform.js"></script>
+    <script src="./app.js" defer></script>
+    <script src="./paradigm-page.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#paradigm-content">跳到范式说明</a>
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="返回知觉之间首页">
+        <span class="brand-mark" aria-hidden="true">知</span>
+        <span><strong>知觉之间</strong><small>COGNITION LAB</small></span>
+      </a>
+      <nav aria-label="主导航">
+        <a href="./experiments.html">实验目录</a>
+        <a href="./index.html#how-it-works">如何使用</a>
+        <a href="./index.html#notice">使用须知</a>
+      </nav>
+    </header>
+
+    <main id="paradigm-content">
+      <section class="paradigm-hero section-shell" id="paradigm-hero" hidden>
+        <a class="back-link" href="./experiments.html">← 返回实验目录</a>
+        <div class="paradigm-title-grid">
+          <div>
+            <p class="eyebrow" id="paradigm-domain"></p>
+            <h1 id="paradigm-title"></h1>
+            <p class="paradigm-lead" id="paradigm-lead"></p>
+            <div class="paradigm-actions">
+              <button class="button button-primary" id="start-experiment-top" type="button">开始实验</button>
+              <span id="paradigm-duration"></span>
+            </div>
+          </div>
+          <aside class="paradigm-facts" aria-label="范式概要">
+            <p><span>任务类型</span><strong id="paradigm-task"></strong></p>
+            <div><span>主要指标</span><ul id="paradigm-metrics"></ul></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="paradigm-reading section-shell" id="paradigm-reading" hidden>
+        <div class="reading-rail"><span>PARADIGM NOTE</span><i></i></div>
+        <article class="markdown-body" id="markdown-body"></article>
+        <div class="reading-action">
+          <p>已经了解任务了吗？你也可以稍后再回来阅读。</p>
+          <button class="button button-primary" id="start-experiment-bottom" type="button">开始实验</button>
+        </div>
+      </section>
+
+      <section class="page-state section-shell" id="paradigm-loading">
+        <p class="eyebrow">LOADING NOTE</p><h1>正在准备范式说明…</h1>
+      </section>
+      <section class="page-state section-shell" id="paradigm-error" hidden>
+        <p class="eyebrow">NOT FOUND</p><h1>没有找到这个范式</h1>
+        <p id="paradigm-error-message">它可能尚未发布，或链接已经失效。</p>
+        <a class="button button-secondary" href="./experiments.html">返回实验目录</a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div><strong>知觉之间</strong><p>认知心理学实验范式教学平台 · 内部测试版</p></div>
+      <p>本平台不保存实验数据，请在退出前导出需要的结果。</p>
+    </footer>
+    <div id="experiment-shell"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

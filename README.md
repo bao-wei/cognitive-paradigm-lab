@@ -34,14 +34,21 @@ node tests/importer-self-check.mjs
 
 该检查覆盖三个范式的正式试次数量与条件平衡、正确反应时筛选以及 CSV 字段转义。
 
-## 添加下载的实验包
+## 管理范式库
 
-1. 将完整实验文件夹复制到 `paradigms/packages/`，不要打散目录结构。
-2. 运行 `node tools/build-catalog.mjs`；本地目录会立即更新。
-3. 检查自动识别的入口、类别、平台、联网风险和许可证状态。
-4. 审核完成后，在实验包根目录添加 `paradigm.json` 并设置 `approved: true`。
+普通学习页面不提供范式维护入口。教材编写人员可以访问隐藏的 `admin.html` 工作台，在浏览器本地完成 ZIP/文件夹读取、Markdown 说明预览、资源检查、完整试做和变更包导出。
 
-详细字段和 Pavlovia 注意事项见 [`paradigms/README.md`](./paradigms/README.md)。推送到 `main` 后，GitHub Actions 会自动重新扫描、执行自检并发布 Pages。
+管理员初始防误入密码为 `cognition-admin-2026`。这是静态页面的便捷门槛，不是真正的服务器端身份认证；需要修改时请同时更换 `admin.js` 中的 SHA-256 摘要。
+
+导出的变更包需要先解压，再运行：
+
+```powershell
+node tools/apply-changes.mjs <变更包目录>
+node tools/apply-changes.mjs <变更包目录> --apply
+node tools/build-catalog.mjs
+```
+
+第一条命令只预演，第二条才应用。替换和删除的旧目录会先移动到 `.changes-backup/`，便于恢复。详细字段、实验完成事件和 Pavlovia 注意事项见 [`paradigms/README.md`](./paradigms/README.md)。推送到 `main` 后，GitHub Actions 会自动重新扫描、执行自检并发布 Pages。
 
 ## 发布到 GitHub Pages
 

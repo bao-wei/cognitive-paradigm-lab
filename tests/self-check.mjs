@@ -11,12 +11,8 @@ const stubElement = () => ({
   replaceChildren(...children) { this.children = children; },
 });
 
-const importedSection = stubElement();
-const importedGrid = stubElement();
 const documentStub = {
   querySelector(selector) {
-    if (selector === "#imported-catalog") return importedSection;
-    if (selector === "#imported-grid") return importedGrid;
     return stubElement();
   },
   querySelectorAll: () => [],
@@ -38,9 +34,9 @@ const context = vm.createContext({
 });
 
 const source = await readFile(new URL("../app.js", import.meta.url), "utf8");
-vm.runInContext(`${source}\n;globalThis.__core = { EXPERIMENTS, meanRT, csvCell, renderImportedParadigms };`, context);
+vm.runInContext(`${source}\n;globalThis.__core = { EXPERIMENTS, meanRT, csvCell };`, context);
 
-const { EXPERIMENTS, meanRT, csvCell, renderImportedParadigms } = context.__core;
+const { EXPERIMENTS, meanRT, csvCell } = context.__core;
 
 const stroop = EXPERIMENTS.stroop.buildTrials(24);
 assert.equal(stroop.length, 24);
@@ -69,20 +65,9 @@ assert.equal(meanRT([
 ]), 500);
 assert.equal(meanRT([{ correct: false, rt: 300 }]), null);
 assert.equal(csvCell('a,"b"'), '"a,""b"""');
-assert.equal(importedSection.hidden, false);
-assert.match(importedGrid.innerHTML, /扩展目录已就绪/);
+const home = await readFile(new URL("../index.html", import.meta.url), "utf8");
+assert.doesNotMatch(home, /扩展范式库|DROP-IN LIBRARY/);
+assert.match(home, /experiments\.html/);
+assert.match(home, /只用于教学体验/);
 
-renderImportedParadigms([{
-  id: "simple-reaction",
-  name: "Simple Reaction Time",
-  description: "A self-contained task.",
-  category: "基础反应",
-  platform: "HTML / JavaScript",
-  entry: "./paradigms/packages/simple-reaction/index.html",
-  status: "ready",
-  dataExport: "self",
-}]);
-assert.equal(importedGrid.children.length, 1);
-assert.match(importedGrid.children[0].innerHTML, /打开实验/);
-
-console.log("self-check passed: trial balance, RT filtering, and CSV escaping");
+console.log("self-check passed: trial balance, RT filtering, CSV escaping, and learner-only homepage");
