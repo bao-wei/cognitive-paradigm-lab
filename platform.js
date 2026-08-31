@@ -200,6 +200,16 @@
     return { profile: levels.length === 2 ? "difference" : "generic", fields: { correct, rt, condition }, levels };
   }
 
+  function reconcileResultFields(rows, configured = {}) {
+    const available = [...new Set((Array.isArray(rows) ? rows : []).flatMap((row) => row && typeof row === "object" ? Object.keys(row) : []))];
+    const exact = (field) => available.includes(field) ? field : "";
+    const correct = exact(configured.correct) || available.find((field) => /(?:^|[._])corr(?:ect)?$/i.test(field)) || configured.correct || "correct";
+    const pairedRt = correct.replace(/(?:corr|correct)$/i, "rt");
+    const rt = exact(configured.rt) || exact(pairedRt) || available.find((field) => /(?:^|[._])rt$/i.test(field)) || configured.rt || "rt";
+    const condition = exact(configured.condition) || available.find((field) => /condition|trial.?type|congruen/i.test(field)) || configured.condition || "condition";
+    return { ...configured, correct, rt, condition };
+  }
+
   function inferPsychoJsMetadata({ name = "", readme = "", sample = "", result = {} } = {}) {
     const context = `${name}\n${readme}\n${sample.slice(0, 200000)}`;
     const changeTask = /change detection|change locali[sz]ation/i.test(context);
@@ -258,6 +268,7 @@
     escapeHtml,
     renderMarkdown,
     inferPsychoJsResult,
+    reconcileResultFields,
     inferPsychoJsMetadata,
     summarizeBartRows,
     safeUrl,

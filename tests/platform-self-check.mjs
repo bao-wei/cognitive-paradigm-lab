@@ -32,6 +32,11 @@ assert.deepEqual(JSON.parse(JSON.stringify(inferred)), {
   fields: { correct: "key_resp.corr", rt: "key_resp.rt", condition: "condition_label" },
   levels: ["same", "different"],
 });
+const reconciled = platform.reconcileResultFields([
+  { "key_resp.corr": 1, "key_resp.rt": 0.42, "localisation_resp.rt": 0.81, condition_label: "same" },
+], { correct: "key_resp.corr", rt: "rt", condition: "condition_label" });
+assert.equal(reconciled.rt, "key_resp.rt");
+assert.equal(reconciled.correct, "key_resp.corr");
 const metadata = platform.inferPsychoJsMetadata({
   name: "Change Detection and Change Localisation task",
   readme: "A visual working memory change detection task. Zhao et al. (2023). https://doi.org/10.3758/example",

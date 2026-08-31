@@ -464,7 +464,16 @@
     }
     if (event.data.type !== "cognition-lab:complete") return;
     const rows = Array.isArray(event.data.trials) ? event.data.trials : Array.isArray(event.data.results) ? event.data.results : [];
-    const manifest = collectManifest();
+    let manifest = collectManifest();
+    const reconciled = platform.reconcileResultFields(rows, manifest.result.fields);
+    const corrected = [];
+    for (const [key, element] of [["correct", elements.fieldCorrect], ["rt", elements.fieldRt], ["condition", elements.fieldCondition]]) {
+      if (reconciled[key] !== manifest.result.fields[key]) {
+        corrected.push(`${manifest.result.fields[key] || key} → ${reconciled[key]}`);
+        element.value = reconciled[key];
+      }
+    }
+    if (corrected.length) manifest = collectManifest();
     const required = manifest.result.profile === "bart"
       ? [manifest.result.fields.pumps, manifest.result.fields.popped, manifest.result.fields.earnings].filter(Boolean)
       : [manifest.result.fields.correct, manifest.result.fields.rt].filter(Boolean);
@@ -475,7 +484,7 @@
     } else {
       state.runtimePassed = true;
       state.runtimeRows = rows;
-      elements.runtimeStatus.textContent = `检查通过：收到 ${rows.length} 条试次数据，可以生成平台结果页。`;
+      elements.runtimeStatus.textContent = `检查通过：收到 ${rows.length} 条试次数据${corrected.length ? `；已自动修正字段 ${corrected.join("、")}` : ""}。`;
     }
     validatePackage();
   }
