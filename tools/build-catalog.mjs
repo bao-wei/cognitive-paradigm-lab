@@ -143,7 +143,7 @@ function normalizeList(value) {
 }
 
 async function collectTextSample(root, files) {
-  const ranked = [...files].sort((a, b) => priority(a) - priority(b)).slice(0, 24);
+  const ranked = files.filter((file) => !/^(?:lib|vendor)[\\/]/i.test(file)).sort((a, b) => priority(a) - priority(b)).slice(0, 24);
   const chunks = [];
   for (const file of ranked) {
     if (!TEXT_EXTENSIONS.has(path.extname(file).toLowerCase())) continue;
@@ -202,7 +202,7 @@ function inferCategory(value) {
 function detectNetworkFlags(sample) {
   return {
     remoteAssets: /(?:src|href|import\s+[^;]*?from)\s*[=(]?\s*["']https?:\/\//i.test(sample),
-    dataConnection: /fetch\s*\(|XMLHttpRequest|sendBeacon|WebSocket|pavlovia\.org|ServerManager|\.upload\s*\(/i.test(sample),
+    dataConnection: /fetch\s*\(|XMLHttpRequest|sendBeacon|WebSocket|ServerManager|\.upload\s*\(/i.test(sample),
   };
 }
 

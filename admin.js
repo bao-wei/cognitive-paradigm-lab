@@ -8,9 +8,18 @@
   const platform = window.CognitionPlatform;
   const archive = window.CognitionArchive;
   const published = platform.getParadigms({ includeReview: true });
+  const launchParams = new URLSearchParams(window.location.hash.slice(1));
+  const assistantToken = launchParams.get("token") || "";
+  const linkedSource = launchParams.get("source") || "";
+  const linkedSourceName = launchParams.get("name") || "pavlovia-source";
+  const linkedSourceOrigin = launchParams.get("origin") || "";
+  let linkedSourceLoaded = false;
   const state = {
     files: new Map(),
     packageName: "",
+    baseManifest: {},
+    editingPublished: false,
+    originalTechnical: "",
     runtimePassed: false,
     runtimeRows: [],
     objectUrls: [],
@@ -70,6 +79,7 @@
   function showWorkspace() {
     elements.adminLogin.hidden = true;
     elements.adminWorkspace.hidden = false;
+    loadLinkedSource();
   }
 
   function logout() {
@@ -126,7 +136,7 @@
     }
   }
 
-  async function acceptFiles(rawFiles, packageName, ignored = { count: 0, bytes: 0 }) {
+  async function acceptFiles(rawFiles, packageName, ignored = { count: 0, bytes: 0 }, { lockedId = "" } = {}) {
     closePreview();
     state.files = stripCommonRoot(rawFiles);
     state.packageName = packageName;
@@ -134,31 +144,41 @@
     state.runtimeRows = [];
     elements.manualConfirmation.checked = false;
     const manifest = readJson("manifest.json") || readJson("paradigm.json") || {};
-    const isBartTask = /addData\s*\(\s*["']nPumps["']/i.test(collectTextSample()) && /addData\s*\(\s*["']popped["']/i.test(collectTextSample());
-    const idGuess = slug(manifest.id || packageName);
+    state.baseManifest = manifest;
+    const sample = collectTextSample();
+    const readme = readText(findReadme());
+    const isBartTask = /addData\s*\(\s*["']nPumps["']/i.test(sample) && /addData\s*\(\s*["']popped["']/i.test(sample);
+    const inferred = platform.inferPsychoJsResult(sample, collectCsvSamples());
+    const inferredName = readmeTitle() || cleanImportedTitle(titleFromEntry()) || packageName;
+    const automatic = platform.inferPsychoJsMetadata({ name: inferredName, readme, sample, result: inferred });
+    const idGuess = lockedId || slug(manifest.id || packageName);
     setValue("field-id", idGuess);
-    setValue("field-name", manifest.name || manifest.title || titleFromEntry() || packageName);
-    setValue("field-category", manifest.category || "");
-    setValue("field-task", manifest.taskType || manifest.platform || "行为任务");
-    setValue("field-duration", manifest.duration || "");
+    elements.fieldId.readOnly = Boolean(lockedId);
+    setValue("field-name", manifest.name || manifest.title || automatic.name);
+    setValue("field-category", manifest.category || automatic.category);
+    setValue("field-task", manifest.taskType || manifest.platform || automatic.taskType);
+    setValue("field-duration", manifest.duration || automatic.duration);
     setValue("field-entry", manifest.entry || findEntry());
-    setValue("field-license", manifest.license || (hasLicense() ? "见包内 LICENSE 文件" : ""));
-    setValue("field-profile", manifest.result?.profile || manifest.resultProfile || (isBartTask ? "bart" : "generic"));
-    setValue("field-correct", manifest.result?.fields?.correct || "correct");
-    setValue("field-rt", manifest.result?.fields?.rt || "rt");
-    setValue("field-condition", manifest.result?.fields?.condition || "condition");
+    setValue("field-license", manifest.license || (hasLicense() ? "见包内 LICENSE 文件" : automatic.license));
+    setValue("field-profile", manifest.result?.profile || manifest.resultProfile || (isBartTask ? "bart" : inferred.profile));
+    setValue("field-correct", manifest.result?.fields?.correct || inferred.fields.correct);
+    setValue("field-rt", manifest.result?.fields?.rt || inferred.fields.rt);
+    setValue("field-condition", manifest.result?.fields?.condition || inferred.fields.condition);
     setValue("field-pumps", manifest.result?.fields?.pumps || "nPumps");
     setValue("field-popped", manifest.result?.fields?.popped || "popped");
     setValue("field-earnings", manifest.result?.fields?.earnings || "earnings");
-    setValue("field-levels", (manifest.result?.levels || []).join(", "));
-    setValue("field-summary", manifest.shortDescription || manifest.description || "");
+    setValue("field-levels", (manifest.result?.levels || inferred.levels).join(", "));
+    setValue("field-summary", manifest.shortDescription || automatic.summary);
     setValue("field-source", manifest.source || "");
-    elements.descriptionEditor.value = readText("description.md") || readText("README.md") || "";
+    elements.descriptionEditor.value = readText("description.md") || automatic.description;
+    state.editingPublished = Boolean(lockedId);
+    state.originalTechnical = lockedId ? technicalFingerprint(collectManifest()) : "";
     elements.fileSummary.textContent = `${state.files.size} 个文件 · ${formatBytes(totalSize(state.files))}${ignored.count ? ` · 已忽略 ${ignored.count} 个历史数据或无关文件` : ""}`;
     elements.metadataPanel.hidden = false;
     elements.descriptionPanel.hidden = false;
     elements.validationPanel.hidden = false;
-    setPackageStatus(`已读取 ${packageName}${ignored.count ? `，已忽略 ${ignored.count} 个历史数据或无关文件` : ""}`, "success");
+    elements.stagePackage.textContent = lockedId ? "加入待替换清单" : "加入待导出清单";
+    setPackageStatus(`已读取并自动预填 ${packageName}${ignored.count ? `，已忽略 ${ignored.count} 个历史数据或无关文件` : ""}；请审核后试做`, "success");
     renderDescription();
     validatePackage();
   }
@@ -166,7 +186,12 @@
   function resetPackage() {
     closePreview();
     state.files = new Map();
+    state.baseManifest = {};
+    state.editingPublished = false;
+    state.originalTechnical = "";
     state.runtimePassed = false;
+    elements.fieldId.readOnly = false;
+    elements.stagePackage.textContent = "加入待导出清单";
     elements.metadataPanel.hidden = true;
     elements.descriptionPanel.hidden = true;
     elements.validationPanel.hidden = true;
@@ -210,8 +235,12 @@
       ? "说明内容过短，请完整介绍原理、流程、指标与结果含义"
       : absent.length ? `还需要包含：${absent.join("、")}` : "说明结构完整且可以安全渲染");
 
+    const metadataOnly = state.editingPublished && technicalFingerprint(manifest) === state.originalTechnical;
+    if (metadataOnly) {
+      add("pass", "已发布程序复用", "入口文件与结果配置没有改变，本次只更新说明或目录信息");
+    } else {
     const textSample = collectTextSample();
-    const network = /fetch\s*\(|XMLHttpRequest|sendBeacon|WebSocket|pavlovia\.org|ServerManager|\.upload\s*\(/i.test(textSample);
+    const network = /fetch\s*\(|XMLHttpRequest|sendBeacon|WebSocket|ServerManager|\.upload\s*\(/i.test(textSample);
     const remoteAssets = /(?:src|href)\s*=\s*["']https?:\/\//i.test(textSample);
     add(!network && !remoteAssets ? "pass" : "fail", "数据与网络边界", network
       ? "检测到联网或数据上传代码；请移除 Pavlovia/服务器连接后再导出"
@@ -254,13 +283,33 @@
     add(elements.manualConfirmation.checked ? "pass" : "warn", "管理员人工确认", elements.manualConfirmation.checked
       ? "已确认实验流程、材料与结果解释"
       : "完整试做后请勾选人工确认");
+    }
 
     state.checks = checks;
     renderValidationSummary(checks);
     elements.validationList.replaceChildren(...checks.map(renderCheck));
     const hasFailure = checks.some((check) => check.level === "fail");
-    elements.stagePackage.disabled = hasFailure || !state.runtimePassed || !elements.manualConfirmation.checked;
+    elements.stagePackage.disabled = hasFailure || (!metadataOnly && (!state.runtimePassed || !elements.manualConfirmation.checked));
     return !elements.stagePackage.disabled;
+  }
+
+  async function loadLinkedSource() {
+    if (!linkedSource || linkedSourceLoaded) return;
+    linkedSourceLoaded = true;
+    setPackageStatus("正在自动载入 Pavlovia 源码…", "working");
+    try {
+      const response = await fetch(linkedSource);
+      if (!response.ok) throw new Error((await response.json().catch(() => null))?.error || `源码读取失败（HTTP ${response.status}）`);
+      const { files, ignored } = await archive.readZip(await response.blob());
+      await acceptFiles(files, linkedSourceName, ignored);
+      if (linkedSourceOrigin && !elements.fieldSource.value) elements.fieldSource.value = linkedSourceOrigin;
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}${assistantToken ? `#token=${encodeURIComponent(assistantToken)}` : ""}`);
+      elements.metadataPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast("Pavlovia 源码已自动载入，请核对识别结果");
+    } catch (error) {
+      resetPackage();
+      setPackageStatus(error.message, "error");
+    }
   }
 
   function renderValidationSummary(checks) {
@@ -270,6 +319,7 @@
     const basicFailure = failures.find((check) => check.title === "基本信息");
     const descriptionFailure = failures.find((check) => check.title === "范式说明");
     const technicalFailures = failures.filter((check) => !["基本信息", "范式说明"].includes(check.title));
+    const reusingPublished = checks.some((check) => check.title === "已发布程序复用");
     const actions = [];
 
     if (basicFailure) actions.push({ title: "补全范式信息", detail: basicFailure.detail, target: "metadata-panel" });
@@ -278,8 +328,8 @@
       title: "实验程序需要技术适配",
       detail: `系统发现 ${technicalFailures.length} 类程序问题，例如运行依赖、核心指标或结果页接口。上传者无需逐项填写，可展开技术详情交由平台维护人员处理。`,
     });
-    if (!failures.length && !state.runtimePassed) actions.push({ title: "进行一次完整试做", detail: "打开实验预览并完成任务，系统会自动确认结果是否成功返回。", target: "open-preview" });
-    if (!failures.length && state.runtimePassed && !elements.manualConfirmation.checked) actions.push({ title: "确认试做结果", detail: "确认材料、流程和结果解释无误后，勾选下方人工确认。", target: "manual-confirmation" });
+    if (!reusingPublished && !failures.length && !state.runtimePassed) actions.push({ title: "进行一次完整试做", detail: "打开实验预览并完成任务，系统会自动确认结果是否成功返回。", target: "open-preview" });
+    if (!reusingPublished && !failures.length && state.runtimePassed && !elements.manualConfirmation.checked) actions.push({ title: "确认试做结果", detail: "确认材料、流程和结果解释无误后，勾选下方人工确认。", target: "manual-confirmation" });
 
     const status = failures.length ? "需要处理" : warnings.length ? "等待试做" : "可以加入";
     const title = failures.length ? "这个范式还不能直接加入" : warnings.length ? "文件检查完成，下一步进行试做" : "检查完成，可以加入范式库";
@@ -322,6 +372,7 @@
   function collectManifest() {
     const profile = elements.fieldProfile.value;
     return {
+      ...state.baseManifest,
       schemaVersion: 1,
       id: elements.fieldId.value.trim(),
       name: elements.fieldName.value.trim(),
@@ -333,8 +384,8 @@
       license: elements.fieldLicense.value.trim(),
       source: elements.fieldSource.value.trim() || null,
       approved: true,
-      allowNetwork: false,
-      dataExport: "adapter",
+      allowNetwork: state.baseManifest.allowNetwork === true,
+      dataExport: state.baseManifest.dataExport || "adapter",
       description: "description.md",
       result: {
         profile,
@@ -351,7 +402,7 @@
     };
   }
 
-  function openPreview() {
+  async function openPreview() {
     const entry = elements.fieldEntry.value.trim().replace(/^\.\//, "");
     if (!state.files.has(entry)) {
       showToast("入口文件不存在，无法预览");
@@ -360,15 +411,35 @@
     closePreview();
     state.runtimePassed = false;
     state.runtimeRows = [];
-    const html = readText(entry);
-    const rewritten = rewriteEntryForPreview(html, entry);
     elements.experimentPreview.hidden = false;
-    const previewUrl = URL.createObjectURL(new Blob([rewritten], { type: "text/html" }));
-    state.objectUrls.push(previewUrl);
-    elements.previewFrame.src = previewUrl;
-    elements.runtimeStatus.textContent = "实验已启动；请完成全部流程，等待结果回传。";
-    validatePackage();
     elements.experimentPreview.scrollIntoView({ behavior: "smooth", block: "start" });
+    elements.runtimeStatus.textContent = "正在准备本地实验文件…";
+    elements.openPreview.disabled = true;
+    try {
+      if (assistantToken) {
+        const zip = archive.createZip(state.files);
+        const response = await fetch("/api/preview", {
+          method: "POST",
+          headers: { "content-type": "application/zip", "x-entry": entry, "x-assistant-token": assistantToken },
+          body: zip,
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || `预览准备失败（HTTP ${response.status}）`);
+        elements.previewFrame.src = result.url;
+      } else {
+        const rewritten = rewriteEntryForPreview(readText(entry), entry);
+        const previewUrl = URL.createObjectURL(new Blob([rewritten], { type: "text/html" }));
+        state.objectUrls.push(previewUrl);
+        elements.previewFrame.src = previewUrl;
+      }
+      elements.runtimeStatus.textContent = "实验已启动；请完成全部流程，等待结果回传。";
+      validatePackage();
+    } catch (error) {
+      elements.runtimeStatus.textContent = `预览启动失败：${error.message}`;
+      showToast(error.message);
+    } finally {
+      elements.openPreview.disabled = false;
+    }
   }
 
   function rewriteEntryForPreview(html, entry) {
@@ -438,6 +509,16 @@
       const isCore = item.mode === "builtin";
       const deleting = state.deletions.has(item.id);
       row.innerHTML = `<div><strong>${platform.escapeHtml(item.name)}</strong><span>${platform.escapeHtml(item.category)} · ${platform.escapeHtml(item.id)}</span></div>`;
+      const actions = document.createElement("div");
+      actions.className = "library-actions";
+      if (!isCore) {
+        const edit = document.createElement("button");
+        edit.className = "text-button";
+        edit.type = "button";
+        edit.textContent = "编辑";
+        edit.addEventListener("click", () => editPublished(item));
+        actions.append(edit);
+      }
       const button = document.createElement("button");
       button.className = "text-button";
       button.type = "button";
@@ -445,9 +526,36 @@
       button.textContent = isCore ? "核心范式" : deleting ? "撤销删除" : "标记删除";
       if (deleting) row.classList.add("pending-delete");
       button.addEventListener("click", () => toggleDelete(item.id));
-      row.append(button);
+      actions.append(button);
+      row.append(actions);
       return row;
     }));
+  }
+
+  function technicalFingerprint(manifest) {
+    return JSON.stringify({ entry: manifest.entry, result: manifest.result });
+  }
+
+  async function editPublished(item) {
+    if (!assistantToken) {
+      showToast("请从本地导入发布助手打开工作台后再编辑现有范式");
+      return;
+    }
+    setPackageStatus(`正在载入 ${item.name}…`, "working");
+    try {
+      const response = await fetch(`/api/package-download?id=${encodeURIComponent(item.id)}&token=${encodeURIComponent(assistantToken)}`);
+      if (!response.ok) throw new Error((await response.json().catch(() => null))?.error || `范式读取失败（HTTP ${response.status}）`);
+      const { files, ignored } = await archive.readZip(await response.blob());
+      await acceptFiles(files, item.id, ignored, { lockedId: item.id });
+      state.deletions.delete(item.id);
+      renderLibrary();
+      renderChanges();
+      elements.metadataPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast("现有范式已载入；修改后将作为替换操作导出");
+    } catch (error) {
+      resetPackage();
+      setPackageStatus(error.message, "error");
+    }
   }
 
   function toggleDelete(id) {
@@ -521,10 +629,17 @@
 
   function collectTextSample() {
     return [...state.files]
-      .filter(([path, bytes]) => /\.(?:html?|js|mjs|json|md|txt)$/i.test(path) && bytes.byteLength <= 1024 * 1024)
+      .filter(([path, bytes]) => !/^(?:lib|vendor)\//i.test(path) && /\.(?:html?|js|mjs|json|md|txt)$/i.test(path) && bytes.byteLength <= 1024 * 1024)
       .slice(0, 60)
       .map(([, bytes]) => decoder.decode(bytes))
       .join("\n");
+  }
+
+  function collectCsvSamples() {
+    return [...state.files]
+      .filter(([path, bytes]) => /\.csv$/i.test(path) && bytes.byteLength <= 1024 * 1024)
+      .slice(0, 20)
+      .map(([, bytes]) => decoder.decode(bytes));
   }
 
   function findEntry() {
@@ -534,6 +649,18 @@
 
   function titleFromEntry() {
     return readText(findEntry()).match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() || "";
+  }
+
+  function findReadme() {
+    return [...state.files.keys()].find((path) => /(^|\/)readme\.md$/i.test(path)) || "";
+  }
+
+  function readmeTitle() {
+    return readText(findReadme()).split(/\r?\n/).map((line) => line.replace(/^#+\s*/, "").trim()).find((line) => line && !/^[-=]+$/.test(line)) || "";
+  }
+
+  function cleanImportedTitle(value) {
+    return String(value || "").replace(/\s*\[PsychoPy\]\s*/i, "").replaceAll(/[_-]+/g, " ").trim();
   }
 
   function hasLicense() {

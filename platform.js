@@ -177,6 +177,74 @@
     };
   }
 
+  function inferPsychoJsResult(sample, csvTexts = []) {
+    const fields = [...new Set([...String(sample || "").matchAll(/\.addData\s*\(\s*["']([^"']+)["']/g)].map((match) => match[1]))];
+    const correct = fields.find((field) => /(?:^|[._])corr(?:ect)?$/i.test(field)) || "correct";
+    const pairedRt = correct.replace(/(?:corr|correct)$/i, "rt");
+    const rt = fields.includes(pairedRt) ? pairedRt : fields.find((field) => /(?:^|[._])rt$/i.test(field)) || "rt";
+    let condition = "condition";
+    let levels = [];
+    for (const csv of csvTexts) {
+      const lines = String(csv || "").replaceAll("\r\n", "\n").split("\n").filter(Boolean);
+      if (lines.length < 2) continue;
+      const headers = parseCsvRow(lines[0]);
+      const index = headers.findIndex((header) => /condition|trial.?type|congruen/i.test(header));
+      if (index < 0) continue;
+      const values = [...new Set(lines.slice(1, 301).map((line) => parseCsvRow(line)[index]?.trim()).filter(Boolean))];
+      if (values.length >= 2 && values.length <= 12) {
+        condition = headers[index].trim();
+        levels = values;
+        break;
+      }
+    }
+    return { profile: levels.length === 2 ? "difference" : "generic", fields: { correct, rt, condition }, levels };
+  }
+
+  function inferPsychoJsMetadata({ name = "", readme = "", sample = "", result = {} } = {}) {
+    const context = `${name}\n${readme}\n${sample.slice(0, 200000)}`;
+    const changeTask = /change detection|change locali[sz]ation/i.test(context);
+    const category = changeTask ? "工作记忆"
+      : /attention|stroop|flanker|inhibition/i.test(context) ? "注意与执行控制"
+        : /decision|risk|reward/i.test(context) ? "决策与奖赏" : "认知心理学实验";
+    const taskType = changeTask ? "变化检测与定位" : "行为任务";
+    const duration = changeTask ? "约 10 分钟" : "约 5–10 分钟";
+    const license = /\bMIT\b/i.test(readme) ? "MIT"
+      : /Apache(?: License)?(?:,? Version)? 2\.0|Apache-2\.0/i.test(readme) ? "Apache-2.0"
+        : "来源仓库未声明；发布前请核对授权";
+    const cleanName = String(name || taskType).replace(/\s*\[PsychoPy\]\s*/i, "").trim();
+    const correct = result.fields?.correct || "correct";
+    const rt = result.fields?.rt || "rt";
+    const condition = result.fields?.condition || "condition";
+    const reference = String(readme).split(/\r?\n/).find((line) => /doi\.org|\(20\d{2}\)/i.test(line))?.trim() || "请以来源仓库 README 与原始论文为准。";
+    if (changeTask) {
+      return {
+        name: "变化检测与变化定位任务", category, taskType, duration, license,
+        summary: "通过变化检测与变化定位任务测量视觉工作记忆表现，比较相同与变化条件下的正确率和反应时。",
+        description: `# 学习目标\n\n理解变化检测和变化定位范式如何测量视觉工作记忆，并能够解释正确率、反应时及条件差异。\n\n# 实验原理\n\n视觉工作记忆容量有限。被试短暂记忆一组彩色方块，随后判断指定位置的颜色是否改变，或指出发生变化的位置。表现越准确，通常说明对视觉信息的保持与比较越稳定。\n\n# 任务流程\n\n1. 观察并记忆屏幕上的 6 个彩色方块。\n2. 在变化检测阶段，判断指定位置的颜色与记忆画面相同还是不同，并按 Y 或 N。\n3. 在变化定位阶段，比较前后两组方块，并按 1–6 指出颜色发生变化的位置。\n4. 程序记录每次反应的正确性、按键和反应时。\n\n# 核心指标\n\n- **变化检测正确率**：字段 \`${correct}\`，数值越高表示判断越准确。\n- **变化检测反应时**：字段 \`${rt}\`，在保证准确的前提下越短表示反应越快。\n- **变化定位正确率**：字段 \`localisation_resp.corr\`，反映识别变化位置的能力。\n- **实验条件**：字段 \`${condition}\`，用于比较相同与变化试次。\n\n# 结果解读\n\n应同时查看正确率和反应时，避免把单纯的快速反应解释为更好的表现。相同与变化条件之间的差异可反映任务难度或判断偏向；变化定位正确率可作为视觉工作记忆表现的补充指标。\n\n# 注意事项\n\n请在安静环境中使用键盘完成任务，保持注视屏幕中央，并在发布前完整试做一次，确认材料、按键和结果回传均正常。\n\n# 来源与参考\n\n${reference}`,
+      };
+    }
+    return {
+      name: cleanName, category, taskType, duration, license,
+      summary: `${cleanName}用于演示${category}中的${taskType}，记录正确率与反应时。`,
+      description: `# 学习目标\n\n理解${cleanName}的基本流程，并能够根据正确率和反应时解释任务表现。\n\n# 实验原理\n\n本任务通过标准化刺激和按键反应测量认知加工表现。\n\n# 任务流程\n\n阅读指导语后完成全部试次，并按照屏幕提示作答。\n\n# 核心指标\n\n- 正确字段：\`${correct}\`\n- 反应时字段：\`${rt}\`\n- 条件字段：\`${condition}\`\n\n# 结果解读\n\n应结合正确率与反应时综合判断，避免只依据单一指标下结论。\n\n# 注意事项\n\n发布前请完整试做，确认刺激、按键与结果回传正常。\n\n# 来源与参考\n\n${reference}`,
+    };
+  }
+
+  function parseCsvRow(line) {
+    const cells = [];
+    let cell = "";
+    let quoted = false;
+    for (let index = 0; index < line.length; index += 1) {
+      const character = line[index];
+      if (character === '"' && quoted && line[index + 1] === '"') { cell += '"'; index += 1; }
+      else if (character === '"') quoted = !quoted;
+      else if (character === "," && !quoted) { cells.push(cell); cell = ""; }
+      else cell += character;
+    }
+    cells.push(cell);
+    return cells;
+  }
+
   function parseBoolean(value) {
     if (value === true || value === 1 || value === "1" || String(value).toLowerCase() === "true") return true;
     if (value === false || value === 0 || value === "0" || String(value).toLowerCase() === "false") return false;
@@ -189,6 +257,8 @@
     findParadigm,
     escapeHtml,
     renderMarkdown,
+    inferPsychoJsResult,
+    inferPsychoJsMetadata,
     summarizeBartRows,
     safeUrl,
   });

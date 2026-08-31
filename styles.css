@@ -778,6 +778,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
 .library-row, .change-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 0; border-top: 1px solid var(--line); }
 .library-row:last-child, .change-row:last-child { border-bottom: 1px solid var(--line); }
 .library-row div, .change-row div { display: grid; }
+.library-row .library-actions { display: flex; align-items: center; gap: 14px; }
 .library-row span, .change-row small { color: var(--ink-soft); font-size: 10px; }
 .library-row.pending-delete { opacity: .55; text-decoration: line-through; }
 .text-button:disabled { color: var(--ink-soft); cursor: not-allowed; opacity: .6; text-decoration: none; }

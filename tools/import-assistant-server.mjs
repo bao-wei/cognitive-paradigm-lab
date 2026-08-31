@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { applyChanges } from "./apply-changes.mjs";
@@ -10,6 +10,7 @@ import { buildCatalog } from "./build-catalog.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const UI_ROOT = path.join(ROOT, "tools", "import-assistant");
 const WORK_ROOT = path.join(ROOT, ".assistant-work");
+const ASSISTANT_PORT = 4174;
 const TESTS = [
   "archive-self-check.mjs",
   "self-check.mjs",
@@ -66,6 +67,8 @@ export async function createAssistantServer({ port = 0, openBrowser = true } = {
     verified: false,
     publishedSha: null,
     sourceZip: null,
+    sourceName: null,
+    runtimePreview: null,
   };
   let baseUrl = "";
 
@@ -85,22 +88,29 @@ export async function createAssistantServer({ port = 0, openBrowser = true } = {
       if (request.method === "GET" && url.pathname === "/assistant.css") return serveFile(response, path.join(UI_ROOT, "assistant.css"), true);
       if (request.method === "GET" && url.pathname === "/styles.css") return serveFile(response, path.join(ROOT, "styles.css"), true);
       if (request.method === "GET" && url.pathname.startsWith("/site/")) return serveSite(response, url.pathname.slice(6));
+      if (request.method === "OPTIONS" && url.pathname.startsWith(`/preview/${token}/`)) return send(response, 204, "", "text/plain", true, previewCors(request));
+      if (request.method === "GET" && url.pathname.startsWith(`/preview/${token}/`)) return serveRuntimePreview(response, url.pathname, state, token);
       if (request.method === "GET" && url.pathname === "/api/source-download") {
         if (url.searchParams.get("token") !== token || !state.sourceZip) return sendJson(response, 403, { error: "下载凭据无效" });
-        return serveFile(response, state.sourceZip, false, { "Content-Disposition": `attachment; filename="${path.basename(state.sourceZip)}"` });
+        return serveFile(response, state.sourceZip, false, { "Content-Disposition": `attachment; filename="${state.sourceName || path.basename(state.sourceZip)}"` });
+      }
+      if (request.method === "GET" && url.pathname === "/api/package-download") {
+        if (url.searchParams.get("token") !== token) return sendJson(response, 403, { error: "下载凭据无效" });
+        return await handlePackageDownload(response, url.searchParams.get("id"));
       }
       if (url.pathname.startsWith("/api/")) {
         if (!validOrigin(request, baseUrl) || request.headers["x-assistant-token"] !== token) return sendJson(response, 403, { error: "本地会话凭据无效，请刷新助手页面" });
         if (request.method === "GET" && url.pathname === "/api/status") return sendJson(response, 200, await environmentStatus());
         if (request.method === "GET" && url.pathname === "/api/deployment") return sendJson(response, 200, await deploymentStatus(state.publishedSha));
-        if (request.method === "POST" && url.pathname === "/api/upload") return await handleUpload(request, response, state);
+        if (request.method === "POST" && url.pathname === "/api/preview") return await handleRuntimePreview(request, response, state, token);
+        if (request.method === "POST" && url.pathname === "/api/upload") return await handleUpload(request, response, state, token);
         if (request.method === "POST" && url.pathname === "/api/apply") return await handleApply(request, response, state);
         if (request.method === "POST" && url.pathname === "/api/publish") return await handlePublish(request, response, state);
         if (request.method === "POST" && url.pathname === "/api/pavlovia") return await handlePavlovia(request, response, state, token);
       }
       sendJson(response, 404, { error: "未找到页面" });
     } catch (error) {
-      sendJson(response, Number(error.statusCode) || 500, { error: cleanError(error) });
+      sendJson(response, Number(error.statusCode) || 500, { error: cleanError(error), ...(error.details || {}) });
     }
   });
 
@@ -111,7 +121,7 @@ export async function createAssistantServer({ port = 0, openBrowser = true } = {
   return { server, url: baseUrl };
 }
 
-async function handleUpload(request, response, state) {
+async function handleUpload(request, response, state, token) {
   const fileName = String(request.headers["x-file-name"] || "changes.zip").replace(/[^\w.-]+/g, "-");
   if (!fileName.toLowerCase().endsWith(".zip")) throw userError("请选择工作台导出的 ZIP 变更包");
   const body = await readBody(request, 120 * 1024 * 1024);
@@ -121,7 +131,22 @@ async function handleUpload(request, response, state) {
   await mkdir(extractRoot, { recursive: true });
   await writeFile(zipPath, body);
   await expandArchive(zipPath, extractRoot);
-  const changeRoot = await findChangeRoot(extractRoot);
+  let changeRoot;
+  try {
+    changeRoot = await findChangeRoot(extractRoot);
+  } catch (error) {
+    if (!(await looksLikeSourcePackage(extractRoot))) throw error;
+    const sourceRoot = await findSourceRoot(extractRoot);
+    const adaptation = await adaptPsychoJsPackage(sourceRoot);
+    const adaptedZip = path.join(sessionRoot, `adapted-${fileName}`);
+    await compressArchive(sourceRoot, adaptedZip);
+    state.sourceZip = adaptedZip;
+    state.sourceName = sourceNameFromFile(fileName);
+    const sourceError = userError(`已识别为待配置源码包；已自动完成 ${adaptation.count} 项技术适配，请在工作台审核信息并试做`);
+    sourceError.statusCode = 422;
+    sourceError.details = { kind: "source-package", adminUrl: adminUrl(token, state.sourceName.replace(/\.zip$/i, "")) };
+    throw sourceError;
+  }
   const preview = await applyChanges(changeRoot, { projectRoot: ROOT, apply: false });
   state.changeRoot = changeRoot;
   state.actions = preview.actions;
@@ -176,17 +201,61 @@ async function handlePavlovia(request, response, state, token) {
   await mkdir(path.dirname(sourceRoot), { recursive: true });
   await run("git", ["clone", "--depth", "1", "--single-branch", source.cloneUrl, sourceRoot], { cwd: ROOT, timeout: 300000 });
   const removed = await removeGeneratedFolders(sourceRoot);
+  const adaptation = await adaptPsychoJsPackage(sourceRoot);
   await compressArchive(sourceRoot, zipPath);
   state.sourceZip = zipPath;
+  state.sourceName = `${source.repo}.zip`;
   const summary = await directorySummary(sourceRoot);
   sendJson(response, 200, {
     source: source.cloneUrl,
     folder: sourceRoot,
     removed,
+    adapted: adaptation.count,
     ...summary,
     downloadUrl: `/api/source-download?token=${token}`,
-    adminUrl: "/site/admin.html",
+    adminUrl: adminUrl(token, source.repo, source.cloneUrl.replace(/\.git$/, "")),
   });
+}
+
+async function handleRuntimePreview(request, response, state, token) {
+  const entry = String(request.headers["x-entry"] || "index.html").replaceAll("\\", "/").replace(/^\.\//, "");
+  if (!entry || entry.split("/").some((part) => !part || part === "." || part === "..")) throw userError("实验入口路径不正确");
+  const body = await readBody(request, 120 * 1024 * 1024);
+  const id = randomBytes(12).toString("hex");
+  const previewRoot = path.join(WORK_ROOT, "previews", id);
+  const zipPath = path.join(WORK_ROOT, "previews", `${id}.zip`);
+  await mkdir(previewRoot, { recursive: true });
+  await writeFile(zipPath, body);
+  await expandArchive(zipPath, previewRoot);
+  if (!(await exists(safeChild(previewRoot, entry)))) throw userError(`找不到实验入口 ${entry}`);
+  state.runtimePreview = { id, root: previewRoot };
+  sendJson(response, 200, { url: `/preview/${token}/${id}/${entry}` });
+}
+
+function serveRuntimePreview(response, pathname, state, token) {
+  const prefix = `/preview/${token}/`;
+  const [id, ...parts] = decodeURIComponent(pathname.slice(prefix.length)).split("/");
+  if (!state.runtimePreview || id !== state.runtimePreview.id || !parts.length) return sendJson(response, 404, { error: "预览已失效，请重新打开" });
+  const target = safeChild(state.runtimePreview.root, parts.join("/"));
+  return serveFile(response, target, false, previewCors());
+}
+
+function previewCors(request) {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": request?.headers["access-control-request-headers"] || "Content-Type",
+  };
+}
+
+async function handlePackageDownload(response, id) {
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(String(id || ""))) throw userError("范式 ID 不正确");
+  const packageRoot = safeChild(path.join(ROOT, "paradigms", "packages"), id);
+  if (!(await exists(packageRoot))) throw userError("找不到该扩展范式");
+  const zipPath = path.join(WORK_ROOT, "packages", `${id}.zip`);
+  await mkdir(path.dirname(zipPath), { recursive: true });
+  await compressArchive(packageRoot, zipPath);
+  return serveFile(response, zipPath, false, { "Content-Disposition": `attachment; filename="${id}.zip"` });
 }
 
 async function environmentStatus() {
@@ -303,6 +372,78 @@ async function directorySummary(root) {
   return { fileCount: files.length, bytes };
 }
 
+export async function findSourceRoot(root) {
+  const indexes = (await listFiles(root)).filter((file) => path.basename(file).toLowerCase() === "index.html");
+  if (!indexes.length) throw userError("源码包中没有找到 index.html");
+  indexes.sort((left, right) => left.split(path.sep).length - right.split(path.sep).length);
+  return path.dirname(indexes[0]);
+}
+
+export async function adaptPsychoJsPackage(root, { fetchImpl = fetch } = {}) {
+  const indexPath = path.join(root, "index.html");
+  if (!(await exists(indexPath))) return { count: 0 };
+  let html = await readFile(indexPath, "utf8");
+  if (!/psychojs-/i.test(html)) return { count: 0 };
+  let count = 0;
+  const vendorRoot = path.join(root, "vendor");
+  const bundledVendor = path.join(ROOT, "paradigms", "packages", "bart", "vendor");
+  const vendorUrls = new Map([
+    ["https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js", "jquery-3.6.0.min.js"],
+    ["https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.12.1/jquery-ui.min.js", "jquery-ui-1.12.1.min.js"],
+    ["https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.12.1/jquery-ui.min.css", "jquery-ui-1.12.1.min.css"],
+    ["https://cdn.jsdelivr.net/npm/preloadjs@1.0.1/lib/preloadjs.min.js", "preloadjs-1.0.1.min.js"],
+  ]);
+  for (const [url, name] of vendorUrls) {
+    if (!html.includes(url)) continue;
+    await mkdir(vendorRoot, { recursive: true });
+    await copyFile(path.join(bundledVendor, name), path.join(vendorRoot, name));
+    html = html.replaceAll(url, `./vendor/${name}`);
+    count += 1;
+  }
+
+  const dependencySources = [html];
+  for (const file of await listFiles(root)) {
+    if (/\.js$/i.test(file) && (await stat(file)).size <= 1024 * 1024) dependencySources.push(await readFile(file, "utf8"));
+  }
+  const runtimePaths = [...dependencySources.join("\n").matchAll(/["']((?:\.\/)?lib\/(psychojs-[\d.]+(?:\.iife)?\.(?:js|css)))["']/gi)];
+  for (const match of runtimePaths) {
+    const relative = match[1].replace(/^\.\//, "");
+    const target = safeChild(root, relative);
+    if (await exists(target)) continue;
+    const response = await fetchImpl(`https://lib.pavlovia.org/${match[2]}`);
+    if (!response.ok) throw userError(`无法自动下载 PsychoJS 运行库 ${match[2]}（HTTP ${response.status}）`);
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength > 10 * 1024 * 1024) throw userError(`PsychoJS 运行库 ${match[2]} 超过安全大小限制`);
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, bytes);
+    count += 1;
+  }
+
+  if (!html.includes("cognition-lab:preview-error")) {
+    const monitor = `<script>window.addEventListener("error",function(e){parent.postMessage({type:"cognition-lab:preview-error",message:e.message||"资源加载失败"},"*")});window.addEventListener("unhandledrejection",function(e){parent.postMessage({type:"cognition-lab:preview-error",message:String(e.reason?.message||e.reason||"程序运行失败")},"*")});</script>`;
+    html = html.replace(/<head([^>]*)>/i, `<head$1>${monitor}`);
+    count += 1;
+  }
+  await writeFile(indexPath, html);
+
+  const modulePath = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+\.js)["'][^>]*\btype=["']module["'][^>]*>/gi)]
+    .map((match) => match[1].replace(/^\.\//, ""))[0];
+  if (modulePath) {
+    const scriptPath = safeChild(root, modulePath);
+    let script = await readFile(scriptPath, "utf8");
+    if (!/cognition-lab:complete/i.test(script) && script.includes("psychoJS.window.close();")) {
+      script = script.replace("psychoJS.window.close();", `window.parent.postMessage({type: "cognition-lab:complete", trials: psychoJS.experiment?._trialsData || []}, "*");\n  psychoJS.window.close();`);
+      await writeFile(scriptPath, script);
+      count += 1;
+    }
+  }
+  return { count };
+}
+
+async function looksLikeSourcePackage(root) {
+  return (await listFiles(root)).some((file) => path.basename(file).toLowerCase() === "index.html");
+}
+
 async function listFiles(root, output = []) {
   for (const entry of await readdir(root, { withFileTypes: true })) {
     const target = path.join(root, entry.name);
@@ -405,8 +546,32 @@ function openUrl(url) {
   child.unref();
 }
 
+async function reopenRunningAssistant(error) {
+  if (error?.code !== "EADDRINUSE") throw error;
+  const url = `http://127.0.0.1:${ASSISTANT_PORT}`;
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
+    if (!response.ok || !html.includes("<title>本地导入发布助手｜知觉之间</title>")) throw error;
+  } catch {
+    throw error;
+  }
+  openUrl(url);
+  return url;
+}
+
 function cleanError(error) {
   return String(error?.message || error).replace(/gho_[A-Za-z0-9_]+/g, "[已隐藏凭据]").slice(0, 4000);
+}
+
+function sourceNameFromFile(fileName) {
+  return String(fileName).replace(/^\d{10,}-/, "").replace(/[^\w.-]+/g, "-");
+}
+
+function adminUrl(token, name, origin = "") {
+  const params = new URLSearchParams({ token, source: `/api/source-download?token=${token}`, name });
+  if (origin) params.set("origin", origin);
+  return `/site/admin.html#${params}`;
 }
 
 function userError(message) {
@@ -420,7 +585,12 @@ async function exists(target) { try { await stat(target); return true; } catch {
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
 if (isMain) {
-  const { url } = await createAssistantServer();
-  console.log(`\n本地导入发布助手已启动：${url}`);
-  console.log("请保留此窗口；完成后按 Ctrl+C 关闭助手。\n");
+  try {
+    const { url } = await createAssistantServer({ port: ASSISTANT_PORT });
+    console.log(`\n本地导入发布助手已启动：${url}`);
+    console.log("请保留此窗口；完成后按 Ctrl+C 关闭助手。\n");
+  } catch (error) {
+    const url = await reopenRunningAssistant(error);
+    console.log(`\n助手已在运行，已重新打开：${url}\n`);
+  }
 }

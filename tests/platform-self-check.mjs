@@ -23,6 +23,27 @@ assert.equal(bart.bankedCount, 2);
 assert.equal(bart.adjustedPumps, 5);
 assert.ok(Math.abs(bart.burstRate - (100 / 3)) < 0.001);
 assert.equal(bart.totalEarnings, 0.5);
+const inferred = platform.inferPsychoJsResult(
+  "psychoJS.experiment.addData('key_resp.corr', key_resp.corr); psychoJS.experiment.addData('key_resp.rt', key_resp.rt);",
+  ["condition_label,answer\nsame,y\ndifferent,n\n"],
+);
+assert.deepEqual(JSON.parse(JSON.stringify(inferred)), {
+  profile: "difference",
+  fields: { correct: "key_resp.corr", rt: "key_resp.rt", condition: "condition_label" },
+  levels: ["same", "different"],
+});
+const metadata = platform.inferPsychoJsMetadata({
+  name: "Change Detection and Change Localisation task",
+  readme: "A visual working memory change detection task. Zhao et al. (2023). https://doi.org/10.3758/example",
+  sample: "",
+  result: inferred,
+});
+assert.equal(metadata.category, "工作记忆");
+assert.equal(metadata.name, "变化检测与变化定位任务");
+assert.equal(metadata.taskType, "变化检测与定位");
+assert.equal(metadata.duration, "约 10 分钟");
+assert.match(metadata.summary, /视觉工作记忆/);
+assert.match(metadata.description, /# 学习目标[\s\S]+# 实验原理[\s\S]+# 任务流程[\s\S]+# 核心指标[\s\S]+# 结果解读[\s\S]+# 注意事项[\s\S]+# 来源与参考/);
 
 const catalogPage = await readFile(new URL("../experiments.html", import.meta.url), "utf8");
 const detailPage = await readFile(new URL("../paradigm.html", import.meta.url), "utf8");
@@ -36,6 +57,7 @@ assert.match(detailPage, /start-experiment-top/);
 assert.match(adminPage, /validation-summary/);
 assert.match(adminPage, /<details class="technical-details">/);
 assert.match(adminPage, /<details class="advanced-settings">/);
+assert.match(adminPage, /扩展范式可编辑/);
 assert.match(adminScript, /实验程序需要技术适配/);
 assert.match(adminPage, /value="bart"/);
 assert.match(adminScript, /调整后平均充气次数/);

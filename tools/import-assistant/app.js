@@ -1,5 +1,6 @@
 (() => {
   const token = "__ASSISTANT_TOKEN__";
+  const disconnectedMessage = "本地导入发布助手已断开。请重新双击“启动范式导入发布助手.cmd”，并在新打开的页面继续操作。";
   const state = { environment: null, previewToken: null, verified: false, publishing: false };
   const elements = {
     environment: document.querySelector("#environment-list"),
@@ -27,9 +28,18 @@
   }
 
   async function api(url, options = {}) {
-    const response = await fetch(url, { ...options, headers: { "x-assistant-token": token, ...(options.headers || {}) } });
+    let response;
+    try {
+      response = await fetch(url, { ...options, headers: { "x-assistant-token": token, ...(options.headers || {}) } });
+    } catch {
+      throw new Error(disconnectedMessage);
+    }
     const payload = await response.json().catch(() => ({ error: `请求失败（HTTP ${response.status}）` }));
-    if (!response.ok) throw new Error(payload.error || `请求失败（HTTP ${response.status}）`);
+    if (!response.ok) {
+      const error = new Error(payload.error || `请求失败（HTTP ${response.status}）`);
+      Object.assign(error, payload);
+      throw error;
+    }
     return payload;
   }
 
@@ -75,6 +85,24 @@
     }
   }
 
+  async function openWorkbench(event) {
+    const link = event.target.closest('a[href="/site/admin.html"]');
+    if (!link) return;
+    event.preventDefault();
+    const target = window.open("about:blank", "_blank");
+    try {
+      await api("/api/status");
+      const destination = new URL(link.href);
+      if (!new URLSearchParams(destination.hash.slice(1)).has("token")) destination.hash = `token=${encodeURIComponent(token)}`;
+      if (target) target.location.href = destination.href;
+      else window.location.href = destination.href;
+    } catch (error) {
+      target?.close();
+      window.alert(error.message);
+      log(error.message, "error");
+    }
+  }
+
   async function preparePavlovia(event) {
     event.preventDefault();
     const button = elements.pavloviaForm.querySelector("button");
@@ -83,7 +111,7 @@
     log("开始读取 Pavlovia 公开项目。", "");
     try {
       const value = await api("/api/pavlovia", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: elements.pavloviaUrl.value }) });
-      setResult(elements.pavloviaResult, `<p><strong>来源包已整理完成</strong></p><p>保留 ${value.fileCount} 个文件（${formatBytes(value.bytes)}），排除 ${value.removed} 个数据或生成文件。</p><p><a class="text-link" href="${escapeHtml(value.downloadUrl)}">下载整理后的 ZIP</a> · <a class="text-link" href="${escapeHtml(value.adminUrl)}" target="_blank">打开配置工作台</a></p>`, "");
+      setResult(elements.pavloviaResult, `<p><strong>待配置源码已整理完成</strong></p><p>保留 ${value.fileCount} 个文件（${formatBytes(value.bytes)}），排除 ${value.removed} 个数据或生成文件，自动完成 ${value.adapted} 项技术适配。</p><p>下一步请在工作台审核自动预填结果；只有工作台最后导出的 ZIP 才是第 02 步使用的变更包。</p><p><a class="button button-secondary" href="${escapeHtml(value.adminUrl)}" target="_blank">打开工作台并自动载入</a> · <a class="text-link" href="${escapeHtml(value.downloadUrl)}">另存源码 ZIP</a></p>`, "");
       markStep(1, "done");
       log(`Pavlovia 来源已整理：${value.fileCount} 个文件。`, "success");
     } catch (error) {
@@ -120,8 +148,13 @@
       markStep(3, "active");
       log("变更包预演通过，尚未修改本地范式库。", "success");
     } catch (error) {
-      setTag(elements.uploadStatus, "预演失败", "error");
-      setResult(elements.previewResult, `<strong>未应用任何变更：</strong>${escapeHtml(error.message)}`, "error");
+      if (error.kind === "source-package") {
+        setTag(elements.uploadStatus, "需要先配置", "processing");
+        setResult(elements.previewResult, `<p><strong>已识别为待配置源码包</strong></p><p>${escapeHtml(error.message)}</p><p><a class="button button-secondary" href="${escapeHtml(error.adminUrl)}" target="_blank">打开工作台并自动载入</a></p>`, "processing");
+      } else {
+        setTag(elements.uploadStatus, "预演失败", "error");
+        setResult(elements.previewResult, `<strong>未应用任何变更：</strong>${escapeHtml(error.message)}`, "error");
+      }
       log(`变更包预演失败：${error.message}`, "error");
     }
   }
@@ -196,6 +229,7 @@
   }
 
   elements.pavloviaForm.addEventListener("submit", preparePavlovia);
+  document.addEventListener("click", openWorkbench);
   elements.fileInput.addEventListener("change", () => readChangePack(elements.fileInput.files[0]));
   for (const eventName of ["dragenter", "dragover"]) elements.drop.addEventListener(eventName, (event) => { event.preventDefault(); elements.drop.classList.add("dragging"); });
   for (const eventName of ["dragleave", "drop"]) elements.drop.addEventListener(eventName, (event) => { event.preventDefault(); elements.drop.classList.remove("dragging"); });

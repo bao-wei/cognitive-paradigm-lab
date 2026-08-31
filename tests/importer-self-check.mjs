@@ -16,18 +16,21 @@ try {
   await mkdir(stroop, { recursive: true });
   await mkdir(unknown, { recursive: true });
   await mkdir(ready, { recursive: true });
+  await mkdir(path.join(ready, "vendor"), { recursive: true });
   await mkdir(bart, { recursive: true });
   await writeFile(path.join(stroop, "index.html"), "<title>Stroop Demo</title><script src='experiment.js'></script>");
   await writeFile(path.join(stroop, "experiment.js"), "const psychoJS = new PsychoJS(); fetch('https://example.test/session');");
   await writeFile(path.join(stroop, "README.md"), "# Stroop Demo\nA colour-word interference task for attention.");
   await writeFile(path.join(ready, "index.html"), "<title>Simple Reaction Time</title><button>Start</button>");
   await writeFile(path.join(ready, "bridge.js"), "parent.postMessage({type:'cognition-lab:complete', trials:[]}, '*');");
+  await writeFile(path.join(ready, "vendor", "runtime.js"), "const request = new XMLHttpRequest();");
   await writeFile(path.join(ready, "description.md"), "# Simple Reaction Time\n\n## Learning goal\n\nA teaching task.");
   await writeFile(path.join(ready, "manifest.json"), JSON.stringify({
     name: "Simple Reaction Time",
     shortDescription: "Press a key when the target appears.",
     approved: true,
     license: "MIT",
+    source: "https://gitlab.pavlovia.org/demos/simple-reaction",
     dataExport: "adapter",
     result: { profile: "generic", fields: { correct: "correct", rt: "rt", condition: "condition" }, levels: [] },
   }));
@@ -58,6 +61,7 @@ try {
 
   const launchable = found.find((item) => item.id === "simple-reaction");
   assert.equal(launchable.status, "ready");
+  assert.equal(launchable.source, "https://gitlab.pavlovia.org/demos/simple-reaction");
   assert.equal(launchable.category, "基础反应");
   assert.equal(launchable.dataExport, "adapter");
   assert.equal(launchable.descriptionPath, "./paradigms/packages/simple-reaction/description.md");
