@@ -8,6 +8,9 @@ const temporary = await mkdtemp(path.join(os.tmpdir(), "cognition-changes-"));
 const project = path.join(temporary, "project");
 const changeRoot = path.join(temporary, "changes");
 try {
+  await mkdir(changeRoot, { recursive: true });
+  await writeFile(path.join(changeRoot, "changes.json"), JSON.stringify({ add: [], replace: [], delete: [] }));
+  await assert.rejects(applyChanges(changeRoot, { projectRoot: project }), /没有新增、替换或删除/);
   await mkdir(path.join(project, "paradigms", "packages", "old-task"), { recursive: true });
   await writeFile(path.join(project, "paradigms", "packages", "old-task", "index.html"), "old");
   await mkdir(path.join(changeRoot, "packages", "new-task"), { recursive: true });

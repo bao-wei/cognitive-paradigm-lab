@@ -13,9 +13,16 @@ export async function applyChanges(changeRoot, { projectRoot = ROOT, apply = fal
     replace: validateIds(changes.replace),
     delete: validateIds(changes.delete),
   };
+  if (![...actions.add, ...actions.replace, ...actions.delete].length) throw new Error("变更包中没有新增、替换或删除操作");
   const duplicates = [...actions.add, ...actions.replace, ...actions.delete].filter((id, index, all) => all.indexOf(id) !== index);
   if (duplicates.length) throw new Error(`同一范式存在冲突操作：${[...new Set(duplicates)].join(", ")}`);
   for (const id of [...actions.add, ...actions.replace]) await stat(path.join(sourceRoot, "packages", id));
+  for (const id of actions.add) {
+    if (await exists(safePackagePath(packagesRoot, id))) throw new Error(`“添加”操作与现有范式冲突：${id}；请在工作台中改为“替换”`);
+  }
+  for (const id of actions.replace) {
+    if (!await exists(safePackagePath(packagesRoot, id))) throw new Error(`找不到要替换的现有范式：${id}；请在工作台中改为“添加”`);
+  }
   if (!apply) return { applied: false, actions };
 
   await mkdir(packagesRoot, { recursive: true });

@@ -34,6 +34,7 @@ jobs:
           node tests/importer-self-check.mjs
           node tests/platform-self-check.mjs
           node tests/change-pack-self-check.mjs
+          node tests/import-assistant-self-check.mjs
 
       - name: Prepare static site
         run: |

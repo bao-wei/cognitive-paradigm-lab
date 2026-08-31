@@ -50,6 +50,19 @@ node tools/build-catalog.mjs
 
 第一条命令只预演，第二条才应用。替换和删除的旧目录会先移动到 `.changes-backup/`，便于恢复。详细字段、实验完成事件和 Pavlovia 注意事项见 [`paradigms/README.md`](./paradigms/README.md)。推送到 `main` 后，GitHub Actions 会自动重新扫描、执行自检并发布 Pages。
 
+## 本地导入发布助手（推荐）
+
+教材编写人员可以直接双击根目录的 `启动范式导入发布助手.cmd`。助手会自动打开浏览器，并按四步完成：
+
+1. 打开维护工作台配置、试做并导出“范式库变更包”；也可先粘贴公开 Pavlovia GitLab 地址，由助手下载并排除 `.git`、`data`、`results` 和 `node_modules`。
+2. 上传变更包 ZIP，预演新增、替换和删除清单。
+3. 建立可恢复备份、应用变更、重建目录并运行全部自检；检查失败会自动恢复，不会发布。
+4. 核对目标仓库后发布，并等待 GitHub Pages 返回真实部署结果。
+
+第一次使用前，需要安装 Node.js 和 GitHub CLI，并在终端完成一次 `gh auth login`。GitHub 凭据由本机 `gh` 管理，不会写入网页、变更包或仓库。助手只监听 `127.0.0.1`；使用结束后关闭命令窗口即可停止服务。
+
+旧的命令行流程仍然保留，适合需要逐步排查时使用。
+
 ## 发布到 GitHub Pages
 
 1. 在 GitHub 新建仓库并上传本目录中的文件。

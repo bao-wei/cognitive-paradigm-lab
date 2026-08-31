@@ -8,3 +8,4 @@ paradigms/packages/**/*result*.csv
 .changes-backup/
 .playwright-cli/
 output/
+.assistant-work/

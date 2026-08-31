@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <meta name="theme-color" content="#f4efe4" />
+    <title>本地导入发布助手｜知觉之间</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/assistant.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body class="assistant-page">
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <header class="assistant-header">
+      <a class="brand" href="/site/index.html" target="_blank" rel="noreferrer">
+        <span class="brand-mark" aria-hidden="true">知</span>
+        <span><strong>知觉之间</strong><small>LOCAL PUBLISHER</small></span>
+      </a>
+      <div class="local-badge"><span aria-hidden="true"></span>仅在这台电脑运行</div>
+    </header>
+
+    <main id="main" class="assistant-shell">
+      <section class="assistant-intro" aria-labelledby="assistant-title">
+        <p class="eyebrow">LOCAL IMPORT · VERIFY · PUBLISH</p>
+        <h1 id="assistant-title">范式从文件到网页，走一条可检查的路。</h1>
+        <p>管理员工作台负责配置和试做，本助手负责备份、写入、自检与 GitHub Pages 发布。任何一步失败都会停止，不会把未通过检查的范式发布出去。</p>
+        <div class="flow-line" aria-label="工作流程">
+          <span>配置</span><i></i><span>预演</span><i></i><span>自检</span><i></i><span>发布</span>
+        </div>
+      </section>
+
+      <section class="environment-card" aria-labelledby="environment-title">
+        <div>
+          <p class="eyebrow">00 · ENVIRONMENT</p>
+          <h2 id="environment-title">发布环境</h2>
+        </div>
+        <dl id="environment-list" class="environment-list" aria-live="polite">
+          <div><dt>本地服务</dt><dd class="status-good">已连接</dd></div>
+          <div><dt>GitHub</dt><dd>检查中…</dd></div>
+          <div><dt>目标仓库</dt><dd>检查中…</dd></div>
+          <div><dt>项目目录</dt><dd>检查中…</dd></div>
+        </dl>
+      </section>
+
+      <div class="assistant-grid">
+        <aside class="step-rail" aria-label="发布步骤">
+          <ol>
+            <li class="active" data-step-marker="1"><span>01</span><div><strong>准备范式</strong><small>来源与配置</small></div></li>
+            <li data-step-marker="2"><span>02</span><div><strong>读取变更包</strong><small>仅做预演</small></div></li>
+            <li data-step-marker="3"><span>03</span><div><strong>应用并自检</strong><small>失败自动恢复</small></div></li>
+            <li data-step-marker="4"><span>04</span><div><strong>发布网页</strong><small>等待真实部署</small></div></li>
+          </ol>
+        </aside>
+
+        <div class="assistant-main">
+          <section class="assistant-panel" aria-labelledby="prepare-title">
+            <header><div><p class="eyebrow">01 · PREPARE</p><h2 id="prepare-title">准备范式</h2></div><span class="panel-tag">二选一</span></header>
+            <div class="prepare-grid">
+              <article>
+                <h3>已有实验文件</h3>
+                <p>打开维护工作台，读取 ZIP 或文件夹，填写说明与指标，完整试做后导出“范式库变更包”。</p>
+                <a class="button button-secondary" href="/site/admin.html" target="_blank" rel="noreferrer">打开范式维护工作台</a>
+              </article>
+              <article>
+                <h3>从 Pavlovia 获取</h3>
+                <p>粘贴公开项目地址。助手会下载项目，并排除 Git、参与者数据与生成结果目录，再生成待配置 ZIP。</p>
+                <form id="pavlovia-form" class="stack-form">
+                  <label><span>Pavlovia GitLab 地址</span><input id="pavlovia-url" type="url" required placeholder="https://gitlab.pavlovia.org/demos/bart" /></label>
+                  <button class="button button-secondary" type="submit">下载并整理</button>
+                </form>
+                <div id="pavlovia-result" class="inline-result" hidden aria-live="polite"></div>
+              </article>
+            </div>
+          </section>
+
+          <section class="assistant-panel" aria-labelledby="upload-title">
+            <header><div><p class="eyebrow">02 · CHANGE PACK</p><h2 id="upload-title">读取变更包</h2></div><span class="panel-tag" id="upload-status">尚未读取</span></header>
+            <p class="panel-copy">选择维护工作台最后导出的 ZIP。这里先预演新增、替换和删除清单，不会立刻修改范式库。</p>
+            <label class="assistant-drop" id="change-pack-drop">
+              <input id="change-pack-input" type="file" accept=".zip,application/zip" />
+              <span class="drop-index">ZIP</span>
+              <strong>选择范式库变更包</strong>
+              <small>也可以把 ZIP 拖到这里 · 最大 120 MB</small>
+            </label>
+            <div id="preview-result" class="action-summary" hidden aria-live="polite"></div>
+          </section>
+
+          <section class="assistant-panel" aria-labelledby="verify-title">
+            <header><div><p class="eyebrow">03 · APPLY & VERIFY</p><h2 id="verify-title">应用并运行全部自检</h2></div><span class="panel-tag" id="verify-status">等待变更包</span></header>
+            <p class="panel-copy">替换或删除前会建立本地备份；随后重建目录并运行全部自动检查。检查失败时会自动恢复，且不会进入发布步骤。</p>
+            <button class="button button-primary" id="apply-button" type="button" disabled>确认应用并开始自检</button>
+            <div id="verify-result" class="action-summary" hidden aria-live="polite"></div>
+          </section>
+
+          <section class="assistant-panel publish-panel" aria-labelledby="publish-title">
+            <header><div><p class="eyebrow">04 · PUBLISH</p><h2 id="publish-title">发布到 GitHub Pages</h2></div><span class="panel-tag" id="publish-status">尚未就绪</span></header>
+            <p class="panel-copy">只提交本次变更涉及的范式目录和自动目录文件。发布后，助手会继续等待 GitHub Actions 给出真实部署结果。</p>
+            <label class="publish-confirm"><input id="publish-confirm" type="checkbox" disabled /><span>我已核对变更清单，并确认发布到 <strong id="target-repository">目标仓库</strong></span></label>
+            <button class="button button-primary" id="publish-button" type="button" disabled>发布并等待网页部署</button>
+            <div id="publish-result" class="action-summary" hidden aria-live="polite"></div>
+          </section>
+
+          <section class="assistant-log" aria-labelledby="log-title">
+            <header><div><p class="eyebrow">ACTIVITY</p><h2 id="log-title">操作记录</h2></div><button class="text-button" id="clear-log" type="button">清空显示</button></header>
+            <ol id="activity-log" aria-live="polite"><li><time></time><span>助手已启动，正在检查环境。</span></li></ol>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
