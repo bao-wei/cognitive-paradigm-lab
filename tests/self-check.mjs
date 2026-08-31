@@ -66,8 +66,14 @@ assert.equal(meanRT([
 assert.equal(meanRT([{ correct: false, rt: 300 }]), null);
 assert.equal(csvCell('a,"b"'), '"a,""b"""');
 const home = await readFile(new URL("../index.html", import.meta.url), "utf8");
+const howToUse = await readFile(new URL("../how-to-use.html", import.meta.url), "utf8");
+const notice = await readFile(new URL("../notice.html", import.meta.url), "utf8");
 assert.doesNotMatch(home, /扩展范式库|DROP-IN LIBRARY/);
+assert.doesNotMatch(home, /EXPERIMENT INDEX|id="how-it-works"|id="notice"/);
 assert.match(home, /experiments\.html/);
-assert.match(home, /只用于教学体验/);
+assert.match(home, /how-to-use\.html/);
+assert.match(home, /notice\.html/);
+assert.match(howToUse, /不是测验/);
+assert.match(notice, /只用于教学体验/);
 
-console.log("self-check passed: trial balance, RT filtering, CSV escaping, and learner-only homepage");
+console.log("self-check passed: trials, CSV escaping, cover-only homepage, and separate guidance pages");

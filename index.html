@@ -12,8 +12,8 @@
     <title>知觉之间｜认知心理学实验范式平台</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body>
-    <a class="skip-link" href="#featured-experiments">跳到精选实验</a>
+  <body class="cover-page">
+    <a class="skip-link" href="#cover-content">跳到首页内容</a>
 
     <header class="site-header">
       <a class="brand" href="#top" aria-label="知觉之间首页">
@@ -25,13 +25,13 @@
       </a>
       <nav aria-label="主导航">
         <a href="./experiments.html">实验目录</a>
-        <a href="#how-it-works">如何使用</a>
-        <a href="#notice">使用须知</a>
+        <a href="./how-to-use.html">如何使用</a>
+        <a href="./notice.html">使用须知</a>
       </nav>
     </header>
 
     <main id="top">
-      <section class="hero" aria-labelledby="hero-title">
+      <section class="hero" id="cover-content" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="eyebrow">认知心理学 · 行为实验学习空间</p>
           <h1 id="hero-title">把经典范式，<br />变成亲手验证的知识。</h1>
@@ -40,7 +40,7 @@
           </p>
           <div class="hero-actions">
             <a class="button button-primary" href="./experiments.html">选择一个实验</a>
-            <a class="text-link" href="#how-it-works">先了解使用方式 <span aria-hidden="true">↘</span></a>
+            <a class="text-link" href="./how-to-use.html">先了解使用方式 <span aria-hidden="true">↘</span></a>
           </div>
         </div>
 
@@ -61,100 +61,6 @@
         <span><i aria-hidden="true"></i> 支持键盘操作</span>
       </section>
 
-      <section class="experiments section-shell" id="featured-experiments" aria-labelledby="experiments-title">
-        <header class="section-heading">
-          <div>
-            <p class="eyebrow">EXPERIMENT INDEX · 01—03</p>
-            <h2 id="experiments-title">从一次反应开始</h2>
-          </div>
-          <p>每个实验约 2–4 分钟。建议使用电脑并保持环境安静。</p>
-        </header>
-
-        <div class="experiment-grid">
-          <article class="experiment-card card-stroop">
-            <div class="card-number">01</div>
-            <div class="card-symbol" aria-hidden="true">
-              <span>红</span><span>蓝</span><span>绿</span>
-            </div>
-            <p class="card-domain">注意 · 自动化加工</p>
-            <h3>Stroop 色词干扰</h3>
-            <p>忽略文字含义，只判断字体颜色。体验自动阅读如何干扰当前任务。</p>
-            <dl>
-              <div><dt>按键</dt><dd>1 / 2 / 3 / 4</dd></div>
-              <div><dt>正式试次</dt><dd>24</dd></div>
-            </dl>
-            <a class="button button-card" href="./paradigm.html?id=stroop">查看说明 <span aria-hidden="true">→</span></a>
-          </article>
-
-          <article class="experiment-card card-flanker">
-            <div class="card-number">02</div>
-            <div class="card-symbol arrows" aria-hidden="true">←←→←←</div>
-            <p class="card-domain">执行控制 · 选择性注意</p>
-            <h3>Flanker 侧抑制任务</h3>
-            <p>判断中央箭头的方向，同时抑制两侧无关箭头带来的反应冲突。</p>
-            <dl>
-              <div><dt>按键</dt><dd>F / J</dd></div>
-              <div><dt>正式试次</dt><dd>24</dd></div>
-            </dl>
-            <a class="button button-card" href="./paradigm.html?id=flanker">查看说明 <span aria-hidden="true">→</span></a>
-          </article>
-
-          <article class="experiment-card card-gonogo">
-            <div class="card-number">03</div>
-            <div class="card-symbol circles" aria-hidden="true"><i></i><i></i><i></i></div>
-            <p class="card-domain">反应抑制 · 冲动控制</p>
-            <h3>Go / No-Go 任务</h3>
-            <p>看到绿色圆形快速反应，看到红色圆形保持不动，测量反应抑制能力。</p>
-            <dl>
-              <div><dt>按键</dt><dd>空格键</dd></div>
-              <div><dt>正式试次</dt><dd>28</dd></div>
-            </dl>
-            <a class="button button-card" href="./paradigm.html?id=gonogo">查看说明 <span aria-hidden="true">→</span></a>
-          </article>
-        </div>
-        <div class="section-cta"><a class="text-link" href="./experiments.html">浏览全部实验范式 <span aria-hidden="true">→</span></a></div>
-      </section>
-
-      <section class="method section-shell" id="how-it-works" aria-labelledby="method-title">
-        <div class="method-intro">
-          <p class="eyebrow">LEARNING LOOP</p>
-          <h2 id="method-title">不是测验，<br />是一次微型研究。</h2>
-          <p>平台不会给你贴标签。结果只用于理解实验操作、因变量与经典效应。</p>
-        </div>
-        <ol class="method-steps">
-          <li>
-            <span>01</span>
-            <div><h3>读懂任务</h3><p>了解研究问题、刺激材料和按键规则。</p></div>
-          </li>
-          <li>
-            <span>02</span>
-            <div><h3>亲手完成</h3><p>练习后进入正式实验，系统按试次记录反应。</p></div>
-          </li>
-          <li>
-            <span>03</span>
-            <div><h3>观察结果</h3><p>比较正确率、反应时以及不同条件间的差异。</p></div>
-          </li>
-          <li>
-            <span>04</span>
-            <div><h3>带走数据</h3><p>导出 CSV，在课堂或统计软件中继续分析。</p></div>
-          </li>
-        </ol>
-      </section>
-
-      <section class="usage-notice section-shell" id="notice" aria-labelledby="notice-title">
-        <header>
-          <p class="eyebrow">BEFORE YOU BEGIN</p>
-          <h2 id="notice-title">使用须知</h2>
-          <p>这是一个把经典范式带进课堂的学习空间，不是正式的数据采集系统。</p>
-        </header>
-        <div class="notice-grid">
-          <article><span>01</span><h3>只用于教学体验</h3><p>实验经过缩短，用于理解实验操作、因变量和经典效应。结果不能作为心理评估、能力判断或科研结论。</p></article>
-          <article><span>02</span><h3>不保存任何数据</h3><p>结果只存在于当前页面，不上传服务器，也不写入浏览器持久化存储。刷新或关闭页面后无法找回。</p></article>
-          <article><span>03</span><h3>离开前及时导出</h3><p>如果课堂讨论或练习需要保留数据，请在结果页下载 CSV，并确认文件已经保存到自己的设备。</p></article>
-          <article><span>04</span><h3>不要用于正式实验</h3><p>平台不提供被试管理、服务器留存、实验版本锁定或科研级数据保障，请勿用于正式研究和真实被试采集。</p></article>
-        </div>
-        <aside class="notice-callout"><strong>开始前建议</strong><p>使用电脑键盘、关闭输入法干扰，在安静环境中完成，并避免在实验过程中切换窗口。</p></aside>
-      </section>
     </main>
 
     <footer class="site-footer">
