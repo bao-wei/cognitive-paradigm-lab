@@ -84,8 +84,8 @@
     if (!file) return;
     setPackageStatus("正在解压并检查…", "working");
     try {
-      const files = await archive.readZip(file);
-      await acceptFiles(files, file.name.replace(/\.zip$/i, ""));
+      const { files, ignored } = await archive.readZip(file);
+      await acceptFiles(files, file.name.replace(/\.zip$/i, ""), ignored);
     } catch (error) {
       resetPackage();
       setPackageStatus(error.message, "error");
@@ -99,17 +99,24 @@
     if (!selected.length) return;
     setPackageStatus("正在读取文件夹…", "working");
     try {
-      if (selected.length > 1000) throw new Error("文件夹超过 1000 个文件的限制");
+      if (selected.length > 10000) throw new Error("文件夹超过 10000 个条目的安全限制");
       const total = selected.reduce((sum, file) => sum + file.size, 0);
       if (total > 100 * 1024 * 1024) throw new Error("文件夹超过 100 MB 的限制");
       const files = new Map();
+      const ignored = { count: 0, bytes: 0 };
       for (const file of selected) {
         const path = file.webkitRelativePath || file.name;
         archive.assertSafePath(path);
+        if (archive.shouldIgnoreImportPath(path)) {
+          ignored.count += 1;
+          ignored.bytes += file.size;
+          continue;
+        }
+        if (files.size >= 1000) throw new Error("文件夹包含超过 1000 个有效文件，请精简后重试");
         files.set(path.replaceAll("\\", "/"), new Uint8Array(await file.arrayBuffer()));
       }
       const root = selected[0].webkitRelativePath?.split("/")[0] || "experiment-package";
-      await acceptFiles(files, root);
+      await acceptFiles(files, root, ignored);
     } catch (error) {
       resetPackage();
       setPackageStatus(error.message, "error");
@@ -118,7 +125,7 @@
     }
   }
 
-  async function acceptFiles(rawFiles, packageName) {
+  async function acceptFiles(rawFiles, packageName, ignored = { count: 0, bytes: 0 }) {
     closePreview();
     state.files = stripCommonRoot(rawFiles);
     state.packageName = packageName;
@@ -142,11 +149,11 @@
     setValue("field-summary", manifest.shortDescription || manifest.description || "");
     setValue("field-source", manifest.source || "");
     elements.descriptionEditor.value = readText("description.md") || readText("README.md") || "";
-    elements.fileSummary.textContent = `${state.files.size} 个文件 · ${formatBytes(totalSize(state.files))}`;
+    elements.fileSummary.textContent = `${state.files.size} 个文件 · ${formatBytes(totalSize(state.files))}${ignored.count ? ` · 已忽略 ${ignored.count} 个历史数据或无关文件` : ""}`;
     elements.metadataPanel.hidden = false;
     elements.descriptionPanel.hidden = false;
     elements.validationPanel.hidden = false;
-    setPackageStatus(`已读取 ${packageName}`, "success");
+    setPackageStatus(`已读取 ${packageName}${ignored.count ? `，已忽略 ${ignored.count} 个历史数据或无关文件` : ""}`, "success");
     renderDescription();
     validatePackage();
   }

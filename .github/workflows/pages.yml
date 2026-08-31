@@ -29,6 +29,7 @@ jobs:
 
       - name: Run self-checks
         run: |
+          node tests/archive-self-check.mjs
           node tests/self-check.mjs
           node tests/importer-self-check.mjs
           node tests/platform-self-check.mjs

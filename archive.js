@@ -7,15 +7,17 @@
 
   async function readZip(file, limits = {}) {
     const maxFiles = limits.maxFiles || 1000;
+    const maxEntries = limits.maxEntries || 10000;
     const maxBytes = limits.maxBytes || 100 * 1024 * 1024;
     const buffer = file instanceof ArrayBuffer ? file : await file.arrayBuffer();
     const view = new DataView(buffer);
     const eocd = findEndOfCentralDirectory(view);
     const count = view.getUint16(eocd + 10, true);
     const centralOffset = view.getUint32(eocd + 16, true);
-    if (count > maxFiles) throw new Error(`压缩包包含 ${count} 个文件，超过 ${maxFiles} 个文件的限制`);
+    if (count > maxEntries) throw new Error(`压缩包包含 ${count} 个条目，超过 ${maxEntries} 个条目的安全限制`);
 
     const entries = new Map();
+    const ignored = { count: 0, bytes: 0 };
     let offset = centralOffset;
     let totalBytes = 0;
     for (let index = 0; index < count; index += 1) {
@@ -35,6 +37,12 @@
       assertSafePath(name);
       totalBytes += size;
       if (totalBytes > maxBytes) throw new Error(`解压后文件超过 ${Math.round(maxBytes / 1024 / 1024)} MB 限制`);
+      if (shouldIgnoreImportPath(name)) {
+        ignored.count += 1;
+        ignored.bytes += size;
+        continue;
+      }
+      if (entries.size >= maxFiles) throw new Error(`压缩包包含超过 ${maxFiles} 个有效文件，请精简后重试`);
       if (view.getUint32(localOffset, true) !== 0x04034b50) throw new Error(`文件 ${name} 的本地头损坏`);
       const localNameLength = view.getUint16(localOffset + 26, true);
       const localExtraLength = view.getUint16(localOffset + 28, true);
@@ -47,7 +55,15 @@
       if (crc32(bytes) !== expectedCrc) throw new Error(`文件 ${name} 的完整性校验失败`);
       entries.set(name, bytes);
     }
-    return entries;
+    return { files: entries, ignored };
+  }
+
+  function shouldIgnoreImportPath(path) {
+    const parts = String(path).replaceAll("\\", "/").toLowerCase().split("/").filter(Boolean);
+    const name = parts.at(-1);
+    if ([".ds_store", "thumbs.db"].includes(name)) return true;
+    if (parts.some((part) => [".git", "node_modules", "__macosx"].includes(part))) return true;
+    return parts.indexOf("data") >= 0 && parts.indexOf("data") <= 1;
   }
 
   function createZip(entries) {
@@ -137,5 +153,5 @@
     });
   }
 
-  global.CognitionArchive = Object.freeze({ readZip, createZip, crc32, assertSafePath });
+  global.CognitionArchive = Object.freeze({ readZip, createZip, crc32, assertSafePath, shouldIgnoreImportPath });
 })(window);
