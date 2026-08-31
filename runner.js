@@ -9,9 +9,10 @@
   const error = document.querySelector("#runner-error");
   const results = document.querySelector("#runner-results");
   let rows = [];
+  let exportUrl = "";
 
   document.querySelector("#runner-exit").addEventListener("click", exitRunner);
-  document.querySelector("#runner-export").addEventListener("click", exportCsv);
+  document.querySelector("#runner-export").addEventListener("click", () => showToast("CSV 已生成，请在下载文件夹中查看"));
   document.querySelector("#runner-retry").href = window.location.href;
   window.addEventListener("message", receiveResult);
 
@@ -35,11 +36,18 @@
       return;
     }
     rows = received;
-    try { renderResult(); } catch (cause) { showError(`结果字段无法解析：${cause.message}`); }
+    try {
+      renderResult();
+      prepareCsvExport();
+    } catch (cause) { showError(`结果字段无法解析：${cause.message}`); }
   }
 
   function renderResult() {
     const config = item.result;
+    if (config.profile === "bart") {
+      renderBartResult(config);
+      return;
+    }
     const correctField = config.fields.correct;
     const rtField = config.fields.rt;
     if (!rows.some((row) => Object.hasOwn(row, correctField)) || !rows.some((row) => Object.hasOwn(row, rtField))) {
@@ -49,6 +57,7 @@
     const accuracy = rows.length ? correctRows.length / rows.length * 100 : 0;
     const mean = meanRt(correctRows, rtField);
     const effect = calculateEffect(rows, config);
+    setMetricCopy("正确率", "全部有效试次", "平均反应时", "仅统计正确反应");
     document.querySelector("#runner-result-note").textContent = `${item.name} · ${rows.length} 个有效试次。单次短测仅用于理解范式。`;
     document.querySelector("#runner-accuracy").textContent = `${Math.round(accuracy)}%`;
     document.querySelector("#runner-rt").textContent = mean === null ? "—" : `${Math.round(mean)} ms`;
@@ -59,6 +68,29 @@
     frame.hidden = true;
     results.hidden = false;
     document.querySelector("#runner-status").textContent = "实验完成 · 结果未上传";
+  }
+
+  function renderBartResult(config) {
+    const summary = platform.summarizeBartRows(rows, config.fields);
+    if (!summary.count) throw new Error(`缺少 ${config.fields.pumps} 或 ${config.fields.popped}`);
+    setMetricCopy("调整后平均充气次数", `${summary.bankedCount} 个未爆炸气球`, "气球爆炸比例", "全部有效气球");
+    document.querySelector("#runner-result-note").textContent = `${item.name} · ${summary.count} 个有效气球。单次短测仅用于理解范式。`;
+    document.querySelector("#runner-accuracy").textContent = summary.adjustedPumps === null ? "数据不足" : summary.adjustedPumps.toFixed(1);
+    document.querySelector("#runner-rt").textContent = summary.burstRate === null ? "—" : `${Math.round(summary.burstRate)}%`;
+    document.querySelector("#runner-effect-label").textContent = "累计收益";
+    document.querySelector("#runner-effect").textContent = `£${summary.totalEarnings.toFixed(2)}`;
+    document.querySelector("#runner-effect-note").textContent = "仅为任务内模拟金额";
+    document.querySelector("#runner-explanation").textContent = "调整后平均充气次数仅统计没有爆炸的气球，是 BART 常用的风险行为指标。数值越高，表示本次任务中选择继续承担风险的次数越多；单次教学练习不能用于个人评价或心理诊断。";
+    frame.hidden = true;
+    results.hidden = false;
+    document.querySelector("#runner-status").textContent = "实验完成 · 结果未上传";
+  }
+
+  function setMetricCopy(primaryLabel, primaryNote, secondaryLabel, secondaryNote) {
+    document.querySelector("#runner-primary-label").textContent = primaryLabel;
+    document.querySelector("#runner-primary-note").textContent = primaryNote;
+    document.querySelector("#runner-secondary-label").textContent = secondaryLabel;
+    document.querySelector("#runner-secondary-note").textContent = secondaryNote;
   }
 
   function calculateEffect(data, config) {
@@ -85,23 +117,22 @@
     };
   }
 
-  function exportCsv() {
+  function prepareCsvExport() {
     if (!rows.length) return;
     const headers = [...new Set(rows.flatMap((row) => Object.keys(row)))];
     const csv = [headers, ...rows.map((row) => headers.map((key) => row[key] ?? ""))]
       .map((line) => line.map(csvCell).join(",")).join("\r\n");
     const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
+    if (exportUrl) URL.revokeObjectURL(exportUrl);
+    exportUrl = URL.createObjectURL(blob);
+    const link = document.querySelector("#runner-export");
+    link.href = exportUrl;
     link.download = `${item.id}-result-${new Date().toISOString().replace(/[:.]/g, "-")}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-    showToast("CSV 已生成，请在下载文件夹中查看");
   }
 
   function exitRunner() {
     if (rows.length && !window.confirm("退出后，本次未导出的结果将被清除。确定退出吗？")) return;
+    if (exportUrl) URL.revokeObjectURL(exportUrl);
     window.location.assign(`./paradigm.html?id=${encodeURIComponent(id)}`);
   }
 

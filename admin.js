@@ -23,7 +23,7 @@
     "admin-login", "login-form", "admin-password", "login-error", "admin-workspace", "admin-logout",
     "zip-input", "folder-input", "package-status", "metadata-panel", "description-panel", "validation-panel", "file-summary",
     "field-id", "field-name", "field-category", "field-task", "field-duration", "field-entry", "field-license", "field-profile",
-    "field-correct", "field-rt", "field-condition", "field-levels", "field-summary", "field-source", "markdown-input",
+    "field-correct", "field-rt", "field-condition", "field-levels", "field-pumps", "field-popped", "field-earnings", "field-summary", "field-source", "markdown-input",
     "description-editor", "description-preview", "run-validation", "validation-list", "open-preview", "close-preview",
     "validation-summary", "validation-actions", "validation-details-summary",
     "experiment-preview", "preview-frame", "runtime-status", "manual-confirmation", "stage-package", "library-list",
@@ -134,6 +134,7 @@
     state.runtimeRows = [];
     elements.manualConfirmation.checked = false;
     const manifest = readJson("manifest.json") || readJson("paradigm.json") || {};
+    const isBartTask = /addData\s*\(\s*["']nPumps["']/i.test(collectTextSample()) && /addData\s*\(\s*["']popped["']/i.test(collectTextSample());
     const idGuess = slug(manifest.id || packageName);
     setValue("field-id", idGuess);
     setValue("field-name", manifest.name || manifest.title || titleFromEntry() || packageName);
@@ -142,10 +143,13 @@
     setValue("field-duration", manifest.duration || "");
     setValue("field-entry", manifest.entry || findEntry());
     setValue("field-license", manifest.license || (hasLicense() ? "见包内 LICENSE 文件" : ""));
-    setValue("field-profile", manifest.result?.profile || manifest.resultProfile || "generic");
+    setValue("field-profile", manifest.result?.profile || manifest.resultProfile || (isBartTask ? "bart" : "generic"));
     setValue("field-correct", manifest.result?.fields?.correct || "correct");
     setValue("field-rt", manifest.result?.fields?.rt || "rt");
     setValue("field-condition", manifest.result?.fields?.condition || "condition");
+    setValue("field-pumps", manifest.result?.fields?.pumps || "nPumps");
+    setValue("field-popped", manifest.result?.fields?.popped || "popped");
+    setValue("field-earnings", manifest.result?.fields?.earnings || "earnings");
     setValue("field-levels", (manifest.result?.levels || []).join(", "));
     setValue("field-summary", manifest.shortDescription || manifest.description || "");
     setValue("field-source", manifest.source || "");
@@ -223,13 +227,20 @@
       ? "检测到 cognition-lab:complete 结果桥接事件"
       : "实验必须在结束时向父页面发送 cognition-lab:complete 事件和逐试次数据");
 
-    const resultFields = [manifest.result.fields.correct, manifest.result.fields.rt].filter(Boolean);
-    let resultOkay = resultFields.length === 2;
-    let resultDetail = resultOkay ? `已配置 ${resultFields.join("、")} 字段，将在试运行时确认` : "请填写正确字段和反应时字段";
     const isBartTask = /addData\s*\(\s*["']nPumps["']/i.test(textSample) && /addData\s*\(\s*["']popped["']/i.test(textSample);
-    if (isBartTask) {
+    const resultFields = manifest.result.profile === "bart"
+      ? [manifest.result.fields.pumps, manifest.result.fields.popped, manifest.result.fields.earnings].filter(Boolean)
+      : [manifest.result.fields.correct, manifest.result.fields.rt].filter(Boolean);
+    let resultOkay = resultFields.length === (manifest.result.profile === "bart" ? 3 : 2);
+    let resultDetail = resultOkay ? `已配置 ${resultFields.join("、")} 字段，将在试运行时确认` : "请补齐当前结果模板所需字段";
+    if (manifest.result.profile === "bart") {
+      resultOkay = resultOkay && isBartTask;
+      resultDetail = resultOkay
+        ? "已识别 BART，将生成调整后平均充气次数、爆炸比例与累计收益"
+        : "BART 模板需要 nPumps、popped、earnings 字段及对应任务数据";
+    } else if (isBartTask) {
       resultOkay = false;
-      resultDetail = "检测到 BART：核心指标应为未爆炸气球的平均充气次数，而不是正确率与反应时；需要配置专用结果适配器";
+      resultDetail = "检测到 BART，请在高级配置中选择“BART 风险指标”结果模板";
     }
     else if (["difference", "dot-probe"].includes(manifest.result.profile)) {
       resultOkay = resultOkay && Boolean(manifest.result.fields.condition) && manifest.result.levels.length === 2;
@@ -331,6 +342,9 @@
           correct: elements.fieldCorrect.value.trim(),
           rt: elements.fieldRt.value.trim(),
           condition: elements.fieldCondition.value.trim(),
+          pumps: elements.fieldPumps.value.trim(),
+          popped: elements.fieldPopped.value.trim(),
+          earnings: elements.fieldEarnings.value.trim(),
         },
         levels: elements.fieldLevels.value.split(",").map((value) => value.trim()).filter(Boolean),
       },
@@ -380,7 +394,9 @@
     if (event.data.type !== "cognition-lab:complete") return;
     const rows = Array.isArray(event.data.trials) ? event.data.trials : Array.isArray(event.data.results) ? event.data.results : [];
     const manifest = collectManifest();
-    const required = [manifest.result.fields.correct, manifest.result.fields.rt].filter(Boolean);
+    const required = manifest.result.profile === "bart"
+      ? [manifest.result.fields.pumps, manifest.result.fields.popped, manifest.result.fields.earnings].filter(Boolean)
+      : [manifest.result.fields.correct, manifest.result.fields.rt].filter(Boolean);
     const missing = required.filter((field) => !rows.some((row) => row && Object.hasOwn(row, field)));
     if (!rows.length || missing.length) {
       state.runtimePassed = false;

@@ -114,20 +114,26 @@ function resolveDescription(configured, files) {
 
 function normalizeResult(value) {
   if (!value || typeof value !== "object") return null;
-  const profile = ["generic", "difference", "dot-probe"].includes(value.profile) ? value.profile : null;
+  const profile = ["generic", "difference", "dot-probe", "bart"].includes(value.profile) ? value.profile : null;
   const fields = value.fields && typeof value.fields === "object" ? {
     correct: cleanText(value.fields.correct),
     rt: cleanText(value.fields.rt),
     condition: cleanText(value.fields.condition),
+    pumps: cleanText(value.fields.pumps),
+    popped: cleanText(value.fields.popped),
+    earnings: cleanText(value.fields.earnings),
   } : {};
   const levels = normalizeList(value.levels);
-  if (!profile || !fields.correct || !fields.rt) return null;
+  if (!profile) return null;
+  if (profile === "bart" && (!fields.pumps || !fields.popped || !fields.earnings)) return null;
+  if (profile !== "bart" && (!fields.correct || !fields.rt)) return null;
   if (["difference", "dot-probe"].includes(profile) && (!fields.condition || levels.length !== 2)) return null;
   return { profile, fields, levels };
 }
 
 function metricsForResult(result) {
   if (!result) return [];
+  if (result.profile === "bart") return ["调整后平均充气次数", "气球爆炸比例", "累计收益"];
   const third = result.profile === "dot-probe" ? "注意偏向分数" : result.profile === "difference" ? "条件差异" : "有效试次";
   return ["正确率", "平均反应时", third];
 }

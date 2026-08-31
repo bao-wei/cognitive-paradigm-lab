@@ -12,9 +12,11 @@ try {
   const stroop = path.join(packages, "stroop-demo");
   const unknown = path.join(packages, "mystery-task");
   const ready = path.join(packages, "simple-reaction");
+  const bart = path.join(packages, "bart");
   await mkdir(stroop, { recursive: true });
   await mkdir(unknown, { recursive: true });
   await mkdir(ready, { recursive: true });
+  await mkdir(bart, { recursive: true });
   await writeFile(path.join(stroop, "index.html"), "<title>Stroop Demo</title><script src='experiment.js'></script>");
   await writeFile(path.join(stroop, "experiment.js"), "const psychoJS = new PsychoJS(); fetch('https://example.test/session');");
   await writeFile(path.join(stroop, "README.md"), "# Stroop Demo\nA colour-word interference task for attention.");
@@ -29,9 +31,19 @@ try {
     dataExport: "adapter",
     result: { profile: "generic", fields: { correct: "correct", rt: "rt", condition: "condition" }, levels: [] },
   }));
+  await writeFile(path.join(bart, "index.html"), "<title>BART</title><script src='bart.js'></script>");
+  await writeFile(path.join(bart, "bart.js"), "psychoJS.experiment.addData('nPumps', 4); psychoJS.experiment.addData('popped', false); parent.postMessage({type:'cognition-lab:complete', trials:[]}, '*');");
+  await writeFile(path.join(bart, "description.md"), "# BART\n\n## 学习目标\n\n教学。\n\n## 实验原理\n\n风险。\n\n## 任务流程与操作\n\n操作。\n\n## 核心指标\n\n指标。\n\n## 结果\n\n结果。\n\n## 注意\n\n注意。\n\n## 来源与参考\n\n参考。");
+  await writeFile(path.join(bart, "manifest.json"), JSON.stringify({
+    name: "BART",
+    approved: true,
+    license: "Source notice",
+    dataExport: "adapter",
+    result: { profile: "bart", fields: { pumps: "nPumps", popped: "popped", earnings: "earnings" }, levels: [] },
+  }));
 
   const found = await buildCatalog({ packagesDir: packages, output });
-  assert.equal(found.length, 3);
+  assert.equal(found.length, 4);
 
   const detected = found.find((item) => item.id === "stroop-demo");
   assert.equal(detected.name, "Stroop Demo");
@@ -49,6 +61,9 @@ try {
   assert.equal(launchable.category, "基础反应");
   assert.equal(launchable.dataExport, "adapter");
   assert.equal(launchable.descriptionPath, "./paradigms/packages/simple-reaction/description.md");
+  const bartTask = found.find((item) => item.id === "bart");
+  assert.equal(bartTask.result.profile, "bart");
+  assert.deepEqual(bartTask.metrics, ["调整后平均充气次数", "气球爆炸比例", "累计收益"]);
   console.log("importer self-check passed: discovery, classification, and safety states");
 } finally {
   await rm(temporary, { recursive: true, force: true });

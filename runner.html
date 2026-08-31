@@ -18,18 +18,18 @@
       <button class="icon-button" id="runner-exit" type="button" aria-label="退出实验">×</button>
     </header>
     <main class="runner-main">
-      <iframe id="experiment-frame" title="实验程序" sandbox="allow-scripts allow-forms allow-modals allow-downloads allow-pointer-lock" allow="fullscreen" allowfullscreen hidden></iframe>
+      <iframe id="experiment-frame" title="实验程序" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-pointer-lock" allow="fullscreen" allowfullscreen hidden></iframe>
       <section class="runner-wait" id="runner-wait"><p class="eyebrow">PREPARING</p><h1>正在准备实验…</h1></section>
       <section class="runner-error page-state" id="runner-error" hidden><p class="eyebrow">CANNOT START</p><h1>实验暂时无法运行</h1><p id="runner-error-message"></p><a class="button button-secondary" href="./experiments.html">返回实验目录</a></section>
       <section class="runner-results dialog-content results-screen" id="runner-results" hidden>
         <div class="result-heading"><div><p class="eyebrow">YOUR RESULT</p><h2>这一次，你观察到了什么？</h2></div><p id="runner-result-note"></p></div>
         <div class="metric-grid">
-          <article><span>正确率</span><strong id="runner-accuracy">—</strong><small>全部有效试次</small></article>
-          <article><span>平均反应时</span><strong id="runner-rt">—</strong><small>仅统计正确反应</small></article>
+          <article><span id="runner-primary-label">正确率</span><strong id="runner-accuracy">—</strong><small id="runner-primary-note">全部有效试次</small></article>
+          <article><span id="runner-secondary-label">平均反应时</span><strong id="runner-rt">—</strong><small id="runner-secondary-note">仅统计正确反应</small></article>
           <article><span id="runner-effect-label">有效试次</span><strong id="runner-effect">—</strong><small id="runner-effect-note">—</small></article>
         </div>
         <div class="result-explanation"><h3>如何理解</h3><p id="runner-explanation"></p></div>
-        <div class="result-actions"><button class="button button-primary" id="runner-export" type="button">导出本次 CSV</button><a class="button button-secondary" id="runner-retry" href="#">再做一次</a></div>
+        <div class="result-actions"><a class="button button-primary" id="runner-export" href="#" download>导出本次 CSV</a><a class="button button-secondary" id="runner-retry" href="#">再做一次</a></div>
         <p class="ephemeral-warning">退出本页后，本次结果将被清除。请先导出需要保留的数据。</p>
       </section>
     </main>

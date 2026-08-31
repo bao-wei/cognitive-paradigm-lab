@@ -157,12 +157,39 @@
     return output.join("\n");
   }
 
+  function summarizeBartRows(rows, fields = {}) {
+    const pumpsField = fields.pumps || "nPumps";
+    const poppedField = fields.popped || "popped";
+    const earningsField = fields.earnings || "earnings";
+    const valid = (Array.isArray(rows) ? rows : []).map((row) => ({
+      pumps: Number(row?.[pumpsField]),
+      popped: parseBoolean(row?.[poppedField]),
+      earnings: Number(row?.[earningsField]),
+    })).filter((row) => Number.isFinite(row.pumps) && row.popped !== null);
+    const banked = valid.filter((row) => !row.popped);
+    const earnings = valid.map((row) => row.earnings).filter(Number.isFinite);
+    return {
+      count: valid.length,
+      bankedCount: banked.length,
+      adjustedPumps: banked.length ? banked.reduce((sum, row) => sum + row.pumps, 0) / banked.length : null,
+      burstRate: valid.length ? valid.filter((row) => row.popped).length / valid.length * 100 : null,
+      totalEarnings: earnings.reduce((sum, value) => sum + value, 0),
+    };
+  }
+
+  function parseBoolean(value) {
+    if (value === true || value === 1 || value === "1" || String(value).toLowerCase() === "true") return true;
+    if (value === false || value === 0 || value === "0" || String(value).toLowerCase() === "false") return false;
+    return null;
+  }
+
   global.CognitionPlatform = Object.freeze({
     BUILTIN_PARADIGMS,
     getParadigms,
     findParadigm,
     escapeHtml,
     renderMarkdown,
+    summarizeBartRows,
     safeUrl,
   });
 })(window);

@@ -13,16 +13,32 @@ const rendered = platform.renderMarkdown("# 标题\n\n<script>alert(1)</script>\
 assert.doesNotMatch(rendered, /<script>|javascript:/i);
 assert.match(rendered, /&lt;script&gt;/);
 assert.match(rendered, /<ul>/);
+const bart = platform.summarizeBartRows([
+  { nPumps: 4, popped: false, earnings: 0.2 },
+  { nPumps: 8, popped: true, earnings: 0 },
+  { nPumps: 6, popped: "false", earnings: 0.3 },
+]);
+assert.equal(bart.count, 3);
+assert.equal(bart.bankedCount, 2);
+assert.equal(bart.adjustedPumps, 5);
+assert.ok(Math.abs(bart.burstRate - (100 / 3)) < 0.001);
+assert.equal(bart.totalEarnings, 0.5);
 
 const catalogPage = await readFile(new URL("../experiments.html", import.meta.url), "utf8");
 const detailPage = await readFile(new URL("../paradigm.html", import.meta.url), "utf8");
 const adminPage = await readFile(new URL("../admin.html", import.meta.url), "utf8");
 const adminScript = await readFile(new URL("../admin.js", import.meta.url), "utf8");
+const runnerPage = await readFile(new URL("../runner.html", import.meta.url), "utf8");
+const runnerScript = await readFile(new URL("../runner.js", import.meta.url), "utf8");
 assert.match(catalogPage, /catalog-search/);
 assert.match(detailPage, /start-experiment-top/);
 assert.match(adminPage, /validation-summary/);
 assert.match(adminPage, /<details class="technical-details">/);
 assert.match(adminPage, /<details class="advanced-settings">/);
 assert.match(adminScript, /实验程序需要技术适配/);
-assert.match(adminScript, /核心指标应为未爆炸气球的平均充气次数/);
+assert.match(adminPage, /value="bart"/);
+assert.match(adminScript, /调整后平均充气次数/);
+assert.match(runnerPage, /id="runner-export"[^>]+download/);
+assert.match(runnerScript, /prepareCsvExport/);
+assert.match(runnerScript, /summarizeBartRows/);
 console.log("platform self-check passed: catalog data, safe Markdown, and page landmarks");
