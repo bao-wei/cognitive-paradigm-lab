@@ -455,11 +455,19 @@ async function listFiles(root, output = []) {
 }
 
 async function expandArchive(zipPath, destination) {
+  if (process.platform !== "win32") {
+    await run("unzip", ["-q", zipPath, "-d", destination], { timeout: 300000 });
+    return;
+  }
   const script = "Expand-Archive -LiteralPath $env:ASSISTANT_ZIP -DestinationPath $env:ASSISTANT_DEST -Force";
   await run("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], { env: { ASSISTANT_ZIP: zipPath, ASSISTANT_DEST: destination }, timeout: 300000 });
 }
 
 async function compressArchive(source, destination) {
+  if (process.platform !== "win32") {
+    await run("zip", ["-q", "-r", destination, "."], { cwd: source, timeout: 300000 });
+    return;
+  }
   const script = "$items = Join-Path $env:ASSISTANT_SOURCE '*'; Compress-Archive -Path $items -DestinationPath $env:ASSISTANT_ZIP -CompressionLevel Optimal -Force";
   await run("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], { env: { ASSISTANT_SOURCE: source, ASSISTANT_ZIP: destination }, timeout: 300000 });
 }
