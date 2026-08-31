@@ -25,6 +25,7 @@
     "field-id", "field-name", "field-category", "field-task", "field-duration", "field-entry", "field-license", "field-profile",
     "field-correct", "field-rt", "field-condition", "field-levels", "field-summary", "field-source", "markdown-input",
     "description-editor", "description-preview", "run-validation", "validation-list", "open-preview", "close-preview",
+    "validation-summary", "validation-actions", "validation-details-summary",
     "experiment-preview", "preview-frame", "runtime-status", "manual-confirmation", "stage-package", "library-list",
     "change-list", "change-count", "export-changes", "toast",
   ].map((id) => [camel(id), document.getElementById(id)]));
@@ -224,8 +225,13 @@
 
     const resultFields = [manifest.result.fields.correct, manifest.result.fields.rt].filter(Boolean);
     let resultOkay = resultFields.length === 2;
-    let resultDetail = resultOkay ? `将读取 ${resultFields.join("、")} 字段` : "请填写正确字段和反应时字段";
-    if (["difference", "dot-probe"].includes(manifest.result.profile)) {
+    let resultDetail = resultOkay ? `已配置 ${resultFields.join("、")} 字段，将在试运行时确认` : "请填写正确字段和反应时字段";
+    const isBartTask = /addData\s*\(\s*["']nPumps["']/i.test(textSample) && /addData\s*\(\s*["']popped["']/i.test(textSample);
+    if (isBartTask) {
+      resultOkay = false;
+      resultDetail = "检测到 BART：核心指标应为未爆炸气球的平均充气次数，而不是正确率与反应时；需要配置专用结果适配器";
+    }
+    else if (["difference", "dot-probe"].includes(manifest.result.profile)) {
       resultOkay = resultOkay && Boolean(manifest.result.fields.condition) && manifest.result.levels.length === 2;
       resultDetail = resultOkay ? `将比较 ${manifest.result.levels[0]} 与 ${manifest.result.levels[1]}` : "条件差异模板还需要条件字段和两个条件值";
     }
@@ -239,10 +245,59 @@
       : "完整试做后请勾选人工确认");
 
     state.checks = checks;
+    renderValidationSummary(checks);
     elements.validationList.replaceChildren(...checks.map(renderCheck));
     const hasFailure = checks.some((check) => check.level === "fail");
     elements.stagePackage.disabled = hasFailure || !state.runtimePassed || !elements.manualConfirmation.checked;
     return !elements.stagePackage.disabled;
+  }
+
+  function renderValidationSummary(checks) {
+    const failures = checks.filter((check) => check.level === "fail");
+    const warnings = checks.filter((check) => check.level === "warn");
+    const passes = checks.filter((check) => check.level === "pass").length;
+    const basicFailure = failures.find((check) => check.title === "基本信息");
+    const descriptionFailure = failures.find((check) => check.title === "范式说明");
+    const technicalFailures = failures.filter((check) => !["基本信息", "范式说明"].includes(check.title));
+    const actions = [];
+
+    if (basicFailure) actions.push({ title: "补全范式信息", detail: basicFailure.detail, target: "metadata-panel" });
+    if (descriptionFailure) actions.push({ title: "补充教学说明", detail: "请在上方说明区介绍学习目标、实验原理、操作流程、核心指标与结果含义。", target: "description-panel" });
+    if (technicalFailures.length) actions.push({
+      title: "实验程序需要技术适配",
+      detail: `系统发现 ${technicalFailures.length} 类程序问题，例如运行依赖、核心指标或结果页接口。上传者无需逐项填写，可展开技术详情交由平台维护人员处理。`,
+    });
+    if (!failures.length && !state.runtimePassed) actions.push({ title: "进行一次完整试做", detail: "打开实验预览并完成任务，系统会自动确认结果是否成功返回。", target: "open-preview" });
+    if (!failures.length && state.runtimePassed && !elements.manualConfirmation.checked) actions.push({ title: "确认试做结果", detail: "确认材料、流程和结果解释无误后，勾选下方人工确认。", target: "manual-confirmation" });
+
+    const status = failures.length ? "需要处理" : warnings.length ? "等待试做" : "可以加入";
+    const title = failures.length ? "这个范式还不能直接加入" : warnings.length ? "文件检查完成，下一步进行试做" : "检查完成，可以加入范式库";
+    const detail = failures.length
+      ? `目前归纳为 ${actions.length} 项待办；红色技术清单已收起。`
+      : warnings.length ? "完成一次预览和人工确认即可继续。" : "所有必需检查均已完成。";
+    elements.validationSummary.dataset.kind = failures.length ? "blocked" : warnings.length ? "pending" : "ready";
+    elements.validationSummary.innerHTML = `<span>${status}</span><div><strong>${title}</strong><p>${detail}</p></div>`;
+    elements.validationActions.replaceChildren(...actions.map(renderValidationAction));
+    elements.validationDetailsSummary.textContent = `查看完整检查（${passes} 项通过，${checks.length - passes} 项待处理）`;
+  }
+
+  function renderValidationAction(action) {
+    const item = document.createElement("article");
+    item.className = "validation-action";
+    item.innerHTML = `<span aria-hidden="true">→</span><div><strong>${platform.escapeHtml(action.title)}</strong><p>${platform.escapeHtml(action.detail)}</p></div>`;
+    if (action.target) {
+      item.tabIndex = 0;
+      item.setAttribute("role", "button");
+      item.addEventListener("click", () => focusValidationTarget(action.target));
+      item.addEventListener("keydown", (event) => { if (["Enter", " "].includes(event.key)) focusValidationTarget(action.target); });
+    }
+    return item;
+  }
+
+  function focusValidationTarget(target) {
+    const element = document.getElementById(target);
+    element?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (element?.matches("input, textarea, button")) window.setTimeout(() => element.focus(), 350);
   }
 
   function renderCheck(check) {

@@ -63,22 +63,27 @@
 
             <section class="admin-panel" id="metadata-panel" hidden aria-labelledby="metadata-title">
               <header><div><p class="eyebrow">PACKAGE PROFILE</p><h2 id="metadata-title">范式信息</h2></div><span class="panel-status" id="file-summary"></span></header>
-              <div class="form-grid">
-                <label><span>范式 ID</span><input id="field-id" required pattern="[a-z0-9][a-z0-9-]*" placeholder="dot-probe" /></label>
+              <div class="form-grid form-grid-primary">
                 <label><span>范式名称</span><input id="field-name" required placeholder="点探测任务" /></label>
                 <label><span>认知领域</span><input id="field-category" required placeholder="注意与执行控制" /></label>
-                <label><span>任务类型</span><input id="field-task" required placeholder="空间选择反应" /></label>
                 <label><span>预计时长</span><input id="field-duration" required placeholder="约 5 分钟" /></label>
-                <label><span>入口文件</span><input id="field-entry" required placeholder="index.html" /></label>
                 <label><span>许可证</span><input id="field-license" required placeholder="MIT 或见 LICENSE" /></label>
-                <label><span>结果模板</span><select id="field-profile"><option value="generic">通用行为指标</option><option value="difference">条件差异</option><option value="dot-probe">点探测注意偏向</option></select></label>
-                <label><span>正确字段</span><input id="field-correct" value="correct" /></label>
-                <label><span>反应时字段</span><input id="field-rt" value="rt" /></label>
-                <label><span>条件字段</span><input id="field-condition" value="condition" /></label>
-                <label><span>条件 A / B</span><input id="field-levels" placeholder="incongruent, congruent" /></label>
                 <label class="form-wide"><span>简短简介</span><textarea id="field-summary" rows="2" required></textarea></label>
-                <label class="form-wide"><span>来源链接（可选）</span><input id="field-source" type="url" placeholder="https://…" /></label>
               </div>
+              <details class="advanced-settings">
+                <summary><span>高级配置</span><small>系统已自动填写，通常无需修改</small></summary>
+                <div class="form-grid">
+                  <label><span>范式 ID</span><input id="field-id" required pattern="[a-z0-9][a-z0-9-]*" placeholder="dot-probe" /></label>
+                  <label><span>任务类型</span><input id="field-task" required placeholder="空间选择反应" /></label>
+                  <label><span>入口文件</span><input id="field-entry" required placeholder="index.html" /></label>
+                  <label><span>结果模板</span><select id="field-profile"><option value="generic">通用行为指标</option><option value="difference">条件差异</option><option value="dot-probe">点探测注意偏向</option></select></label>
+                  <label><span>正确字段</span><input id="field-correct" value="correct" /></label>
+                  <label><span>反应时字段</span><input id="field-rt" value="rt" /></label>
+                  <label><span>条件字段</span><input id="field-condition" value="condition" /></label>
+                  <label><span>条件 A / B</span><input id="field-levels" placeholder="incongruent, congruent" /></label>
+                  <label class="form-wide"><span>来源链接（可选）</span><input id="field-source" type="url" placeholder="https://…" /></label>
+                </div>
+              </details>
             </section>
 
             <section class="admin-panel" id="description-panel" hidden aria-labelledby="description-title">
@@ -90,8 +95,13 @@
             </section>
 
             <section class="admin-panel" id="validation-panel" hidden aria-labelledby="validation-title">
-              <header><div><p class="eyebrow">QUALITY GATE</p><h2 id="validation-title">完整性与运行检查</h2></div><button class="button button-secondary" id="run-validation" type="button">重新检查</button></header>
-              <div class="validation-list" id="validation-list"></div>
+              <header><div><p class="eyebrow">IMPORT STATUS</p><h2 id="validation-title">导入结果</h2></div><button class="button button-secondary" id="run-validation" type="button">重新检查</button></header>
+              <div class="validation-summary" id="validation-summary" role="status" aria-live="polite"></div>
+              <div class="validation-actions" id="validation-actions"></div>
+              <details class="technical-details">
+                <summary id="validation-details-summary">查看完整检查</summary>
+                <div class="validation-list" id="validation-list"></div>
+              </details>
               <div class="preview-controls">
                 <button class="button button-secondary" id="open-preview" type="button">打开实验预览</button>
                 <label class="confirmation"><input id="manual-confirmation" type="checkbox" /> 我已完整试做，并确认实验结束后成功生成结果数据。</label>

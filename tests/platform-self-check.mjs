@@ -16,6 +16,13 @@ assert.match(rendered, /<ul>/);
 
 const catalogPage = await readFile(new URL("../experiments.html", import.meta.url), "utf8");
 const detailPage = await readFile(new URL("../paradigm.html", import.meta.url), "utf8");
+const adminPage = await readFile(new URL("../admin.html", import.meta.url), "utf8");
+const adminScript = await readFile(new URL("../admin.js", import.meta.url), "utf8");
 assert.match(catalogPage, /catalog-search/);
 assert.match(detailPage, /start-experiment-top/);
+assert.match(adminPage, /validation-summary/);
+assert.match(adminPage, /<details class="technical-details">/);
+assert.match(adminPage, /<details class="advanced-settings">/);
+assert.match(adminScript, /实验程序需要技术适配/);
+assert.match(adminScript, /核心指标应为未爆炸气球的平均充气次数/);
 console.log("platform self-check passed: catalog data, safe Markdown, and page landmarks");
