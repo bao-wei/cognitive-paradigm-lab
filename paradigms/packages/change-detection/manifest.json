@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "change-detection",
+  "name": "变化检测与变化定位任务",
+  "shortDescription": "通过变化检测与变化定位任务测量视觉工作记忆表现，比较相同与变化条件下的正确率和反应时。",
+  "category": "工作记忆",
+  "taskType": "变化检测与定位",
+  "duration": "约 10 分钟",
+  "entry": "index.html",
+  "license": "来源仓库未声明；发布前请核对授权",
+  "source": "https://gitlab.pavlovia.org/demos/change_detection",
+  "approved": true,
+  "allowNetwork": false,
+  "dataExport": "adapter",
+  "description": "description.md",
+  "result": {
+    "profile": "difference",
+    "fields": {
+      "correct": "key_resp.corr",
+      "rt": "key_resp.rt",
+      "condition": "condition_label",
+      "pumps": "nPumps",
+      "popped": "popped",
+      "earnings": "earnings"
+    },
+    "levels": [
+      "same",
+      "change"
+    ]
+  }
+}
