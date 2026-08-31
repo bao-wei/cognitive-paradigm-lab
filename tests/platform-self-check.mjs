@@ -30,6 +30,7 @@ const adminPage = await readFile(new URL("../admin.html", import.meta.url), "utf
 const adminScript = await readFile(new URL("../admin.js", import.meta.url), "utf8");
 const runnerPage = await readFile(new URL("../runner.html", import.meta.url), "utf8");
 const runnerScript = await readFile(new URL("../runner.js", import.meta.url), "utf8");
+const bartScript = await readFile(new URL("../paradigms/packages/bart/bart.js", import.meta.url), "utf8");
 assert.match(catalogPage, /catalog-search/);
 assert.match(detailPage, /start-experiment-top/);
 assert.match(adminPage, /validation-summary/);
@@ -41,4 +42,6 @@ assert.match(adminScript, /调整后平均充气次数/);
 assert.match(runnerPage, /id="runner-export"[^>]+download/);
 assert.match(runnerScript, /prepareCsvExport/);
 assert.match(runnerScript, /summarizeBartRows/);
+assert.match(runnerScript, /frame\.contentWindow\.focus/);
+assert.match(bartScript, /请按【空格键】开始实验/);
 console.log("platform self-check passed: catalog data, safe Markdown, and page landmarks");

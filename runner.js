@@ -15,6 +15,7 @@
   document.querySelector("#runner-export").addEventListener("click", () => showToast("CSV 已生成，请在下载文件夹中查看"));
   document.querySelector("#runner-retry").href = window.location.href;
   window.addEventListener("message", receiveResult);
+  frame.addEventListener("load", focusExperiment);
 
   if (!item || item.mode !== "package" || !item.entry || !item.result) {
     showError("这个范式尚未通过平台运行与结果协议检查。");
@@ -27,6 +28,11 @@
   frame.hidden = false;
   wait.hidden = true;
   document.querySelector("#runner-status").textContent = "实验数据只保留在当前页面";
+
+  function focusExperiment() {
+    frame.focus();
+    try { frame.contentWindow.focus(); } catch { /* The package can still be focused by clicking its canvas. */ }
+  }
 
   function receiveResult(event) {
     if (event.source !== frame.contentWindow || !event.data || event.data.type !== "cognition-lab:complete") return;
