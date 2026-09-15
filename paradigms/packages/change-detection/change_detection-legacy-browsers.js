@@ -916,7 +916,7 @@ function change_trialsLoopBegin(change_trialsLoopScheduler, snapshot) {
       psychoJS: psychoJS,
       nReps: 1, method: TrialHandler.Method.RANDOM,
       extraInfo: expInfo, originPath: undefined,
-      trialList: 'code/sampled_circle_points_with_colors.csv',
+      trialList: TrialHandler.importConditions(psychoJS.serverManager, 'code/sampled_circle_points_with_colors.csv').slice(0, 10),
       seed: undefined, name: 'change_trials'
     });
     psychoJS.experiment.addLoop(change_trials); // add the loop to the experiment
@@ -990,9 +990,9 @@ function localisation_trialsLoopBegin(localisation_trialsLoopScheduler, snapshot
     // set up handler to look after randomisation of conditions etc
     localisation_trials = new TrialHandler({
       psychoJS: psychoJS,
-      nReps: 5, method: TrialHandler.Method.RANDOM,
+      nReps: 1, method: TrialHandler.Method.RANDOM,
       extraInfo: expInfo, originPath: undefined,
-      trialList: 'code/localisation_trials_with_test_columns.xlsx',
+      trialList: TrialHandler.importConditions(psychoJS.serverManager, 'code/localisation_trials_with_test_columns.xlsx').slice(0, 10),
       seed: undefined, name: 'localisation_trials'
     });
     psychoJS.experiment.addLoop(localisation_trials); // add the loop to the experiment

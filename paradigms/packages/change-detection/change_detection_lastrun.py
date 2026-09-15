@@ -869,7 +869,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     # set up handler to look after randomisation of conditions etc
     change_trials = data.TrialHandler(nReps=1.0, method='random', 
         extraInfo=expInfo, originPath=-1,
-        trialList=data.importConditions('code/sampled_circle_points_with_colors.csv', selection='1'),
+        trialList=data.importConditions('code/sampled_circle_points_with_colors.csv', selection='0:10'),
         seed=None, name='change_trials')
     thisExp.addLoop(change_trials)  # add the loop to the experiment
     thisChange_trial = change_trials.trialList[0]  # so we can initialise stimuli with some values
@@ -1577,9 +1577,9 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     routineTimer.reset()
     
     # set up handler to look after randomisation of conditions etc
-    localisation_trials = data.TrialHandler(nReps=5.0, method='random', 
+    localisation_trials = data.TrialHandler(nReps=1.0, method='random', 
         extraInfo=expInfo, originPath=-1,
-        trialList=data.importConditions('code/localisation_trials_with_test_columns.xlsx'),
+        trialList=data.importConditions('code/localisation_trials_with_test_columns.xlsx', selection='0:10'),
         seed=None, name='localisation_trials')
     thisExp.addLoop(localisation_trials)  # add the loop to the experiment
     thisLocalisation_trial = localisation_trials.trialList[0]  # so we can initialise stimuli with some values

@@ -46,7 +46,7 @@ const metadata = platform.inferPsychoJsMetadata({
 assert.equal(metadata.category, "工作记忆");
 assert.equal(metadata.name, "变化检测与变化定位任务");
 assert.equal(metadata.taskType, "变化检测与定位");
-assert.equal(metadata.duration, "约 10 分钟");
+assert.equal(metadata.duration, "约 4 分钟");
 assert.match(metadata.summary, /视觉工作记忆/);
 assert.match(metadata.description, /# 学习目标[\s\S]+# 实验原理[\s\S]+# 任务流程[\s\S]+# 核心指标[\s\S]+# 结果解读[\s\S]+# 注意事项[\s\S]+# 来源与参考/);
 

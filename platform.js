@@ -217,7 +217,7 @@
       : /attention|stroop|flanker|inhibition/i.test(context) ? "注意与执行控制"
         : /decision|risk|reward/i.test(context) ? "决策与奖赏" : "认知心理学实验";
     const taskType = changeTask ? "变化检测与定位" : "行为任务";
-    const duration = changeTask ? "约 10 分钟" : "约 5–10 分钟";
+    const duration = changeTask ? "约 4 分钟" : "约 5–10 分钟";
     const license = /\bMIT\b/i.test(readme) ? "MIT"
       : /Apache(?: License)?(?:,? Version)? 2\.0|Apache-2\.0/i.test(readme) ? "Apache-2.0"
         : "来源仓库未声明；发布前请核对授权";

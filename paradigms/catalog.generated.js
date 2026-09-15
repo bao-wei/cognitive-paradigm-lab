@@ -5,7 +5,7 @@ window.IMPORTED_PARADIGMS = [
     "shortDescription": "通过变化检测与变化定位任务测量视觉工作记忆表现，比较相同与变化条件下的正确率和反应时。",
     "category": "工作记忆",
     "taskType": "变化检测与定位",
-    "duration": "约 10 分钟",
+    "duration": "约 4 分钟",
     "metrics": [
       "正确率",
       "平均反应时",
@@ -15,7 +15,7 @@ window.IMPORTED_PARADIGMS = [
     "platform": "PsychoJS",
     "entry": "./paradigms/packages/change-detection/index.html",
     "descriptionPath": "./paradigms/packages/change-detection/description.md",
-    "status": "ready",
+    "status": "review",
     "dataExport": "adapter",
     "controls": [
       "space",
@@ -45,7 +45,9 @@ window.IMPORTED_PARADIGMS = [
     },
     "license": "来源仓库未声明；发布前请核对授权",
     "source": "https://gitlab.pavlovia.org/demos/change_detection",
-    "issues": []
+    "issues": [
+      "检测到可能的数据联网代码，尚未明确允许"
+    ]
   },
   {
     "id": "bart",

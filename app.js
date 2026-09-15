@@ -15,7 +15,7 @@ const EXPERIMENTS = {
     instruction: "屏幕会出现一个颜色词。请忽略文字写的是什么，只判断文字本身的颜色，并按对应数字键。",
     keys: Object.entries(COLORS).map(([value, item]) => ({ key: item.key, label: item.label, value, color: item.hex })),
     practiceCount: 6,
-    formalCount: 24,
+    formalCount: 20,
     responseWindow: 1800,
     buildTrials(count) {
       const names = Object.keys(COLORS);
@@ -63,7 +63,7 @@ const EXPERIMENTS = {
       { key: "J", label: "中央向右", value: "right" },
     ],
     practiceCount: 6,
-    formalCount: 24,
+    formalCount: 20,
     responseWindow: 1600,
     buildTrials(count) {
       return shuffle(Array.from({ length: count }, (_, index) => {
@@ -108,7 +108,7 @@ const EXPERIMENTS = {
       { key: "不按", label: "红色：等待", value: "nogo", color: "#c74b36" },
     ],
     practiceCount: 7,
-    formalCount: 28,
+    formalCount: 20,
     responseWindow: 1100,
     buildTrials(count) {
       const noGoCount = Math.max(1, Math.round(count * 0.25));
