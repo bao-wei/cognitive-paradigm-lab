@@ -22,7 +22,7 @@ try {
   await writeFile(path.join(stroop, "experiment.js"), "const psychoJS = new PsychoJS(); fetch('https://example.test/session');");
   await writeFile(path.join(stroop, "README.md"), "# Stroop Demo\nA colour-word interference task for attention.");
   await writeFile(path.join(ready, "index.html"), "<title>Simple Reaction Time</title><button>Start</button>");
-  await writeFile(path.join(ready, "bridge.js"), "const keys = task.getKeys({keyList: ['space', 'f', 'j', 'escape']}); parent.postMessage({type:'cognition-lab:complete', trials:[]}, '*');");
+  await writeFile(path.join(ready, "bridge.js"), "const manager = new ServerManager(); const keys = task.getKeys({keyList: ['space', 'f', 'j', 'escape']}); parent.postMessage({type:'cognition-lab:complete', trials:[]}, '*');");
   await writeFile(path.join(ready, "vendor", "runtime.js"), "const request = new XMLHttpRequest();");
   await writeFile(path.join(ready, "description.md"), "# Simple Reaction Time\n\n## Learning goal\n\nA teaching task.");
   await writeFile(path.join(ready, "manifest.json"), JSON.stringify({

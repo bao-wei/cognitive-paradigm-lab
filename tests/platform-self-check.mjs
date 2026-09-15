@@ -70,5 +70,5 @@ assert.match(runnerPage, /id="runner-export"[^>]+download/);
 assert.match(runnerScript, /prepareCsvExport/);
 assert.match(runnerScript, /summarizeBartRows/);
 assert.match(runnerScript, /frame\.contentWindow\.focus/);
-assert.match(bartScript, /请按【空格键】开始实验/);
+assert.match(bartScript, /点击【继续】开始实验/);
 console.log("platform self-check passed: catalog data, safe Markdown, and page landmarks");

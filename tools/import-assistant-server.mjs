@@ -400,6 +400,10 @@ export async function adaptPsychoJsPackage(root, { fetchImpl = fetch } = {}) {
     html = html.replaceAll(url, `./vendor/${name}`);
     count += 1;
   }
+  if (!/<meta\b[^>]*\bname=["']viewport["']/i.test(html)) {
+    html = html.replace(/<head([^>]*)>/i, '<head$1><meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">');
+    count += 1;
+  }
 
   const dependencySources = [html];
   for (const file of await listFiles(root)) {

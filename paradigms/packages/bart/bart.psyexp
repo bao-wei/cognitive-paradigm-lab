@@ -185,7 +185,7 @@
         <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
         <Param val="" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="Press SPACE to pump the balloon&amp;#10;Press RETURN to bank this sum" valType="str" updates="constant" name="text"/>
+        <Param val="空格键或下方“继续”：继续充气&amp;#10;回车键或下方“确认”：保存本轮收益" valType="str" updates="constant" name="text"/>
         <Param val="from exp settings" valType="str" updates="None" name="units"/>
       </TextboxComponent>
       <TextboxComponent name="balloonValTxt" plugin="None">
@@ -671,7 +671,7 @@
         <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
         <Param val="1.5" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="Press SPACE to pump the balloon&amp;#10;Press RETURN to bank this sum" valType="str" updates="constant" name="text"/>
+        <Param val="空格键或下方“继续”：继续充气&amp;#10;回车键或下方“确认”：保存本轮收益" valType="str" updates="constant" name="text"/>
         <Param val="from exp settings" valType="str" updates="None" name="units"/>
       </TextboxComponent>
       <TextboxComponent name="trialcount_2" plugin="None">
@@ -814,7 +814,7 @@
         <Param val="duration (s)" valType="str" updates="None" name="stopType"/>
         <Param val="" valType="code" updates="constant" name="stopVal"/>
         <Param val="True" valType="bool" updates="None" name="syncScreenRefresh"/>
-        <Param val="This is a game where you have to optimise your earnings in a balloon pumping competition.&amp;#10;&amp;#10;You get prize money for each balloon you pump up, according to its size. But if you pump it too far it will pop and you'll get nothing for that balloon.&amp;#10;&amp;#10;Balloons differ in their maximum size - they can occasionally reach to almost the size of the screen but most will pop well before that.&amp;#10;&amp;#10;Press&amp;#10;    SPACE to pump the balloon&amp;#10;    RETURN to bank the cash for this balloon and move onto the next" valType="str" updates="constant" name="text"/>
+        <Param val="这是一项气球模拟风险任务。&amp;#10;&amp;#10;每次继续操作，气球都会变大，同时本轮收益增加。但气球可能在某一次充气时爆炸；如果爆炸，本轮收益将归零。&amp;#10;&amp;#10;不同气球的爆炸点并不相同。请在继续充气以争取更多收益和及时保存本轮收益之间作出选择。&amp;#10;&amp;#10;空格键或下方“继续”：继续充气&amp;#10;回车键或下方“确认”：保存本轮收益并进入下一个气球" valType="str" updates="constant" name="text"/>
         <Param val="from exp settings" valType="str" updates="None" name="units"/>
       </TextboxComponent>
       <SoundComponent name="pop_sound" plugin="None">

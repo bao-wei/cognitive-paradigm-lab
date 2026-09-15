@@ -378,7 +378,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "instructions" ---
     welcometxt = visual.TextBox2(
-         win, text='本任务包含两个阶段。\n\n第一阶段：屏幕先呈现六个彩色方块，随后在某一位置呈现一个彩色方块。请判断该颜色是否曾出现在同一位置。\n\n若出现过，请按 Y；若没有出现，请按 N。\n\n按空格键开始', placeholder='在此输入…', font='Arial',
+         win, text='本任务包含两个阶段。\n\n第一阶段：屏幕先呈现六个彩色方块，随后在某一位置呈现一个彩色方块。请判断该颜色是否曾出现在同一位置。\n\n若出现过，请按 Y 或点击“Y / 是”；若没有出现，请按 N 或点击“N / 否”。\n\n按空格键或点击“继续”开始', placeholder='在此输入…', font='Arial',
          pos=(0, 0),     letterHeight=0.05,
          size=(1, 1), borderWidth=2.0,
          color='white', colorSpace='rgb',
@@ -435,7 +435,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "show_test" ---
     question = visual.TextBox2(
-         win, text='这个颜色的方块刚才出现在这个位置吗？\n\n是：按 Y　　否：按 N', placeholder='在此输入…', font='Arial',
+         win, text='这个颜色的方块刚才出现在这个位置吗？\n\n是：按 Y 或点击“Y / 是”　　否：按 N 或点击“N / 否”', placeholder='在此输入…', font='Arial',
          pos=(0, 0.45),     letterHeight=0.05,
          size=(1, 0.1), borderWidth=2.0,
          color='white', colorSpace='rgb',
@@ -478,7 +478,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "next_instr" ---
     nextinstrtxt = visual.TextBox2(
-         win, text='很好！\n\n接下来，屏幕会先后呈现两组六个方块，其中一个方块的颜色发生了变化。请按 1–6，选择发生变化的方块编号。\n\n按空格键开始', placeholder='在此输入…', font='Arial',
+         win, text='很好！\n\n接下来，屏幕会先后呈现两组六个方块，其中一个方块的颜色发生了变化。请按 1–6 或点击对应数字，选择发生变化的方块编号。\n\n按空格键或点击“继续”开始', placeholder='在此输入…', font='Arial',
          pos=(0, 0),     letterHeight=0.05,
          size=(1, 1), borderWidth=2.0,
          color='white', colorSpace='rgb',

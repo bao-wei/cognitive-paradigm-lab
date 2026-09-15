@@ -12,8 +12,8 @@ const EXPERIMENTS = {
     number: "实验 01",
     title: "Stroop 色词干扰",
     question: "文字的含义，会在多大程度上干扰你对颜色的判断？",
-    instruction: "屏幕会出现一个颜色词。请忽略文字写的是什么，只判断文字本身的颜色，并按对应数字键。",
-    keys: Object.entries(COLORS).map(([value, item]) => ({ key: item.key, label: item.label, value, color: item.hex })),
+    instruction: "屏幕会出现一个颜色词。请忽略文字写的是什么，只判断文字本身的颜色；可按对应数字键，也可点击下方按钮。",
+    keys: Object.entries(COLORS).map(([value, item]) => ({ key: item.key, input: item.key, label: item.label, value, color: item.hex })),
     practiceCount: 6,
     formalCount: 20,
     responseWindow: 1800,
@@ -57,10 +57,10 @@ const EXPERIMENTS = {
     number: "实验 02",
     title: "Flanker 侧抑制任务",
     question: "当周围信息与目标冲突时，你能否只对中央目标作出反应？",
-    instruction: "请只判断五个箭头中最中央箭头的方向。中央箭头向左按 F，向右按 J；两侧箭头只是干扰项。",
+    instruction: "请只判断五个箭头中最中央箭头的方向。中央箭头向左按 F 或点击“中央向左”，向右按 J 或点击“中央向右”。",
     keys: [
-      { key: "F", label: "中央向左", value: "left" },
-      { key: "J", label: "中央向右", value: "right" },
+      { key: "F", input: "f", label: "中央向左", value: "left" },
+      { key: "J", input: "j", label: "中央向右", value: "right" },
     ],
     practiceCount: 6,
     formalCount: 20,
@@ -102,9 +102,9 @@ const EXPERIMENTS = {
     number: "实验 03",
     title: "Go / No-Go 任务",
     question: "当“立即反应”成为习惯后，你能否在关键信号出现时停下来？",
-    instruction: "看到绿色圆形时尽快按空格键；看到红色圆形时不要按任何键。请兼顾速度与准确性。",
+    instruction: "看到绿色圆形时尽快按空格键或点击“绿色：按下”；看到红色圆形时不要操作，等待下一个刺激。",
     keys: [
-      { key: "空格", label: "绿色：按下", value: "go", color: "#47745a" },
+      { key: "空格", input: "space", label: "绿色：按下", value: "go", color: "#47745a" },
       { key: "不按", label: "红色：等待", value: "nogo", color: "#c74b36" },
     ],
     practiceCount: 7,
@@ -195,6 +195,12 @@ elements.startFormal.addEventListener("click", () => startPhase("formal"));
 elements.exportCsv.addEventListener("click", exportResults);
 elements.retry.addEventListener("click", resetToIntro);
 elements.close.addEventListener("click", requestClose);
+elements.taskKeyGuide.addEventListener("pointerdown", (event) => {
+  const button = event.target.closest?.("button[data-key]");
+  if (!button) return;
+  event.preventDefault();
+  handleResponse({ key: button.dataset.key, repeat: false, preventDefault() {} });
+});
 elements.dialog.addEventListener("cancel", (event) => {
   event.preventDefault();
   requestClose();
@@ -301,16 +307,16 @@ function renderIntro() {
   elements.instruction.textContent = config.instruction;
   elements.introTrials.textContent = `约 ${Math.ceil((config.formalCount * (config.responseWindow + 700)) / 60000) + 1} 分钟`;
   elements.keyGuide.innerHTML = renderKeys(config.keys);
-  elements.taskKeyGuide.innerHTML = renderKeys(config.keys);
+  elements.taskKeyGuide.innerHTML = renderKeys(config.keys, true);
 }
 
-function renderKeys(keys) {
+function renderKeys(keys, interactive = false) {
   return keys.map((item) => `
-    <span class="key-item">
+    <${interactive && item.input ? `button type="button" data-key="${escapeHtml(item.input)}"` : "span"} class="key-item">
       <kbd>${escapeHtml(item.key)}</kbd>
       ${item.color ? `<i class="color-dot" style="background:${item.color}" aria-hidden="true"></i>` : ""}
       <span>${escapeHtml(item.label)}</span>
-    </span>
+    </${interactive && item.input ? "button" : "span"}>
   `).join("");
 }
 
@@ -355,13 +361,17 @@ function showStimulus() {
 
 function handleResponse(event) {
   if (!state.acceptingResponse || event.repeat) return;
-  const key = event.key.toLowerCase();
+  const key = normalizeResponseKey(event.key);
   const validKeys = state.id === "stroop" ? ["1", "2", "3", "4"]
     : state.id === "flanker" ? ["f", "j"]
       : [" "];
   if (!validKeys.includes(key)) return;
   event.preventDefault();
   recordTrial(key, performance.now() - state.stimulusStartedAt);
+}
+
+function normalizeResponseKey(key) {
+  return key === "space" ? " " : String(key).toLowerCase();
 }
 
 function handleTimeout() {

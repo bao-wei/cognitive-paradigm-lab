@@ -34,9 +34,9 @@ const context = vm.createContext({
 });
 
 const source = await readFile(new URL("../app.js", import.meta.url), "utf8");
-vm.runInContext(`${source}\n;globalThis.__core = { EXPERIMENTS, meanRT, csvCell };`, context);
+vm.runInContext(`${source}\n;globalThis.__core = { EXPERIMENTS, meanRT, csvCell, renderKeys, normalizeResponseKey };`, context);
 
-const { EXPERIMENTS, meanRT, csvCell } = context.__core;
+const { EXPERIMENTS, meanRT, csvCell, renderKeys, normalizeResponseKey } = context.__core;
 
 assert.equal(EXPERIMENTS.stroop.formalCount, 20);
 const stroop = EXPERIMENTS.stroop.buildTrials(EXPERIMENTS.stroop.formalCount);
@@ -59,6 +59,10 @@ const goNoGo = EXPERIMENTS.gonogo.buildTrials(EXPERIMENTS.gonogo.formalCount);
 assert.equal(goNoGo.length, 20);
 assert.equal(goNoGo.filter((trial) => trial.condition === "go").length, 15);
 assert.equal(goNoGo.filter((trial) => trial.condition === "nogo").length, 5);
+assert.equal(renderKeys(EXPERIMENTS.stroop.keys, true).match(/<button/g)?.length, 4);
+assert.equal(renderKeys(EXPERIMENTS.flanker.keys, true).match(/<button/g)?.length, 2);
+assert.equal(renderKeys(EXPERIMENTS.gonogo.keys, true).match(/<button/g)?.length, 1);
+assert.equal(normalizeResponseKey("space"), " ");
 
 for (const filename of ["change_detection.js", "change_detection-legacy-browsers.js"]) {
   const changeSource = await readFile(new URL(`../paradigms/packages/change-detection/${filename}`, import.meta.url), "utf8");

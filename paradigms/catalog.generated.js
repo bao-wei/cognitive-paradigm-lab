@@ -15,7 +15,7 @@ window.IMPORTED_PARADIGMS = [
     "platform": "PsychoJS",
     "entry": "./paradigms/packages/change-detection/index.html",
     "descriptionPath": "./paradigms/packages/change-detection/description.md",
-    "status": "review",
+    "status": "ready",
     "dataExport": "adapter",
     "controls": [
       "space",
@@ -45,9 +45,7 @@ window.IMPORTED_PARADIGMS = [
     },
     "license": "来源仓库未声明；发布前请核对授权",
     "source": "https://gitlab.pavlovia.org/demos/change_detection",
-    "issues": [
-      "检测到可能的数据联网代码，尚未明确允许"
-    ]
+    "issues": []
   },
   {
     "id": "bart",

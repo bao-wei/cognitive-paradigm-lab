@@ -158,7 +158,7 @@ async function experimentInit() {
   instrtxt = new visual.TextBox({
     win: psychoJS.window,
     name: 'instrtxt',
-    text: "这是一项气球模拟风险任务。\n\n每按一次空格键，气球都会变大，同时本轮收益增加。但气球可能在某一次充气时爆炸；如果爆炸，本轮收益将归零。\n\n不同气球的爆炸点并不相同。请在继续充气以争取更多收益和及时保存本轮收益之间作出选择。\n\n按键说明\n    空格键：继续充气\n    回车键：保存本轮收益并进入下一个气球\n\n准备好后，请按【空格键】开始实验。\n若按键没有反应，请先单击实验画面。",
+    text: "这是一项气球模拟风险任务。\n\n每次继续操作，气球都会变大，同时本轮收益增加。但气球可能在某一次充气时爆炸；如果爆炸，本轮收益将归零。\n\n不同气球的爆炸点并不相同。请在继续充气以争取更多收益和及时保存本轮收益之间作出选择。\n\n操作说明\n    空格键或下方【继续】：继续充气\n    回车键或下方【确认】：保存本轮收益并进入下一个气球\n\n准备好后，请按空格键或点击【继续】开始实验。",
     placeholder: 'Type here...',
     font: 'Arial',
     pos: [0, 0], 
@@ -211,7 +211,7 @@ async function experimentInit() {
   reminder = new visual.TextBox({
     win: psychoJS.window,
     name: 'reminder',
-    text: '空格键：继续充气\n回车键：保存本轮收益',
+    text: '空格键或下方“继续”：继续充气\n回车键或下方“确认”：保存本轮收益',
     placeholder: 'Type here...',
     font: 'Arial',
     pos: [(- 0.4), (- 0.3)], 
@@ -408,7 +408,7 @@ async function experimentInit() {
   reminder_2 = new visual.TextBox({
     win: psychoJS.window,
     name: 'reminder_2',
-    text: '空格键：继续充气\n回车键：保存本轮收益',
+    text: '空格键或下方“继续”：继续充气\n回车键或下方“确认”：保存本轮收益',
     placeholder: 'Type here...',
     font: 'Arial',
     pos: [(- 0.4), (- 0.3)], 
