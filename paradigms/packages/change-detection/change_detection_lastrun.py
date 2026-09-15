@@ -59,7 +59,7 @@ or run the experiment with `--pilot` as an argument. To change what pilot
 # work out from system args whether we are running in pilot mode
 PILOTING = core.setPilotModeFromArgs()
 # start off with values from experiment settings
-_fullScr = True
+_fullScr = False
 _winSize = (1024, 768)
 _loggingLevel = logging.getLevel('warning')
 # if in pilot mode, apply overrides according to preferences
@@ -378,7 +378,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "instructions" ---
     welcometxt = visual.TextBox2(
-         win, text='In this task you will see six colored squares. \n\nAfter viewing the squares you will see on colored square in a particular location. \n\nYour task is to judge if that colored square did appear in that location. \n\nPress Y if that color square did occur in that location\nPress N if that color square did not appear in that location\n\nPress space to start', placeholder='Type here...', font='Arial',
+         win, text='本任务包含两个阶段。\n\n第一阶段：屏幕先呈现六个彩色方块，随后在某一位置呈现一个彩色方块。请判断该颜色是否曾出现在同一位置。\n\n若出现过，请按 Y；若没有出现，请按 N。\n\n按空格键开始', placeholder='在此输入…', font='Arial',
          pos=(0, 0),     letterHeight=0.05,
          size=(1, 1), borderWidth=2.0,
          color='white', colorSpace='rgb',
@@ -435,7 +435,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "show_test" ---
     question = visual.TextBox2(
-         win, text='Did this color square appear in this location? \n\nPress Y for yes \nPress N for no', placeholder='Type here...', font='Arial',
+         win, text='这个颜色的方块刚才出现在这个位置吗？\n\n是：按 Y　　否：按 N', placeholder='在此输入…', font='Arial',
          pos=(0, 0.45),     letterHeight=0.05,
          size=(1, 0.1), borderWidth=2.0,
          color='white', colorSpace='rgb',
@@ -478,7 +478,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "next_instr" ---
     nextinstrtxt = visual.TextBox2(
-         win, text='Great! \n\nThis time you will see six squares folowed by another six squares. One of the squares will have changed in color, use the keys 1 - 6 on your keyboard to indicate which has changed. \n\nPress space to start', placeholder='Type here...', font='Arial',
+         win, text='很好！\n\n接下来，屏幕会先后呈现两组六个方块，其中一个方块的颜色发生了变化。请按 1–6，选择发生变化的方块编号。\n\n按空格键开始', placeholder='在此输入…', font='Arial',
          pos=(0, 0),     letterHeight=0.05,
          size=(1, 1), borderWidth=2.0,
          color='white', colorSpace='rgb',
@@ -704,7 +704,7 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
     
     # --- Initialize components for Routine "bye" ---
     textbox = visual.TextBox2(
-         win, text='That is the end - goodbye!', placeholder='Type here...', font='Arial',
+         win, text='实验结束，感谢参与！', placeholder='在此输入…', font='Arial',
          pos=(0, 0),     letterHeight=0.05,
          size=(0.5, 0.5), borderWidth=2.0,
          color='white', colorSpace='rgb',
@@ -1353,10 +1353,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         thisExp.addData('feedback.started', globalClock.getTime(format='float'))
         # Run 'Begin Routine' code from code_2
         if key_resp.corr:
-            fbtxt = 'Correct!'
+            fbtxt = '正确！'
             fbcol = 'green'
         else:
-            fbtxt = 'Incorrect'
+            fbtxt = '错误'
             fbcol = 'red'
         fbtextbox.reset()
         fbtextbox.setColor(fbcol, colorSpace='rgb')
@@ -2292,10 +2292,10 @@ def run(expInfo, thisExp, win, globalClock=None, thisSession=None):
         thisExp.addData('localisation_feedback.started', globalClock.getTime(format='float'))
         # Run 'Begin Routine' code from code_4
         if localisation_resp.corr:
-            fbtxt = 'Correct!'
+            fbtxt = '正确！'
             fbcol = 'green'
         else:
-            fbtxt = 'Incorrect'
+            fbtxt = '错误'
             fbcol = 'red'
         fbtextbox_2.reset()
         fbtextbox_2.setColor(fbcol, colorSpace='rgb')

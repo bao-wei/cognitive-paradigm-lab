@@ -38,6 +38,7 @@ try {
   assert.equal(await readFile(path.join(psychoJsRoot, "lib", "psychojs-2024.2.4.js"), "utf8"), "runtime");
   assert.equal(await readFile(path.join(psychoJsRoot, "lib", "psychojs-2024.2.4.css"), "utf8"), "runtime");
   assert.match(await readFile(path.join(psychoJsRoot, "index.html"), "utf8"), /vendor\/jquery-3\.6\.0\.min\.js/);
+  assert.match(await readFile(path.join(psychoJsRoot, "index.html"), "utf8"), /cognition-lab:key/);
   assert.match(await readFile(path.join(psychoJsRoot, "task.js"), "utf8"), /cognition-lab:complete/);
 } finally {
   await rm(psychoJsRoot, { recursive: true, force: true });

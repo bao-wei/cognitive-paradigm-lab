@@ -8,6 +8,7 @@
   const wait = document.querySelector("#runner-wait");
   const error = document.querySelector("#runner-error");
   const results = document.querySelector("#runner-results");
+  const touchControls = document.querySelector("#touch-controls");
   let rows = [];
   let exportUrl = "";
 
@@ -24,6 +25,7 @@
   document.title = `${item.name}｜知觉之间`;
   document.querySelector("#runner-title").textContent = item.name;
   document.querySelector("#runner-back").href = `./paradigm.html?id=${encodeURIComponent(item.id)}`;
+  renderTouchControls(item.controls || []);
   frame.src = item.entry;
   frame.hidden = false;
   wait.hidden = true;
@@ -32,6 +34,28 @@
   function focusExperiment() {
     frame.focus();
     try { frame.contentWindow.focus(); } catch { /* The package can still be focused by clicking its canvas. */ }
+  }
+
+  function renderTouchControls(keys) {
+    if (!keys.length) return;
+    if (window.matchMedia("(max-width: 760px), (hover: none) and (pointer: coarse)").matches) {
+      frame.removeAttribute("allowfullscreen");
+      frame.setAttribute("allow", "fullscreen 'none'");
+    }
+    const labels = { space: "继续", return: "确认", y: "Y / 是", n: "N / 否", left: "←", right: "→", up: "↑", down: "↓" };
+    touchControls.replaceChildren(...keys.map((key) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = labels[key] || key.toUpperCase();
+      button.setAttribute("aria-label", `输入 ${labels[key] || key}`);
+      button.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        frame.contentWindow?.postMessage({ type: "cognition-lab:key", key }, "*");
+      });
+      return button;
+    }));
+    touchControls.hidden = false;
+    document.body.classList.add("has-touch-controls");
   }
 
   function receiveResult(event) {
@@ -72,6 +96,7 @@
     document.querySelector("#runner-effect-note").textContent = effect.note;
     document.querySelector("#runner-explanation").textContent = effect.explanation;
     frame.hidden = true;
+    touchControls.hidden = true;
     results.hidden = false;
     document.querySelector("#runner-status").textContent = "实验完成 · 结果未上传";
   }
@@ -88,6 +113,7 @@
     document.querySelector("#runner-effect-note").textContent = "仅为任务内模拟金额";
     document.querySelector("#runner-explanation").textContent = "调整后平均充气次数仅统计没有爆炸的气球，是 BART 常用的风险行为指标。数值越高，表示本次任务中选择继续承担风险的次数越多；单次教学练习不能用于个人评价或心理诊断。";
     frame.hidden = true;
+    touchControls.hidden = true;
     results.hidden = false;
     document.querySelector("#runner-status").textContent = "实验完成 · 结果未上传";
   }
@@ -144,6 +170,7 @@
 
   function showError(message) {
     frame.hidden = true;
+    touchControls.hidden = true;
     wait.hidden = true;
     results.hidden = true;
     error.hidden = false;

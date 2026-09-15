@@ -839,6 +839,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
 .runner-header .icon-button { justify-self: end; }
 .runner-main { min-height: calc(100vh - 79px); }
 .runner-main > iframe { width: 100%; height: calc(100vh - 79px); border: 0; background: white; }
+.touch-controls { display: none; }
+.touch-controls[hidden] { display: none; }
 .runner-wait { display: grid; min-height: calc(100vh - 79px); place-content: center; text-align: center; }
 .runner-wait h1 { font-family: var(--serif); font-size: clamp(42px, 6vw, 70px); }
 .runner-error { min-height: calc(100vh - 79px); }
@@ -848,4 +850,29 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shado
   .runner-header { grid-template-columns: 1fr auto; padding: 10px 14px; }
   .runner-header > p { grid-column: 1 / -1; grid-row: 2; margin-top: 4px; }
   .runner-main, .runner-main > iframe { min-height: calc(100vh - 96px); height: calc(100vh - 96px); }
+}
+
+@media (max-width: 760px), (hover: none) and (pointer: coarse) {
+  .runner-page.has-touch-controls { --touch-controls-height: calc(116px + env(safe-area-inset-bottom)); }
+  .runner-page.has-touch-controls .runner-main > iframe { height: calc(100dvh - 96px - var(--touch-controls-height)); min-height: 260px; }
+  .touch-controls {
+    display: grid;
+    height: var(--touch-controls-height);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-auto-rows: 44px;
+    gap: 8px;
+    padding: 10px max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+  }
+  .touch-controls button {
+    min-height: 44px;
+    border: 1px solid var(--ink);
+    border-radius: 4px;
+    background: var(--white);
+    color: var(--ink);
+    font: 700 13px/1 var(--sans);
+    touch-action: manipulation;
+  }
+  .touch-controls button:active { background: var(--ink); color: var(--white); }
 }

@@ -17,6 +17,17 @@ window.IMPORTED_PARADIGMS = [
     "descriptionPath": "./paradigms/packages/change-detection/description.md",
     "status": "ready",
     "dataExport": "adapter",
+    "controls": [
+      "space",
+      "y",
+      "n",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
     "result": {
       "profile": "difference",
       "fields": {
@@ -59,6 +70,10 @@ window.IMPORTED_PARADIGMS = [
     "descriptionPath": "./paradigms/packages/bart/description.md",
     "status": "ready",
     "dataExport": "adapter",
+    "controls": [
+      "space",
+      "return"
+    ],
     "result": {
       "profile": "bart",
       "fields": {

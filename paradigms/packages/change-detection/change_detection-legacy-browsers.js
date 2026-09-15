@@ -18,7 +18,7 @@ const psychoJS = new PsychoJS({
 
 // open window:
 psychoJS.openWindow({
-  fullscr: true,
+  fullscr: false,
   color: new util.Color([0,0,0]),
   units: 'height',
   waitBlanking: true,
@@ -165,14 +165,14 @@ async function experimentInit() {
   welcometxt = new visual.TextBox({
     win: psychoJS.window,
     name: 'welcometxt',
-    text: 'In this task you will see six colored squares. \n\nAfter viewing the squares you will see on colored square in a particular location. \n\nYour task is to judge if that colored square did appear in that location. \n\nPress Y if that color square did occur in that location\nPress N if that color square did not appear in that location\n\nPress space to start',
+    text: '本任务包含两个阶段。\n\n第一阶段：屏幕先呈现六个彩色方块，随后在某一位置呈现一个彩色方块。请判断该颜色是否曾出现在同一位置。\n\n若出现过，请按 Y；若没有出现，请按 N。\n\n按空格键开始',
     placeholder: 'Type here...',
     font: 'Arial',
     pos: [0, 0], 
     draggable: false,
-    letterHeight: 0.05,
-    lineSpacing: 1.0,
-    size: [1, 1],  units: 'height', 
+    letterHeight: 0.055,
+    lineSpacing: 1.5,
+    size: [1.8, 1.7],  units: 'norm', 
     ori: 0.0,
     color: 'white', colorSpace: 'rgb',
     fillColor: undefined, borderColor: undefined,
@@ -321,14 +321,14 @@ async function experimentInit() {
   question = new visual.TextBox({
     win: psychoJS.window,
     name: 'question',
-    text: 'Did this color square appear in this location? \n\nPress Y for yes \nPress N for no',
+    text: '这个颜色的方块刚才出现在这个位置吗？\n\n是：按 Y　　否：按 N',
     placeholder: 'Type here...',
     font: 'Arial',
-    pos: [0, 0], 
+    pos: [0, (- 0.82)], 
     draggable: false,
-    letterHeight: 0.03,
-    lineSpacing: 1.0,
-    size: [0.5, 0.3],  units: 'height', 
+    letterHeight: 0.055,
+    lineSpacing: 1.3,
+    size: [1.8, 0.3],  units: 'norm', 
     ori: 0.0,
     color: 'white', colorSpace: 'rgb',
     fillColor: undefined, borderColor: undefined,
@@ -395,14 +395,14 @@ async function experimentInit() {
   nextinstrtxt = new visual.TextBox({
     win: psychoJS.window,
     name: 'nextinstrtxt',
-    text: 'Great! \n\nThis time you will see six squares folowed by another six squares. One of the squares will have changed in color, use the keys 1 - 6 on your keyboard to indicate which has changed. \n\nPress space to start',
+    text: '很好！\n\n接下来，屏幕会先后呈现两组六个方块，其中一个方块的颜色发生了变化。请按 1–6，选择发生变化的方块编号。\n\n按空格键开始',
     placeholder: 'Type here...',
     font: 'Arial',
     pos: [0, 0], 
     draggable: false,
-    letterHeight: 0.05,
-    lineSpacing: 1.0,
-    size: [1, 1],  units: 'height', 
+    letterHeight: 0.055,
+    lineSpacing: 1.5,
+    size: [1.8, 1.7],  units: 'norm', 
     ori: 0.0,
     color: 'white', colorSpace: 'rgb',
     fillColor: undefined, borderColor: undefined,
@@ -679,14 +679,14 @@ async function experimentInit() {
   question_2 = new visual.TextBox({
     win: psychoJS.window,
     name: 'question_2',
-    text: 'Which square changed? \n\nPress 1 - 6',
+    text: '哪个方块的颜色发生了变化？\n\n请按 1–6',
     placeholder: 'Type here...',
     font: 'Arial',
-    pos: [0, 0], 
+    pos: [0, (- 0.82)], 
     draggable: false,
-    letterHeight: 0.03,
-    lineSpacing: 1.0,
-    size: [1, 0.3],  units: 'height', 
+    letterHeight: 0.055,
+    lineSpacing: 1.3,
+    size: [1.8, 0.3],  units: 'norm', 
     ori: 0.0,
     color: 'white', colorSpace: 'rgb',
     fillColor: undefined, borderColor: undefined,
@@ -735,14 +735,14 @@ async function experimentInit() {
   textbox = new visual.TextBox({
     win: psychoJS.window,
     name: 'textbox',
-    text: 'That is the end - goodbye!',
+    text: '实验结束，感谢参与！',
     placeholder: 'Type here...',
     font: 'Arial',
     pos: [0, 0], 
     draggable: false,
-    letterHeight: 0.05,
-    lineSpacing: 1.0,
-    size: [0.5, 0.5],  units: undefined, 
+    letterHeight: 0.06,
+    lineSpacing: 1.5,
+    size: [1.8, 0.6],  units: 'norm', 
     ori: 0.0,
     color: 'white', colorSpace: 'rgb',
     fillColor: undefined, borderColor: undefined,
@@ -1669,10 +1669,10 @@ function feedbackRoutineBegin(snapshot) {
     // update component parameters for each repeat
     // Run 'Begin Routine' code from code_2
     if (key_resp.corr) {
-        fbtxt = "Correct!";
+        fbtxt = "正确！";
         fbcol = "green";
     } else {
-        fbtxt = "Incorrect";
+        fbtxt = "错误";
         fbcol = "red";
     }
     
@@ -2228,10 +2228,10 @@ function localisation_feedbackRoutineBegin(snapshot) {
     // update component parameters for each repeat
     // Run 'Begin Routine' code from code_4
     if (localisation_resp.corr) {
-        fbtxt = "Correct!";
+        fbtxt = "正确！";
         fbcol = "green";
     } else {
-        fbtxt = "Incorrect";
+        fbtxt = "错误";
         fbcol = "red";
     }
     

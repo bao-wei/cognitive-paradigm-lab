@@ -424,6 +424,11 @@ export async function adaptPsychoJsPackage(root, { fetchImpl = fetch } = {}) {
     html = html.replace(/<head([^>]*)>/i, `<head$1>${monitor}`);
     count += 1;
   }
+  if (!html.includes("cognition-lab:key")) {
+    const touchBridge = `<script>window.addEventListener("message",function(e){if(e.source!==parent||e.data?.type!=="cognition-lab:key")return;var k=e.data.key,m={space:[" ","Space",32],return:["Enter","Enter",13],left:["ArrowLeft","ArrowLeft",37],up:["ArrowUp","ArrowUp",38],right:["ArrowRight","ArrowRight",39],down:["ArrowDown","ArrowDown",40]}[k]||[k,k.length===1?"Key"+k.toUpperCase():k,k.length===1?k.toUpperCase().charCodeAt(0):0],o={key:m[0],code:m[1],keyCode:m[2],which:m[2],bubbles:true};window.dispatchEvent(new KeyboardEvent("keydown",o));window.dispatchEvent(new KeyboardEvent("keyup",o))});</script>`;
+    html = html.replace(/<head([^>]*)>/i, `<head$1>${touchBridge}`);
+    count += 1;
+  }
   await writeFile(indexPath, html);
 
   const modulePath = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+\.js)["'][^>]*\btype=["']module["'][^>]*>/gi)]
@@ -431,11 +436,16 @@ export async function adaptPsychoJsPackage(root, { fetchImpl = fetch } = {}) {
   if (modulePath) {
     const scriptPath = safeChild(root, modulePath);
     let script = await readFile(scriptPath, "utf8");
-    if (!/cognition-lab:complete/i.test(script) && script.includes("psychoJS.window.close();")) {
-      script = script.replace("psychoJS.window.close();", `window.parent.postMessage({type: "cognition-lab:complete", trials: psychoJS.experiment?._trialsData || []}, "*");\n  psychoJS.window.close();`);
-      await writeFile(scriptPath, script);
+    const embeddedScript = script.replace(/fullscr\s*:\s*true/g, "fullscr: false");
+    if (embeddedScript !== script) {
+      script = embeddedScript;
       count += 1;
     }
+    if (!/cognition-lab:complete/i.test(script) && script.includes("psychoJS.window.close();")) {
+      script = script.replace("psychoJS.window.close();", `window.parent.postMessage({type: "cognition-lab:complete", trials: psychoJS.experiment?._trialsData || []}, "*");\n  psychoJS.window.close();`);
+      count += 1;
+    }
+    await writeFile(scriptPath, script);
   }
   return { count };
 }

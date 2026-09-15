@@ -53,6 +53,7 @@ async function inspectPackage(packagesDir, folder) {
   const networkApproved = manifest.allowNetwork === true;
   const dataExport = ["adapter", "self", "none"].includes(manifest.dataExport) ? manifest.dataExport : detectDataExport(sample);
   const result = normalizeResult(manifest.result);
+  const controls = inferControls(sample);
   const hasCompletionBridge = /cognition-lab:complete/i.test(sample);
 
   const issues = [];
@@ -82,11 +83,19 @@ async function inspectPackage(packagesDir, folder) {
     descriptionPath: descriptionFile ? `./paradigms/packages/${encodePath(folder)}/${encodePath(descriptionFile)}` : null,
     status,
     dataExport,
+    controls,
     result,
     license: license || null,
     source: cleanText(manifest.source) || null,
     issues,
   };
+}
+
+function inferControls(sample) {
+  const keys = [...sample.matchAll(/keyList\s*:\s*\[([^\]]*)\]/gi)]
+    .flatMap((match) => [...match[1].matchAll(/["']([^"']+)["']/g)].map((key) => key[1].toLowerCase()))
+    .filter((key) => key !== "escape");
+  return [...new Set(keys)];
 }
 
 async function readManifest(root) {
