@@ -22,7 +22,7 @@
     showError("这个范式尚未通过平台运行与结果协议检查。");
     return;
   }
-  document.title = `${item.name}｜知觉之间`;
+  document.title = `${item.name}｜“妙趣认知实验室”在线虚拟实验平台`;
   document.querySelector("#runner-title").textContent = item.name;
   document.querySelector("#runner-back").href = `./paradigm.html?id=${encodeURIComponent(item.id)}`;
   renderTouchControls(item.controls || []);

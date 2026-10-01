@@ -13,7 +13,7 @@
     return;
   }
 
-  document.title = `${item.name}｜知觉之间`;
+  document.title = `${item.name}｜“妙趣认知实验室”在线虚拟实验平台`;
   document.querySelector("#paradigm-domain").textContent = `${item.category} · ${item.taskType}`;
   document.querySelector("#paradigm-title").textContent = item.name;
   document.querySelector("#paradigm-lead").textContent = item.shortDescription;

@@ -622,7 +622,7 @@
       for (const [path, bytes] of item.files) entries.set(`packages/${id}/${path}`, bytes);
     }
     entries.set("changes.json", `${JSON.stringify(manifest, null, 2)}\n`);
-    entries.set("README.txt", "知觉之间范式库变更包\r\n\r\n请先解压，再在项目根目录运行：\r\nnode tools/apply-changes.mjs <解压后的文件夹>\r\n");
+    entries.set("README.txt", "妙趣认知实验室范式库变更包\r\n\r\n请先解压，再在项目根目录运行：\r\nnode tools/apply-changes.mjs <解压后的文件夹>\r\n");
     downloadBlob(archive.createZip(entries), `cognition-lab-changes-${new Date().toISOString().slice(0, 10)}.zip`);
     showToast("变更包已生成，请交由教材编写人员同步到仓库");
   }

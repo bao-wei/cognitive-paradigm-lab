@@ -574,7 +574,7 @@ async function reopenRunningAssistant(error) {
   try {
     const response = await fetch(url);
     const html = await response.text();
-    if (!response.ok || !html.includes("<title>本地导入发布助手｜知觉之间</title>")) throw error;
+    if (!response.ok || !html.includes("<title>本地导入发布助手｜“妙趣认知实验室”在线虚拟实验平台</title>")) throw error;
   } catch {
     throw error;
   }
