@@ -101,7 +101,7 @@
     };
     try {
       if(global.parent!==global&&location.origin!=='null'&&global.parent.location.origin===location.origin)
-        global.parent.postMessage({type:'cognition-lab:complete',trials:exportRows,summary:{metrics,explanation:result.explanation},selfRendered:true},location.origin);
+        global.parent.postMessage({type:'cognition-lab:complete',trialCount:rows.length,selfRendered:true},location.origin);
     } catch { /* Standalone or cross-origin textbook containers keep results inside this page. */ }
   }
   global.Textbook={register,tasks,launch,escape,shuffle,mean,percent,parseCsv,csvText};

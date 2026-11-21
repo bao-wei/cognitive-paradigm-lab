@@ -11,6 +11,7 @@
   const touchControls = document.querySelector("#touch-controls");
   let rows = [];
   let exportUrl = "";
+  let textbookComplete = false;
 
   document.querySelector("#runner-exit").addEventListener("click", exitRunner);
   document.querySelector("#runner-export").addEventListener("click", () => showToast("CSV 已生成，请在下载文件夹中查看"));
@@ -60,6 +61,11 @@
 
   function receiveResult(event) {
     if (event.source !== frame.contentWindow || !event.data || event.data.type !== "cognition-lab:complete") return;
+    if (event.data.selfRendered === true && item.platform === "Textbook HTML5") {
+      textbookComplete = true;
+      document.querySelector("#runner-status").textContent = "实验完成 · 可在下方导出本次结果";
+      return;
+    }
     const received = Array.isArray(event.data.trials) ? event.data.trials : Array.isArray(event.data.results) ? event.data.results : [];
     if (!received.length) {
       showError("实验已结束，但没有返回逐试次数据。请联系平台管理员检查该范式。");
@@ -67,11 +73,6 @@
     }
     rows = received;
     try {
-      if (event.data.selfRendered === true && item.platform === "Textbook HTML5") {
-        prepareCsvExport();
-        document.querySelector("#runner-status").textContent = "实验完成 · 可在下方导出本次结果";
-        return;
-      }
       renderResult();
       prepareCsvExport();
     } catch (cause) { showError(`结果字段无法解析：${cause.message}`); }
@@ -168,7 +169,7 @@
   }
 
   function exitRunner() {
-    if (rows.length && !window.confirm("退出后，本次未导出的结果将被清除。确定退出吗？")) return;
+    if ((rows.length || textbookComplete) && !window.confirm("退出后，本次未导出的结果将被清除。确定退出吗？")) return;
     if (exportUrl) URL.revokeObjectURL(exportUrl);
     window.location.assign(`./paradigm.html?id=${encodeURIComponent(id)}`);
   }
