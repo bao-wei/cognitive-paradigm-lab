@@ -35,6 +35,10 @@ jobs:
           node tests/platform-self-check.mjs
           node tests/change-pack-self-check.mjs
           node tests/import-assistant-self-check.mjs
+          node tests/textbook-self-check.mjs
+          node tests/social-decision-self-check.mjs
+          node tests/perception-self-check.mjs
+          node tests/textbook-memory-self-check.mjs
 
       - name: Prepare static site
         run: |

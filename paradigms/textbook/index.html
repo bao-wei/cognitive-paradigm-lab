@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>教学实验｜妙趣认知实验室</title>
+  <link rel="stylesheet" href="runtime.css">
+</head>
+<body>
+  <header class="lab-header"><span class="lab-brand">妙趣认知实验室<small>在线虚拟实验平台</small></span><button id="exit" class="quiet" type="button">退出本次实验</button></header>
+  <main>
+    <div class="progress-bar"><span id="progress-text">准备开始</span><progress id="progress" value="0" max="1" aria-label="实验进度"></progress></div>
+    <section id="stage" tabindex="-1" aria-label="实验任务"></section>
+    <p id="visibility-note" role="status" hidden>实验期间切换了窗口，受影响的试次会标记为无效，导出数据中保留记录。</p>
+  </main>
+  <script src="runtime.js"></script>
+  <script src="tasks/perception.js"></script>
+  <script src="tasks/memory.js"></script>
+  <script src="tasks/social-decision.js"></script>
+  <script>Textbook.launch();</script>
+</body>
+</html>

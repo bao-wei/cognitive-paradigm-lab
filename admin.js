@@ -515,7 +515,8 @@
     elements.libraryList.replaceChildren(...published.map((item) => {
       const row = document.createElement("article");
       row.className = "library-row";
-      const isCore = item.mode === "builtin";
+      const isTextbook = item.platform === "Textbook HTML5";
+      const isCore = item.mode === "builtin" || isTextbook;
       const deleting = state.deletions.has(item.id);
       row.innerHTML = `<div><strong>${platform.escapeHtml(item.name)}</strong><span>${platform.escapeHtml(item.category)} · ${platform.escapeHtml(item.id)}</span></div>`;
       const actions = document.createElement("div");
@@ -532,7 +533,8 @@
       button.className = "text-button";
       button.type = "button";
       button.disabled = isCore;
-      button.textContent = isCore ? "核心范式" : deleting ? "撤销删除" : "标记删除";
+      button.textContent = isTextbook ? "教材源码维护" : isCore ? "核心范式" : deleting ? "撤销删除" : "标记删除";
+      if (isTextbook) button.title = "教材范式由统一源码生成，需修改教材实验源文件后重新构建。";
       if (deleting) row.classList.add("pending-delete");
       button.addEventListener("click", () => toggleDelete(item.id));
       actions.append(button);

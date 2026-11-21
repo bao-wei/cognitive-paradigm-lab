@@ -48,7 +48,8 @@
 
   function getParadigms({ includeReview = false } = {}) {
     const imported = Array.isArray(global.IMPORTED_PARADIGMS) ? global.IMPORTED_PARADIGMS : [];
-    return [...BUILTIN_PARADIGMS, ...imported]
+    const replacements = new Set(imported.filter(item => item.status === "ready").map(item => item.id));
+    return [...BUILTIN_PARADIGMS.filter(item => !replacements.has(item.id)), ...imported]
       .filter((item) => includeReview || item.status === "ready")
       .map((item, index) => ({
         ...item,

@@ -1,0 +1,21 @@
+McGurk audiovisual syllable stimuli
+
+Creators: Beauchamp Lab; Basu Mallick, D., Magnotti, J. F. & Beauchamp, M. S.
+Reference: Variability and stability in the McGurk effect: contributions of participants, stimuli, time, and response type. Psychonomic Bulletin & Review (2015), 22, 1299–1307. DOI: 10.3758/s13423-015-0817-4.
+
+Primary distribution and rights statement:
+https://openwetware.org/wiki/Beauchamp:Stimuli
+The material page states: "To the extent possible under law, we waive all copyright and related or neighboring rights to the materials on this page."
+The linked waiver is CC0: https://creativecommons.org/publicdomain/zero/1.0/
+
+Original archives:
+https://oww-files-public.sfo3.cdn.digitaloceanspaces.com/d/d4/All_ba_stimuli.zip
+https://oww-files-public.sfo3.cdn.digitaloceanspaces.com/1/17/Experiment2_McGurkStimuli.zip
+
+Local filenames map directly to the original unmodified MP4 files:
+mcgurk-ba-N.mp4 -> all_ba_stimuli/4.N.mp4 (auditory ba, visual ba), N = 1..8.
+mcgurk-fusion-N.mp4 -> Experiment2_McGurkStimuli/2.N.mp4 (auditory ba, visual ga), N = 1..8.
+
+Downloaded on 2026-11-21 for offline educational use. No synthetic or generated speech replaces the actual audiovisual recordings. Auditory-only conditions use the congruent ba file with the entire video hidden and an independent fixation cross shown.
+
+Task implementation and other artwork are original to 妙趣认知实验室; the rights statement above applies to the third-party stimulus videos.

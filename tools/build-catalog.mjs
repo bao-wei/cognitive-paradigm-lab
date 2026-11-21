@@ -1,4 +1,5 @@
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { readTextbookTasks, taskCatalogEntry } from "./textbook-tasks.mjs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -30,6 +31,15 @@ export async function scanPackages(packagesDir = DEFAULT_PACKAGES) {
 
 export async function buildCatalog({ packagesDir = DEFAULT_PACKAGES, output = DEFAULT_OUTPUT } = {}) {
   const packages = await scanPackages(packagesDir);
+  if (packagesDir === DEFAULT_PACKAGES) {
+    const textbook = await readTextbookTasks();
+    const ids = new Set(textbook.map(task => task.id));
+    for (let i = packages.length - 1; i >= 0; i--) if (ids.has(packages[i].id)) packages.splice(i, 1);
+    packages.push(...textbook.map(taskCatalogEntry));
+    const descriptions = path.join(ROOT, "paradigms", "textbook", "descriptions");
+    await mkdir(descriptions, { recursive: true });
+    for (const task of textbook) await writeFile(path.join(descriptions, `${task.id}.md`), task.description, "utf8");
+  }
   const body = `window.IMPORTED_PARADIGMS = ${JSON.stringify(packages, null, 2)};\n`;
   await writeFile(output, body, "utf8");
   return packages;

@@ -67,6 +67,11 @@
     }
     rows = received;
     try {
+      if (event.data.selfRendered === true && item.platform === "Textbook HTML5") {
+        prepareCsvExport();
+        document.querySelector("#runner-status").textContent = "实验完成 · 可在下方导出本次结果";
+        return;
+      }
       renderResult();
       prepareCsvExport();
     } catch (cause) { showError(`结果字段无法解析：${cause.message}`); }
