@@ -39,6 +39,10 @@ jobs:
           node tests/social-decision-self-check.mjs
           node tests/perception-self-check.mjs
           node tests/textbook-memory-self-check.mjs
+          node tests/attention-self-check.mjs
+          node tests/imagery-self-check.mjs
+          node tests/language-self-check.mjs
+          node tests/problem-solving-self-check.mjs
 
       - name: Prepare static site
         run: |

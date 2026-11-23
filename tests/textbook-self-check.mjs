@@ -3,8 +3,8 @@ import { readFile, stat } from 'node:fs/promises';
 import vm from 'node:vm';
 import { readTextbookTasks, taskCatalogEntry } from '../tools/textbook-tasks.mjs';
 const tasks=await readTextbookTasks();
-const required=['donders','stroop','navon','mcgurk','sperling','change-detection','self-reference','semantic-priming','reconsolidation','retrieval-forgetting','eyewitness','drm','wason','bart','hanoi','embedded-figures','cultural-priming','interface-search','flanker','gonogo'];
-assert.equal(tasks.length,20);
+const required=['donders','stroop','navon','mcgurk','sperling','change-detection','self-reference','semantic-priming','reconsolidation','retrieval-forgetting','eyewitness','drm','wason','bart','hanoi','embedded-figures','cultural-priming','interface-search','flanker','gonogo','ant','attentional-blink','real-size-comparison','mental-rotation','self-paced-reading','picture-word-interference','water-jug'];
+assert.equal(tasks.length,27);
 assert.deepEqual(tasks.map(t=>t.id).sort(),required.sort());
 for(const task of tasks){
   assert.equal(typeof task.run,'function',task.id);
@@ -25,4 +25,6 @@ const restored=core.parseCsv(csv);
 assert.equal(restored[0].answer,rows[0].answer);
 assert.equal(restored[1].answer,"'=FORMULA");
 assert.throws(()=>core.parseCsv('a,b\n"unclosed'));
-console.log('textbook self-check passed: 18 required + 2 existing tasks, local media, metadata, CSV round-trip');
+assert.equal(tasks.filter(t=>t.chapter==='第十二章').length,1);
+assert.equal(tasks.filter(t=>t.chapter==='第九章').length,2);
+console.log('textbook self-check passed: final requirements + chapter9 addition + 2 supplemental, local media, metadata, CSV round-trip');

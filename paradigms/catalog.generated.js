@@ -28,7 +28,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -60,7 +60,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -92,7 +92,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -124,7 +124,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -156,7 +156,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -188,7 +188,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -220,7 +220,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -252,7 +252,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -284,7 +284,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -316,7 +316,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -348,7 +348,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -380,7 +380,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -412,7 +412,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -444,7 +444,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -476,7 +476,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -508,7 +508,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -540,7 +540,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -572,7 +572,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -604,7 +604,7 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   },
   {
@@ -636,7 +636,231 @@ window.IMPORTED_PARADIGMS = [
       "levels": []
     },
     "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
-    "source": "《认知心理学》在线实验-11.5 教材要求",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
+    "issues": []
+  },
+  {
+    "id": "ant",
+    "name": "注意网络测试 ANT",
+    "shortDescription": "在四种线索和三种箭头条件下，分别体验警觉、定向与执行控制。",
+    "category": "注意与执行控制",
+    "taskType": "线索与箭头判断",
+    "duration": "时长见范式说明",
+    "metrics": [
+      "警觉效应",
+      "定向效应",
+      "冲突效应"
+    ],
+    "tags": [],
+    "platform": "Textbook HTML5",
+    "mode": "package",
+    "entry": "./paradigms/textbook/index.html?id=ant",
+    "descriptionPath": "./paradigms/textbook/descriptions/ant.md",
+    "status": "ready",
+    "dataExport": "adapter",
+    "controls": [],
+    "result": {
+      "profile": "generic",
+      "fields": {
+        "correct": "correct",
+        "rt": "rt"
+      },
+      "levels": []
+    },
+    "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
+    "issues": []
+  },
+  {
+    "id": "attentional-blink",
+    "name": "注意瞬脱效应",
+    "shortDescription": "观看快速字母流，比较只检测 X 与先识别白色目标再检测 X 的表现。",
+    "category": "注意与执行控制",
+    "taskType": "快速序列视觉呈现",
+    "duration": "时长见范式说明",
+    "metrics": [
+      "T1 识别正确率",
+      "T2 检测正确率",
+      "T2 随间隔变化曲线"
+    ],
+    "tags": [],
+    "platform": "Textbook HTML5",
+    "mode": "package",
+    "entry": "./paradigms/textbook/index.html?id=attentional-blink",
+    "descriptionPath": "./paradigms/textbook/descriptions/attentional-blink.md",
+    "status": "ready",
+    "dataExport": "adapter",
+    "controls": [],
+    "result": {
+      "profile": "generic",
+      "fields": {
+        "correct": "correct",
+        "rt": "rt"
+      },
+      "levels": []
+    },
+    "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
+    "issues": []
+  },
+  {
+    "id": "real-size-comparison",
+    "name": "物体现实大小比较",
+    "shortDescription": "忽略屏幕上的缩放，判断熟悉物体在现实中谁更大，体验视觉大小对表象比较的影响。",
+    "category": "表象与空间认知",
+    "taskType": "现实大小判断",
+    "duration": "时长见范式说明",
+    "metrics": [
+      "条件正确率",
+      "正确反应时",
+      "大小一致性效应"
+    ],
+    "tags": [],
+    "platform": "Textbook HTML5",
+    "mode": "package",
+    "entry": "./paradigms/textbook/index.html?id=real-size-comparison",
+    "descriptionPath": "./paradigms/textbook/descriptions/real-size-comparison.md",
+    "status": "ready",
+    "dataExport": "adapter",
+    "controls": [],
+    "result": {
+      "profile": "generic",
+      "fields": {
+        "correct": "correct",
+        "rt": "rt"
+      },
+      "levels": []
+    },
+    "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
+    "issues": []
+  },
+  {
+    "id": "mental-rotation",
+    "name": "R 字符心理旋转",
+    "shortDescription": "判断不同角度的 R 是正写还是镜像，观察旋转角度与判断时间的关系。",
+    "category": "表象与空间认知",
+    "taskType": "正写与镜像判断",
+    "duration": "时长见范式说明",
+    "metrics": [
+      "正写与镜像正确率",
+      "角度—反应时曲线",
+      "角度与 RT 描述性斜率"
+    ],
+    "tags": [],
+    "platform": "Textbook HTML5",
+    "mode": "package",
+    "entry": "./paradigms/textbook/index.html?id=mental-rotation",
+    "descriptionPath": "./paradigms/textbook/descriptions/mental-rotation.md",
+    "status": "ready",
+    "dataExport": "adapter",
+    "controls": [],
+    "result": {
+      "profile": "generic",
+      "fields": {
+        "correct": "correct",
+        "rt": "rt"
+      },
+      "levels": []
+    },
+    "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
+    "issues": []
+  },
+  {
+    "id": "self-paced-reading",
+    "name": "自定速度阅读与花园路径效应",
+    "shortDescription": "逐词揭示句子，比较歧义与控制句在消歧位置及其后区域的阅读时间。",
+    "category": "语言加工",
+    "taskType": "逐词移动窗口阅读",
+    "duration": "时长见范式说明",
+    "metrics": [
+      "理解判断正确率",
+      "花园路径效应",
+      "消歧后溢出效应"
+    ],
+    "tags": [],
+    "platform": "Textbook HTML5",
+    "mode": "package",
+    "entry": "./paradigms/textbook/index.html?id=self-paced-reading",
+    "descriptionPath": "./paradigms/textbook/descriptions/self-paced-reading.md",
+    "status": "ready",
+    "dataExport": "adapter",
+    "controls": [],
+    "result": {
+      "profile": "generic",
+      "fields": {
+        "correct": "correct",
+        "rt": "rt"
+      },
+      "levels": []
+    },
+    "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
+    "issues": []
+  },
+  {
+    "id": "picture-word-interference",
+    "name": "图片词汇干扰",
+    "shortDescription": "忽略图片上的文字，选择图片名称，比较语义、语音干扰及两种呈现时序。",
+    "category": "语言加工",
+    "taskType": "图片名称选择",
+    "duration": "时长见范式说明",
+    "metrics": [
+      "按键命名正确率",
+      "语义干扰效应",
+      "语音促进效应"
+    ],
+    "tags": [],
+    "platform": "Textbook HTML5",
+    "mode": "package",
+    "entry": "./paradigms/textbook/index.html?id=picture-word-interference",
+    "descriptionPath": "./paradigms/textbook/descriptions/picture-word-interference.md",
+    "status": "ready",
+    "dataExport": "adapter",
+    "controls": [],
+    "result": {
+      "profile": "generic",
+      "fields": {
+        "correct": "correct",
+        "rt": "rt"
+      },
+      "levels": []
+    },
+    "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
+    "issues": []
+  },
+  {
+    "id": "water-jug",
+    "name": "Luchins 水罐与思维定势",
+    "shortDescription": "利用三种容量量出目标水量，观察熟悉方法是否妨碍发现简便解法。",
+    "category": "推理与问题解决",
+    "taskType": "解题策略与转换",
+    "duration": "时长见范式说明",
+    "metrics": [
+      "解题正确率",
+      "熟悉策略使用率",
+      "规则改变后表现"
+    ],
+    "tags": [],
+    "platform": "Textbook HTML5",
+    "mode": "package",
+    "entry": "./paradigms/textbook/index.html?id=water-jug",
+    "descriptionPath": "./paradigms/textbook/descriptions/water-jug.md",
+    "status": "ready",
+    "dataExport": "adapter",
+    "controls": [],
+    "result": {
+      "profile": "generic",
+      "fields": {
+        "correct": "correct",
+        "rt": "rt"
+      },
+      "levels": []
+    },
+    "license": "Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md",
+    "source": "《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充",
     "issues": []
   }
 ];

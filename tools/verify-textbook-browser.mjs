@@ -43,6 +43,7 @@ async function completeTask(page,item) {
       if(stage.querySelector('#download'))return {done:true,count:window.__qaRows.length};
       if(stage.querySelector('#restart'))return {error:stage.innerText};
       if(stage.querySelector('.input-form'))return {kind:'input',label:stage.querySelector('.input-form label').textContent};
+      if(stage.querySelector('[data-spr-next]:enabled'))return {kind:'reading'};
       if(stage.querySelector('[data-card]'))return {kind:'cards'};
       if(stage.querySelector('[data-search-item]'))return {kind:'search',target:stage.querySelector('h2').textContent.replace('请找到：','')};
       const choices=[...stage.querySelectorAll('.choices button:enabled')];
@@ -53,8 +54,10 @@ async function completeTask(page,item) {
     if(state.error)throw new Error(item.id+': '+state.error);
     if(state.kind==='input'){
       const positions=state.label.match(/^(4|12) 个字母/);
-      const text=positions?'?'.repeat(Number(positions[1])):'这幅图像让我想到日常观察到的情境。我认为需要同时考虑画面中对象的行动方向以及周围环境和其他对象之间的关系，才能解释目前看到的情形。';
+      const text=positions?'?'.repeat(Number(positions[1])):state.label==='操作方法'?'A-C':state.label.includes('用 A、B、C')?'B-A-2C':/T1|白色|字母/.test(state.label)?'A':'这幅图像让我想到日常观察到的情境。我认为需要同时考虑画面中对象的行动方向以及周围环境和其他对象之间的关系，才能解释目前看到的情形。';
       await page.locator('.input-form textarea').fill(text);await page.locator('.input-form button').click();
+    }else if(state.kind==='reading'){
+      await page.locator('[data-spr-next]:enabled').click();
     }else if(state.kind==='cards'){
       await page.locator('[data-card]').nth(0).click();await page.locator('[data-card]').nth(3).click();await page.locator('[data-submit]').click();
     }else if(state.kind==='search')await page.locator(`[data-search-item="${state.target}"]`).click();

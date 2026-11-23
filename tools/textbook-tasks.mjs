@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
-export const TEXTBOOK_MODULES = ['perception', 'memory', 'social-decision'];
+export const TEXTBOOK_MODULES = ['perception', 'memory', 'social-decision', 'attention', 'imagery', 'language', 'problem-solving'];
 const METRICS = {
   donders:['三种任务反应时','刺激辨别时间','反应选择时间'],stroop:['条件正确率','Stroop 干扰效应','相对中性条件干扰'],
   navon:['整体优势','局部干扰','整体干扰'],mcgurk:['音节报告比例','语音识别率','融合性报告比例'],
@@ -12,6 +12,10 @@ const METRICS = {
   hanoi:['合法与违例移动','回退次数','完成时间'],'embedded-figures':['轮廓识别正确率','识别反应时','复杂度差异'],
   'cultural-priming':['开放式归因','人工编码比例','文化启动分组'],'interface-search':['目标发现反应时','操作正确率','主观难度'],
   flanker:['正确率','平均反应时','冲突效应'],gonogo:['正确率','Go 反应时','抑制成功率'],
+  ant:['警觉效应','定向效应','冲突效应'],'attentional-blink':['T1 识别率','T2 检测正确率','注意瞬脱曲线'],
+  'real-size-comparison':['条件正确率','正确反应时','大小一致性效应'],'mental-rotation':['正反识别正确率','旋转角度反应时','旋转曲线'],
+  'self-paced-reading':['理解正确率','关键消歧区阅读时间','溢出效应'],'picture-word-interference':['语义干扰','语音促进','SOA 条件差异'],
+  'water-jug':['解题正确率','熟悉策略使用率','规则改变后表现'],
 };
 export async function readTextbookTasks() {
   const context=vm.createContext({window:{}});
@@ -29,6 +33,6 @@ export function taskCatalogEntry(task) {
     status:'ready',dataExport:'adapter',controls:[],
     result:{profile:'generic',fields:{correct:'correct',rt:'rt'},levels:[]},
     license:'Copyright © 妙趣认知实验室；第三方素材见 assets/SOURCES.md',
-    source:'《认知心理学》在线实验-11.5 教材要求',issues:[],
+    source:'《认知心理学》在线实验-11.22（全部定稿）；水罐任务另据第九章第四稿补充',issues:[],
   };
 }
