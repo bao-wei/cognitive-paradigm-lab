@@ -27,6 +27,7 @@ export function taskCatalogEntry(task) {
   return {
     id:task.id,name:task.name,shortDescription:task.shortDescription,category:task.category,
     taskType:task.taskType,duration:task.duration||'时长见范式说明',metrics:task.metrics||METRICS[task.id]||['本次表现','范式特定指标','逐试次数据'],
+    trialCount:task.trialCount,
     tags:task.tags||[],platform:'Textbook HTML5',mode:'package',
     entry:`./paradigms/textbook/index.html?id=${encodeURIComponent(task.id)}`,
     descriptionPath:`./paradigms/textbook/descriptions/${task.id}.md`,

@@ -34,9 +34,7 @@
   ];
   const sizeLabels = { congruent: "呈现大小一致", equal: "呈现大小相同", incongruent: "呈现大小不一致" };
   function sizeTrials(shuffle) {
-    const result = pairs.flatMap((pair, index) => ["congruent", "equal", "incongruent"].map((condition, c) => ({ ...pair, condition, largerSide: (index + c) % 2 ? "right" : "left" })));
-    result.push({ ...pairs[0], condition: "congruent", largerSide: "left" }, { ...pairs[1], condition: "incongruent", largerSide: "right" });
-    return shuffle(result);
+    return Array.from({ length: 2 }, (_, block) => shuffle(pairs.flatMap(pair => ["congruent", "equal", "incongruent"].flatMap(condition => ["left", "right"].map(largerSide => ({ ...pair, condition, largerSide, block: block + 1 })))))).flat();
   }
   function objectDrawing(id, center, size) {
     return `<g data-object="${id}" transform="translate(${center - size / 2},${145 - size / 2}) scale(${size / 160})" stroke="#172839" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">${objects[id].svg}</g>`;
@@ -50,26 +48,26 @@
   }
 
   T.register({
-    id: "real-size-comparison", name: "物体现实大小比较", chapter: "第七章", code: "7-1（大小比较）", category: "表象与空间认知", taskType: "现实大小判断", trialCount: 20,
+    id: "real-size-comparison", name: "物体现实大小比较", chapter: "第七章", code: "7-1（大小比较）", category: "表象与空间认知", taskType: "现实大小判断", trialCount: 72,
     shortDescription: "忽略屏幕上的缩放，判断熟悉物体在现实中谁更大，体验视觉大小对表象比较的影响。",
     metrics: ["条件正确率", "正确反应时", "大小一致性效应"],
-    instructions: ["只依据生活经验判断哪个物体在现实中更大，不判断屏幕图片大小或距离远近。", "每次左右各出现一个物体；较大物体在左侧按 F／左按钮，在右侧按 J／右按钮。", "材料包括斑马与台灯、大象与杯子、公共汽车与椅子、大树与钥匙、房屋与书本、长颈鹿与水瓶。", "共 20 次正式判断，图片大小可能与现实大小一致、相同或不一致。请又快又准。"],
-    description: "# 学习目标\n比较物体在现实中的大小，观察图片呈现大小如何促进或干扰表象判断。此项按 Paivio（1975）大小比较任务实现，不包含距离判断。\n\n# 任务与条件\n20 次正式试次：图片呈现大小与现实大小一致 7 次、呈现大小相同 6 次、不一致 7 次。六组熟悉物体对均在三种条件出现，另增加两次平衡重复；现实较大物体左右位置各 10 次。每次注视 500 毫秒，随后并排呈现两张原创 SVG 物体图，最长反应窗口 5000 毫秒。F／左按钮表示现实较大的物体在左侧，J／右按钮表示在右侧。\n\n# 指标\n按条件计算正确率与正确试次平均 RT。不一致 RT−一致 RT 为总一致性差异；不一致 RT−相同 RT 为相对相同大小的干扰；相同 RT−一致 RT 为促进量。超时按错误保留但不进入正确 RT 平均，离开窗口的试次不进入条件汇总。\n\n# 解释与材料\n图片缩放不改变生活中物体的大小；所有结果来自实际选择，不强制呈现经典方向。现实大小采用典型成年动物和通常物件的明显差异，图形是未标准化的原创教学材料。每个试次 CSV 保留物体身份、现实较大物体、所在侧与呈现条件。\n\n# 来源与编号\n按《认知心理学》11.22 定稿的大小判断要求编写，参照 Paivio（1975）。原文两项实验均编号 7-1，此包用“7-1（大小比较）”区分，未擅自将另一项改编号为 7-2。",
+    instructions: ["只依据生活经验判断哪个物体在现实中更大，不判断屏幕图片大小或距离远近。", "每次左右各出现一个物体；较大物体在左侧按 F／左按钮，在右侧按 J／右按钮。", "材料包括斑马与台灯、大象与杯子、公共汽车与椅子、大树与钥匙、房屋与书本、长颈鹿与水瓶。", "共 72 次正式判断，分 2 组，每组 36 次，组间可休息。每组开始前注视至少 2000 毫秒，其余试次 500 毫秒。图片大小可能与现实大小一致、相同或不一致。"],
+    description: "# 学习目标\n比较物体在现实中的大小，观察图片呈现大小如何促进或干扰表象判断。此项按 Paivio（1975）大小比较任务实现，不包含距离判断。\n\n# 任务与条件\n72 次正式试次，分 2 组，每组 36 次，组间可休息。每组完整交叉 6 组物体对 × 3 种呈现条件 × 2 个左右位置，各组合每组 1 次，组内随机。三种呈现条件各 24 次，现实较大物体左右位置各 36 次。每组首试次注视至少 2000 毫秒，其余试次 500 毫秒，随后并排呈现两张原创 SVG 物体图，最长反应窗口 5000 毫秒。F／左按钮表示现实较大的物体在左侧，J／右按钮表示在右侧。\n\n# 指标\n按条件计算正确率与正确试次平均 RT。不一致 RT−一致 RT 为总一致性差异；不一致 RT−相同 RT 为相对相同大小的干扰；相同 RT−一致 RT 为促进量。超时按错误保留但不进入正确 RT 平均，离开窗口的试次不进入条件汇总。\n\n# 解释与材料\n图片缩放不改变生活中物体的大小；所有结果来自实际选择，不强制呈现经典方向。现实大小采用典型成年动物和通常物件的明显差异，图形是未标准化的原创教学材料。每个试次 CSV 保留物体身份、现实较大物体、所在侧与呈现条件。\n\n# 来源与编号\n按《认知心理学》11.22 定稿的大小判断要求编写，参照 Paivio（1975）。原文两项实验均编号 7-1，此包用“7-1（大小比较）”区分，未擅自将另一项改编号为 7-2。",
     async run(c) {
       const trials = sizeTrials(c.shuffle);
       for (const [index, trial] of trials.entries()) {
-        c.progress(index + 1, 20, "现实大小判断");
-        await c.fixation(500);
+        const fixationMs = await c.trialStart(index, trials.length, { blockSize: 36, label: "现实大小判断", fixationMs: 500 });
         const response = await c.choose(`<p>哪一侧的物体在现实中更大？</p>${sizePicture(trial)}`, [{ value: "left", label: "F · 左侧", key: "f" }, { value: "right", label: "J · 右侧", key: "j" }], { timeout: 5000 });
-        c.record({ phase: "formal", condition: trial.condition, pair: trial.id, larger_object: trial.larger, smaller_object: trial.smaller, larger_object_name: objects[trial.larger].name, smaller_object_name: objects[trial.smaller].name, larger_side: trial.largerSide, left_object: trial.largerSide === "left" ? trial.larger : trial.smaller, right_object: trial.largerSide === "right" ? trial.larger : trial.smaller, response: response.value, correct: response.value === trial.largerSide, rt: response.timedOut ? null : response.rt, timed_out: response.timedOut });
+        c.record({ phase: "formal", fixation_ms: fixationMs, block: trial.block, condition: trial.condition, pair: trial.id, larger_object: trial.larger, smaller_object: trial.smaller, larger_object_name: objects[trial.larger].name, smaller_object_name: objects[trial.smaller].name, larger_side: trial.largerSide, left_object: trial.largerSide === "left" ? trial.larger : trial.smaller, right_object: trial.largerSide === "right" ? trial.larger : trial.smaller, response: response.value, correct: response.value === trial.largerSide, rt: response.timedOut ? null : response.rt, timed_out: response.timedOut });
       }
       const conditions = ["congruent", "equal", "incongruent"];
-      const subsets = conditions.map((condition) => c.rows.filter((row) => row.condition === condition));
+      const rows = c.rows.filter(row => row.phase === "formal");
+      const subsets = conditions.map((condition) => rows.filter((row) => row.condition === condition));
       const means = subsets.map((rows) => correctRT(c, rows));
       return {
         metrics: [
-          { label: "总体正确率", value: accuracy(c, c.rows), note: "按现实大小判分" },
-          { label: "正确平均反应时", value: rtText(correctRT(c, c.rows)), note: "只统计有效且正确的反应" },
+          { label: "总体正确率", value: accuracy(c, rows), note: "按现实大小判分" },
+          { label: "正确平均反应时", value: rtText(correctRT(c, rows)), note: "只统计有效且正确的反应" },
           { label: "大小一致性效应", value: diffText(means[2], means[0]), note: "不一致 RT − 一致 RT" },
           { label: "相同大小基线的干扰", value: diffText(means[2], means[1]), note: "不一致 RT − 相同 RT" },
           { label: "相同大小基线的促进", value: diffText(means[1], means[0]), note: "相同 RT − 一致 RT" },
@@ -83,10 +81,7 @@
   const angles = [0, 60, 120, 180, 240, 300];
   function shortestAngle(angle) { const a = ((angle % 360) + 360) % 360; return Math.min(a, 360 - a); }
   function rotationTrials(shuffle) {
-    const trials = ["normal", "mirror"].flatMap((orientation) => angles.map((angle) => ({ orientation, angle })));
-    for (const angle of [0, 60, 120, 180]) trials.push({ orientation: "normal", angle });
-    for (const angle of [120, 180, 240, 300]) trials.push({ orientation: "mirror", angle });
-    return shuffle(trials);
+    return Array.from({ length: 2 }, (_, block) => shuffle(Array.from({ length: 3 }, () => ["normal", "mirror"].flatMap(orientation => angles.map(angle => ({ orientation, angle, block: block + 1 })))).flat())).flat();
   }
   function letterR(orientation, angle) {
     return `<svg data-rotation-letter viewBox="0 0 280 280" role="img" aria-label="旋转的 R 字符，请判断正写或镜像" style="display:block;width:min(100%,290px);height:auto;margin:auto"><circle cx="140" cy="140" r="126" fill="#fffdf7" stroke="#ccc4b8"/><g transform="translate(140 140) rotate(${angle})"><g data-orientation="${orientation}" transform="scale(${orientation === "mirror" ? -1 : 1} 1)"><path d="M-44 72V-72H2C39-72 57-56 57-29C57-8 47 6 26 13L64 72H36L1 17H-19V72ZM-19-50V-5H0C22-5 32-13 32-28C32-44 22-50 0-50Z" fill="#172839" fill-rule="evenodd"/></g></g></svg>`;
@@ -113,30 +108,30 @@
   }
 
   T.register({
-    id: "mental-rotation", name: "R 字符心理旋转", chapter: "第七章", code: "7-1（R旋转）", category: "表象与空间认知", taskType: "正写与镜像判断", trialCount: 20,
+    id: "mental-rotation", name: "R 字符心理旋转", chapter: "第七章", code: "7-1（R旋转）", category: "表象与空间认知", taskType: "正写与镜像判断", trialCount: 72,
     shortDescription: "判断不同角度的 R 是正写还是镜像，观察旋转角度与判断时间的关系。",
     metrics: ["正写与镜像正确率", "角度—反应时曲线", "角度与 RT 描述性斜率"],
-    instructions: ["不论朝向如何，判断字形是否是通常的正写 R，还是左右翻转的镜像 R。", "F／正写按钮＝正写；J／镜像按钮＝镜像。请不要把倒置或旋转本身当作镜像。", "先做 2 次练习，随后 20 次正式判断。字形方向含 0°、60°、120°、180°、240°、300°。", "最长作答时间 5 秒；可以使用电脑按键或手机按钮。"],
-    description: "# 学习目标\n体验心理旋转：把不同方向的字形与熟悉的直立表象比较，再判断正写或镜像。\n\n# 任务设计\n按定稿的 R 字符图示独立实现，未声称复用尚未提供的课堂原程序。正写与镜像各 10 个正式试次，共 20 次；六个角度为 0°、60°、120°、180°、240°、300°，每角度 3–4 次。先进行 2 次直立字形练习并反馈。每次注视 500 毫秒后呈现原创 R 路径，最长作答 5000 毫秒。镜像先做左右翻转，再在同一中心旋转，避免把单纯旋转当成镜像。\n\n# 操作\n按 F 或点击“正写”，按 J 或点击“镜像”。所有角度使用同一 R 轮廓与固定大小，图中不显示答案和角度。\n\n# 指标\n记录每个字形的原始角度、距直立的最短角度、正写／镜像、反应、正确性和 RT；超时保留为空 RT。展示正写与镜像正确率、按原始角度分组的正确 RT 表，以及按最短角度 0–180°折叠的实际 RT 曲线。描述性斜率为正确试次 RT 对最短角度的一元回归系数，单位 ms/度；至少有两个有正确反应的角度才计算。离开窗口试次不纳入汇总。\n\n# 结果理解\n小样本曲线可能不随角度单调增加，斜率可以为零或负数。曲线只用真实正确反应，不填入教材示例图的数值，也不作显著性推断。按键熟悉程度与屏幕会影响反应。\n\n# 来源与编号\n参照 Cooper 与 Shepard（1973）的字形心理旋转方法及本教材 R 正写／镜像图示编写。原定稿两项均写作 7-1，本包以“7-1（R旋转）”区分，待编辑统一编号。",
+    instructions: ["不论朝向如何，判断字形是否是通常的正写 R，还是左右翻转的镜像 R。", "F／正写按钮＝正写；J／镜像按钮＝镜像。请不要把倒置或旋转本身当作镜像。", "先做 2 次练习，随后 72 次正式判断，分 2 组，每组 36 次，组间可休息。练习首试次及每组开始前注视至少 2000 毫秒。字形方向含 0°、60°、120°、180°、240°、300°。", "最长作答时间 5 秒；可以使用电脑按键或手机按钮。"],
+    description: "# 学习目标\n体验心理旋转：把不同方向的字形与熟悉的直立表象比较，再判断正写或镜像。\n\n# 任务设计\n按定稿的 R 字符图示独立实现，未声称复用尚未提供的课堂原程序。正式测验 72 次，分 2 组，每组 36 次，组间可休息。6 个角度 × 2 种正写／镜像完整交叉，各组合 6 次，每组各组合 3 次，组内随机；六个角度为 0°、60°、120°、180°、240°、300°。正写与镜像各 36 次。先进行 2 次直立字形练习并反馈，练习不计入正式汇总。练习首试次和每组首试次注视至少 2000 毫秒，其余试次 500 毫秒后呈现原创 R 路径，最长作答 5000 毫秒。镜像先做左右翻转，再在同一中心旋转，避免把单纯旋转当成镜像。\n\n# 操作\n按 F 或点击“正写”，按 J 或点击“镜像”。所有角度使用同一 R 轮廓与固定大小，图中不显示答案和角度。\n\n# 指标\n记录每个字形的原始角度、距直立的最短角度、正写／镜像、反应、正确性和 RT；超时保留为空 RT。展示正写与镜像正确率、按原始角度分组的正确 RT 表，以及按最短角度 0–180°折叠的实际 RT 曲线。描述性斜率为正确试次 RT 对最短角度的一元回归系数，单位 ms/度；至少有两个有正确反应的角度才计算。离开窗口试次不纳入汇总。\n\n# 结果理解\n小样本曲线可能不随角度单调增加，斜率可以为零或负数。曲线只用真实正确反应，不填入教材示例图的数值，也不作显著性推断。按键熟悉程度与屏幕会影响反应。\n\n# 来源与编号\n参照 Cooper 与 Shepard（1973）的字形心理旋转方法及本教材 R 正写／镜像图示编写。原定稿两项均写作 7-1，本包以“7-1（R旋转）”区分，待编辑统一编号。",
     async run(c) {
       const choices = [{ value: "normal", label: "F · 正写", key: "f" }, { value: "mirror", label: "J · 镜像", key: "j" }];
       for (const orientation of ["normal", "mirror"]) {
         c.progress(orientation === "normal" ? 1 : 2, 2, "字形练习");
+        await c.fixation(500);
         const answer = await c.choose(`<p>判断字形是正写还是镜像。</p>${letterR(orientation, 0)}`, choices, { timeout: 5000 });
         await c.note(`<h2>${answer.value === orientation ? "判断正确" : "请再看字形"}</h2>${letterR(orientation, 0)}<p>这是${orientation === "normal" ? "通常的正写 R" : "左右翻转的镜像 R"}。旋转字形不会改变它原本的正写／镜像属性。</p>`, orientation === "mirror" ? "开始正式实验" : "下一次练习");
       }
       const trials = rotationTrials(c.shuffle);
       for (const [index, trial] of trials.entries()) {
-        c.progress(index + 1, 20, "R 字形判断");
-        await c.fixation(500);
+        const fixationMs = await c.trialStart(index, trials.length, { blockSize: 36, label: "R 字形判断", fixationMs: 500 });
         const response = await c.choose(letterR(trial.orientation, trial.angle), choices, { timeout: 5000 });
-        c.record({ phase: "formal", condition: trial.orientation, orientation: trial.orientation, angle: trial.angle, angular_distance: shortestAngle(trial.angle), response: response.value, correct: response.value === trial.orientation, rt: response.timedOut ? null : response.rt, timed_out: response.timedOut });
+        c.record({ phase: "formal", fixation_ms: fixationMs, block: trial.block, condition: trial.orientation, orientation: trial.orientation, angle: trial.angle, angular_distance: shortestAngle(trial.angle), response: response.value, correct: response.value === trial.orientation, rt: response.timedOut ? null : response.rt, timed_out: response.timedOut });
       }
-      const rows = valid(c.rows);
+      const rows = valid(c.rows).filter(row => row.phase === "formal");
       const slope = regressionSlope(rows);
       return {
         metrics: [
-          { label: "总体正确率", value: accuracy(c, rows), note: "正写与镜像共 20 个正式试次" },
+          { label: "总体正确率", value: accuracy(c, rows), note: "正写与镜像共 72 个正式试次" },
           { label: "正确平均反应时", value: rtText(correctRT(c, rows)), note: "仅统计有效且正确的反应" },
           { label: "正写正确率", value: accuracy(c, rows.filter((row) => row.orientation === "normal")), note: "正写 R 的有效试次" },
           { label: "镜像正确率", value: accuracy(c, rows.filter((row) => row.orientation === "mirror")), note: "左右翻转 R 的有效试次" },
@@ -144,7 +139,7 @@
           { label: "镜像与正写 RT 差", value: diffText(correctRT(c, rows.filter((row) => row.orientation === "mirror")), correctRT(c, rows.filter((row) => row.orientation === "normal"))), note: "镜像正确 RT − 正写正确 RT" },
         ],
         extraHtml: rotationCurve(c, rows) + table(["原始角度", "正写正确率", "正写正确 RT", "镜像正确率", "镜像正确 RT"], angles.map((angle) => { const normal = rows.filter((row) => row.angle === angle && row.orientation === "normal"), mirror = rows.filter((row) => row.angle === angle && row.orientation === "mirror"); return [`${angle}°`, accuracy(c, normal), rtText(correctRT(c, normal)), accuracy(c, mirror), rtText(correctRT(c, mirror))]; })),
-        explanation: "正写与镜像是字形属性，旋转改变的是朝向。图表使用这一次实际作答；正确 RT 随角度的变化可用于讨论表象转换，但 20 个短版试次不能稳定估计个人的心理旋转速度。",
+        explanation: "正写与镜像是字形属性，旋转改变的是朝向。图表使用这一次实际作答；正确 RT 随角度的变化可用于讨论表象转换，但本教材教学版不能作为个人心理旋转速度测评。",
       };
     },
   });

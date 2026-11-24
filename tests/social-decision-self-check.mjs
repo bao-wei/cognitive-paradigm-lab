@@ -12,12 +12,12 @@ vm.runInContext(source.replace(/\}\)\(\);\s*$/, "window.__checks = { wasonItem, 
 assert.equal(tasks.size, 6);
 const helpers = sandbox.window.__checks;
 const typeCounts = {};
-for (let i = 0; i < 20; i += 1) {
+for (let i = 0; i < 24; i += 1) {
   const item = helpers.wasonItem(i);
   typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
   assert.deepEqual(Array.from(item.cards, (card) => card.role), ["p", "notp", "q", "notq"]);
 }
-assert.deepEqual(typeCounts, { abstract: 7, envelope: 7, drinking: 6 });
+assert.deepEqual(typeCounts, { abstract: 8, envelope: 8, drinking: 8 });
 assert.equal(helpers.DRM_LISTS.flatMap((list) => list.words).length, 20);
 for (const list of helpers.DRM_LISTS) assert.ok(!list.words.includes(list.lure), "critical lures must not be studied");
 for (const group of ["us", "china", "neutral"]) for (let index = 0; index < 6; index += 1) {
@@ -41,6 +41,7 @@ function harness(taskId) {
       }
     },
     progress(index) { trial = index; pumpCount = 0; hanoiChoice = 0; },
+    async trialStart(index,total,{blockSize=0,label='',fixationMs=500}={}) {this.progress(index+1,total,label); const ms=index===0 || blockSize && index%blockSize===0?Math.max(2000,fixationMs):fixationMs; this.starts.push({index,total,blockSize,ms,label}); clock+=ms;return ms;}, starts: [],
     wait: async (ms) => { clock += ms; }, fixation: async (ms = 500) => { clock += ms; },
     note: async () => { clock += 100; }, tone: async () => true,
     input: async (html) => ({ value: html.includes("自由回忆") ? "床铺 枕头 不存在" : "这条鱼游在前面也许因为它想寻找更多食物，同时后面的鱼群正在跟随它，水流方向和群体之间的距离也可能影响它的位置。", rt: 900 }),
@@ -65,7 +66,8 @@ for (const id of tasks.keys()) {
   const ctx = harness(id);
   const result = await tasks.get(id).run(ctx);
   const formal = ctx.rows.filter((row) => row.phase === "formal");
-  assert.equal(formal.length, 20, `${id} must return 20 formal records`);
+  assert.equal(formal.length, tasks.get(id).trialCount, `${id} formal count must match metadata`);
+  assert.ok(ctx.starts.length>0 && ctx.starts[0].ms>=2000, id+" preparation");
   assert.ok(result.metrics.length >= 3, id);
   if (id === "eyewitness") assert.equal(result.metrics.find((m) => m.label === "分组").value, "一致信息 · 同时列队 · 目标在场");
   if (id === "wason") assert.ok(formal.every((row) => row.correct));
@@ -76,8 +78,8 @@ for (const id of tasks.keys()) {
     assert.equal(formal.filter((row) => row.item_type === "new").length, 8);
   }
   if (id === "bart") {
-    assert.equal(formal.filter((row) => row.popped).length, 10);
-    assert.equal(formal.at(-1).total_earnings, 30);
+    assert.equal(formal.filter((row) => row.popped).length, 15);
+    assert.equal(formal.at(-1).total_earnings, 45);
     assert.equal(result.metrics.find((m) => m.label === "调整后平均充气次数").value, "3.0");
   }
   if (id === "hanoi") {

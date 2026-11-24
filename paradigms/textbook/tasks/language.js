@@ -113,19 +113,18 @@
     category: '语言加工', taskType: '逐词移动窗口阅读', trialCount: 20,
     shortDescription: '逐词揭示句子，比较歧义与控制句在消歧位置及其后区域的阅读时间。',
     metrics: ['理解判断正确率', '花园路径效应', '消歧后溢出效应'],
-    instructions: ['每句先显示注视点 500 毫秒，再显示遮挡模板。按空格或点击按钮揭示一个词，前一个词随即重新遮挡。', '用正常理解速度阅读；最后一个词出现后还需按一次按钮结束阅读，再回答一道理解题。请不要长按空格。', '共 20 句，歧义与无歧义控制条件各 10 句，不在同一会话重复同一内容的两个版本。理解正确的句子才进入阅读时间分析。'],
-    description: '# 学习目标\n观察增量式句子理解和句法消歧如何转化为逐词阅读时长差异。\n\n# 实验任务\n20 句：歧义条件与控制条件各 10 句。20 个不同内容框架分别随机分配条件，在会话间形成材料平衡；每位学习者不重复阅读同一内容的两个版本。控制句在较早位置加入明确的因果定语提示，关键“的原因”及其后两个词保持可比。每句注视点 500 ms，随后显示下划线式遮挡，空格或屏幕按钮每次只揭示一个词，并重新遮挡前一词。每句结束后有一道随机位置的选择理解题。\n\n# 指标\n记录所有逐词 RT、词序、词语、消歧前／关键消歧／溢出区域、句子条件以及理解判断。只有理解正确且未被切窗标记失效的句子进入区域 RT。花园路径效应＝歧义句关键消歧 RT−控制句关键消歧 RT；溢出效应＝歧义句溢出区词均 RT−控制句相应 RT。首个词在第一次按键后出现，最后一个词在最后一次按键时结束，不漏计末词。\n\n# 注意\n按键移动窗口不能测量眼动或回视。中文材料为教材演示材料，没有完成独立词频、自然度及歧义强度常模验证；这里不预填显著性或预期正确率。触屏与键盘的操作时长不宜直接混合比较。\n\n# 来源\n教材定稿 10-1；Just, Carpenter & Woolley (1982), Paradigms and processes in reading comprehension；Frazier & Rayner (1982), Making and correcting errors during sentence comprehension。',
+    instructions: ['共分 2 组，每组 10 句，组间可休息；每组首句注视至少 2000 毫秒，其余句 500 毫秒，再显示遮挡模板。按空格或点击按钮揭示一个词，前一个词随即重新遮挡。', '用正常理解速度阅读；最后一个词出现后还需按一次按钮结束阅读，再回答一道理解题。请不要长按空格。', '共 20 句，歧义与无歧义控制条件各 10 句，不在同一会话重复同一内容的两个版本。理解正确的句子才进入阅读时间分析。'],
+    description: '# 学习目标\n观察增量式句子理解和句法消歧如何转化为逐词阅读时长差异。\n\n# 实验任务\n20 句：歧义条件与控制条件各 10 句。20 个不同内容框架分别随机分配条件，在会话间形成材料平衡；每位学习者不重复阅读同一内容的两个版本。控制句在较早位置加入明确的因果定语提示，关键“的原因”及其后两个词保持可比。分 2 组，每组 10 句，组间可休息。每组首句注视至少 2000 ms，其余句 500 ms，随后显示下划线式遮挡，空格或屏幕按钮每次只揭示一个词，并重新遮挡前一词。每句结束后有一道随机位置的选择理解题。\n\n# 指标\n记录所有逐词 RT、词序、词语、消歧前／关键消歧／溢出区域、句子条件以及理解判断。只有理解正确且未被切窗标记失效的句子进入区域 RT。花园路径效应＝歧义句关键消歧 RT−控制句关键消歧 RT；溢出效应＝歧义句溢出区词均 RT−控制句相应 RT。首个词在第一次按键后出现，最后一个词在最后一次按键时结束，不漏计末词。\n\n# 注意\n按键移动窗口不能测量眼动或回视。中文材料为教材演示材料，没有完成独立词频、自然度及歧义强度常模验证；这里不预填显著性或预期正确率。触屏与键盘的操作时长不宜直接混合比较。\n\n# 来源\n教材定稿 10-1；Just, Carpenter & Woolley (1982), Paradigms and processes in reading comprehension；Frazier & Rayner (1982), Making and correcting errors during sentence comprehension。',
     async run(c) {
       const words = [], sentences = [];
       const trials = buildReadingTrials(c);
       for (let i = 0; i < trials.length; i += 1) {
         const item = trials[i];
-        c.progress(i + 1, 20, '逐词阅读');
-        await c.fixation(500);
+        const fixationMs = await c.trialStart(i, trials.length, { blockSize: 10, label: '逐词阅读', fixationMs: 500 });
         const reading = await readMovingWindow(c, item);
         const response = await c.choose(`<h2>理解判断</h2><p>${c.escape(item.question)}</p>`, c.shuffle([{ value: 'correct', label: item.answer, key: '1' }, { value: 'foil', label: item.foil, key: '2' }]).map((option, index) => ({ ...option, key: String(index + 1), label: `${index + 1} · ${option.label}` })));
         const correct = response.value === 'correct';
-        const sentence = { phase: 'formal', sentence_id: item.id, condition: item.condition, comprehension_question: item.question, response: response.value, correct, rt: response.rt, valid: !reading.invalid, words: item.tokens.length };
+        const sentence = { phase: 'formal', fixation_ms: fixationMs, sentence_id: item.id, condition: item.condition, comprehension_question: item.question, response: response.value, correct, rt: response.rt, valid: !reading.invalid, words: item.tokens.length };
         c.record(sentence);
         sentences.push(sentence);
         for (const word of reading.records) {
@@ -146,9 +145,7 @@
   ];
   const interferenceLabels = { semantic: '语义相关', phonological: '语音相关', unrelated: '无关控制' };
   function buildPwiTrials(c) {
-    const trials = ['semantic', 'phonological', 'unrelated'].flatMap(condition => [-100, 0].flatMap(soa => pictures.map(picture => ({ condition, soa, picture }))));
-    trials.push({ condition: 'semantic', soa: -100, picture: pictures[0] }, { condition: 'phonological', soa: 0, picture: pictures[1] });
-    return c.shuffle(trials);
+    return Array.from({ length: 2 }, (_, block) => c.shuffle(Array.from({ length: 2 }, () => ['semantic', 'phonological', 'unrelated'].flatMap(condition => [-100, 0].flatMap(soa => pictures.map(picture => ({ condition, soa, picture, block: block + 1 }))))).flat())).flat();
   }
   function pictureFrame(c, picture, distractor) {
     return `<div style="position:relative;width:min(100%,350px);min-height:280px;display:grid;place-items:center;margin:auto">${picture ? `<svg data-pwi-target="${picture.id}" viewBox="0 0 300 260" role="img" aria-label="需要命名的目标图片" style="width:100%;max-height:300px">${picture.svg}</svg>` : '<div style="height:280px"></div>'}<span data-pwi-word style="position:absolute;top:43%;left:50%;transform:translate(-50%,-50%);font:bold 42px/1.2 var(--serif);color:#a62927;text-shadow:0 1px #fffdf7,1px 0 #fffdf7,-1px 0 #fffdf7,0 -1px #fffdf7">${c.escape(distractor)}</span></div>`;
@@ -170,16 +167,16 @@
       { label: `SOA ${soa} ms · 语音促进`, value: effect(mean('unrelated', soa), mean('phonological', soa)), note: '无关控制 RT − 语音相关 RT' },
     );
     const cells = [-100, 0].flatMap(soa => ['semantic', 'phonological', 'unrelated'].map(condition => { const subset = rows.filter(row => row.condition === condition && row.soa === soa); return [soa + ' ms', interferenceLabels[condition], subset.length, c.percent(subset.filter(row => row.correct).length, subset.length), formatRT(mean(condition, soa))]; }));
-    return { metrics, extraHtml: table(c, ['SOA', '干扰词', '有效次数', '正确率', '正确反应 RT'], cells), explanation: '结果分别在两个 SOA 下比较语义干扰和语音促进，分数只由本次正确且有效的反应计算，缺少正确反应时保留“数据不足”。本教材版采用文档允许的按键名称选择，记录图片出现至手动选择的时长，不能把它当作声学命名潜伏期，也不能用来验证口语产生阶段的精确时间顺序。少量原创教学图片和词语未经独立常模验证，结果不保证出现经典方向。' };
+    return { metrics, extraHtml: table(c, ['SOA', '干扰词', '有效次数', '正确率', '正确反应 RT'], cells), explanation: '结果分别在两个 SOA 下比较语义干扰和语音促进，分数只由本次正确且有效的反应计算，缺少正确反应时保留“数据不足”。本教材版采用文档允许的按键名称选择，记录图片出现至手动选择的时长，不能把它当作声学命名潜伏期，也不能用来验证口语产生阶段的精确时间顺序。本教学版重复三张原创图片，存在熟悉和重复启动影响；图片与词语未经独立常模验证，结果不保证出现经典方向。' };
   }
 
   T.register({
     id: 'picture-word-interference', name: '图片词汇干扰', chapter: '第十章', code: '10-2',
-    category: '语言加工', taskType: '图片名称选择', trialCount: 20,
+    category: '语言加工', taskType: '图片名称选择', trialCount: 72,
     shortDescription: '忽略图片上的文字，选择图片名称，比较语义、语音干扰及两种呈现时序。',
     metrics: ['按键命名正确率', '语义干扰效应', '语音促进效应'],
-    instructions: ['先熟悉三张原创图片及名称：猫、狗、书。实验中忽略红色干扰词，尽快选择目标图片名称。', '共 20 次，语义相关、语音相关、无关控制三种干扰词，与提前 100 ms 或同时出现两种时序组合。', '按 1、2、3 或点击屏幕按钮选择图片名称；具体映射在开始时显示。每次最多 1500 ms。这里记录按键选择时间，不请求麦克风或录音。'],
-    description: '# 学习目标\n体验图片命名中语义竞争与语音相关性的作用，并比较干扰词领先图片与同时出现的安排。\n\n# 设计与流程\n3 种干扰词 × 2 种 SOA，共 6 个条件，20 次正式试次，各组合 3 或 4 次。三个目标分别为猫、狗、书，每个目标都出现在全部六个条件中。语义例为猫—狗，语音例为猫—帽、狗—钩、书—梳，无关词为跨类别词。每次中央注视 500 ms、空屏 200 ms。SOA −100 ms 时干扰词先出现 100 ms，再加入图片；SOA 0 ms 时二者同时出现。图片出现后有 1500 ms 选择窗口。按键映射在会话中固定，在会话间随机。\n\n# 操作与计分\n本实现采用定稿允许的“按下对应图片名称按键”方式，选择有客观对错。不会请求麦克风，也不会把手动选择时间写成声音触发的命名潜伏期。按 SOA 分别计算语义干扰（语义相关正确 RT−无关正确 RT）和语音促进（无关正确 RT−语音相关正确 RT），并输出各条件准确率。原始 CSV 保留超时、错误与切窗试次。\n\n# 时间记录\n记录设定 SOA、浏览器估计 SOA、干扰词及图片的时钟时间。浏览器帧调度和触屏操作存在误差，不能据此推断语音编码的毫秒级阶段边界。\n\n# 注意与来源\n图片为原创 SVG，中文材料为教学示例，未提供独立命名一致性、字频和语音相关强度常模。参考教材定稿 10-2；Rosinski (1977)；Levelt, Roelofs & Meyer (1999), A theory of lexical access in speech production。',
+    instructions: ['先熟悉三张原创图片及名称：猫、狗、书。实验中忽略红色干扰词，尽快选择目标图片名称。', '共 72 次，分 2 组，每组 36 次，组间可休息。三种干扰词与提前 100 ms 或同时出现两种时序完整交叉；每组首试次注视至少 2000 ms。', '按 1、2、3 或点击屏幕按钮选择图片名称；具体映射在开始时显示。每次最多 1500 ms。这里记录按键选择时间，不请求麦克风或录音。'],
+    description: '# 学习目标\n体验图片命名中语义竞争与语音相关性的作用，并比较干扰词领先图片与同时出现的安排。\n\n# 设计与流程\n3 种干扰词 × 2 种 SOA × 3 个目标完整交叉，每个组合 4 次，共 72 次正式试次。分 2 组，每组 36 次，组间可休息；每组每个组合 2 次，组内随机。三个目标分别为猫、狗、书，每个目标都出现在全部六个条件中。语义例为猫—狗，语音例为猫—帽、狗—钩、书—梳，无关词为跨类别词。每组首试次中央注视至少 2000 ms，其余试次 500 ms，随后空屏 200 ms。SOA −100 ms 时干扰词先出现 100 ms，再加入图片；SOA 0 ms 时二者同时出现。图片出现后有 1500 ms 选择窗口。按键映射在会话中固定，在会话间随机。\n\n# 操作与计分\n本实现采用定稿允许的“按下对应图片名称按键”方式，选择有客观对错。不会请求麦克风，也不会把手动选择时间写成声音触发的命名潜伏期。按 SOA 分别计算语义干扰（语义相关正确 RT−无关正确 RT）和语音促进（无关正确 RT−语音相关正确 RT），并输出各条件准确率。原始 CSV 保留超时、错误与切窗试次。\n\n# 时间记录\n记录设定 SOA、浏览器估计 SOA、干扰词及图片的时钟时间。浏览器帧调度和触屏操作存在误差，不能据此推断语音编码的毫秒级阶段边界。\n\n# 注意与来源\n图片为原创 SVG，中文材料为教学示例，未提供独立命名一致性、字频和语音相关强度常模。参考教材定稿 10-2；Rosinski (1977)；Levelt, Roelofs & Meyer (1999), A theory of lexical access in speech production。',
     async run(c) {
       const mapping = c.shuffle(pictures);
       await c.note(`<h2>图片与按键</h2><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px">${mapping.map((picture, index) => `<div style="width:150px"><svg viewBox="0 0 300 260" role="img" aria-label="${c.escape(picture.name)}" style="width:140px;height:125px">${picture.svg}</svg><p>${index + 1} · ${c.escape(picture.name)}</p></div>`).join('')}</div><p>只判断图片，不判断上方的红色文字。</p>`, '已熟悉，开始实验');
@@ -187,8 +184,7 @@
       const trials = buildPwiTrials(c);
       for (let i = 0; i < trials.length; i += 1) {
         const trial = trials[i], distractor = trial.picture[trial.condition];
-        c.progress(i + 1, 20, '图片名称选择');
-        await c.fixation(500);
+        const fixationMs = await c.trialStart(i, trials.length, { blockSize: 36, label: '图片名称选择', fixationMs: 500 });
         c.stage('<div style="min-height:280px" aria-label="空屏"></div>'); await c.wait(200);
         let distractorOnset = null;
         if (trial.soa < 0) {
@@ -201,7 +197,7 @@
         const responseAt = performance.now();
         const pictureOnset = responseAt - (response.timedOut ? 1500 : response.rt);
         if (trial.soa === 0) distractorOnset = pictureOnset;
-        c.record({ phase: 'formal', condition: trial.condition, soa: trial.soa, target: trial.picture.id, target_name: trial.picture.name, distractor, response: response.value, expected: trial.picture.id, correct: response.value === trial.picture.id, rt: response.timedOut ? null : response.rt, timed_out: response.timedOut, response_mode: 'manual_picture_name_choice', key_mapping: mapping.map((picture, index) => `${index + 1}=${picture.name}`).join(';'), distractor_onset_ms: distractorOnset, picture_onset_estimate_ms: pictureOnset, picture_render_requested_ms: renderRequested, measured_soa_estimate_ms: distractorOnset - pictureOnset, onset_method: 'browser response timestamp minus manual RT; no voice trigger', response_window_ms: 1500 });
+        c.record({ phase: 'formal', fixation_ms: fixationMs, block: trial.block, condition: trial.condition, soa: trial.soa, target: trial.picture.id, target_name: trial.picture.name, distractor, response: response.value, expected: trial.picture.id, correct: response.value === trial.picture.id, rt: response.timedOut ? null : response.rt, timed_out: response.timedOut, response_mode: 'manual_picture_name_choice', key_mapping: mapping.map((picture, index) => `${index + 1}=${picture.name}`).join(';'), distractor_onset_ms: distractorOnset, picture_onset_estimate_ms: pictureOnset, picture_render_requested_ms: renderRequested, measured_soa_estimate_ms: distractorOnset - pictureOnset, onset_method: 'browser response timestamp minus manual RT; no voice trigger', response_window_ms: 1500 });
       }
       return pwiSummary(c, c.rows);
     },

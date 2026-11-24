@@ -12,7 +12,7 @@ assert.equal(parse('A-C=20',{A:23,B:49,C:3}).value,20);
 for(const bad of ['A-C=999','A-C==20','A-C=alert(1)'])assert.throws(()=>parse(bad,{A:23,B:49,C:3}),bad);
 for(const bad of ['20','A*B','globalThis.process.exit()','A/2','A+','A+(C','A+2'])assert.throws(()=>parse(bad,{A:23,B:49,C:3}),bad);
 for(const group of ['set','control']){
- const ctx={rows:[],shuffle:a=>a.includes(group)?[group,...a.filter(v=>v!==group)]:[...a],note:async()=>{},progress(){},escape:String,
+ const ctx={rows:[],shuffle:a=>a.includes(group)?[group,...a.filter(v=>v!==group)]:[...a],note:async()=>{},progress(){},trialStart:async()=>2000,escape:String,
   input:async(html,opt)=>{const value=opt.label==='操作方法'?'A-C':'B-A-2C';assert.equal(opt.validate(value),true);return {value,rt:500};},
   choose:async(html,options)=>({value:options[0].value,rt:500}),record(r){this.rows.push({valid:true,...r});},
   mean:a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null,percent:(n,d)=>d?(n/d*100).toFixed(1)+'%':'数据不足'};

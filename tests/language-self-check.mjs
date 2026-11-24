@@ -71,6 +71,11 @@ function harness({ wrongSentence = 0, invalidSentence = '', autoAdvance = true }
     abort() { controller.abort(); },
     async wait(ms) { stats.waits.push(ms); clock += ms; },
     async fixation(ms) { stats.fixations.push(ms); clock += ms; },
+    async trialStart(index, total, { blockSize, fixationMs }) {
+      const ms = index === 0 || index % blockSize === 0 ? Math.max(2000, fixationMs) : fixationMs;
+      await this.fixation(ms);
+      return ms;
+    },
     async note() {},
     async choose(html, options, settings = {}) {
       stats.choices.push({ html, options, settings });
@@ -107,7 +112,8 @@ assert.equal(sentences.length, 20);
 assert.equal(words.length, readingPlan.reduce((sum, item) => sum + item.tokens.length, 0));
 assert.equal(words.length, 170);
 assert.equal(readingContext.stats.fixations.length, 20);
-assert.ok(readingContext.stats.fixations.every(ms => ms === 500));
+assert.ok(readingContext.stats.fixations.every((ms, i) => ms === (i % 10 === 0 ? 2000 : 500)));
+assert.ok(sentences.every((row, i) => row.fixation_ms === (i % 10 === 0 ? 2000 : 500)));
 assert.equal(readingContext.stats.comprehensionCount, 20);
 assert.ok(words.every(row => row.rt === 300));
 assert.ok(words.filter(row => row.sentence_id === 'spr-3').every(row => row.comprehension_correct === false));
@@ -140,21 +146,27 @@ assert.equal(controlled.metrics.find(metric => metric.label === '花园路径效
 assert.equal(controlled.metrics.find(metric => metric.label === '溢出效应').value, '+100 ms');
 
 const pwiPlan = helpers.buildPwiTrials(identity);
-assert.equal(pwiPlan.length, 20);
-assert.equal(pwiPlan.filter(trial => trial.soa === -100).length, 10);
-assert.equal(pwiPlan.filter(trial => trial.soa === 0).length, 10);
+assert.equal(pwiPlan.length, 72);
+assert.equal(pwiPlan.filter(trial => trial.soa === -100).length, 36);
+assert.equal(pwiPlan.filter(trial => trial.soa === 0).length, 36);
 for (const condition of ['semantic', 'phonological', 'unrelated']) for (const soa of [-100, 0]) {
   const cell = pwiPlan.filter(trial => trial.condition === condition && trial.soa === soa);
-  assert.ok(cell.length === 3 || cell.length === 4);
+  assert.equal(cell.length, 12);
+  for (const picture of helpers.pictures) {
+    assert.equal(cell.filter(trial => trial.picture.id === picture.id).length, 4);
+    for (const block of [1, 2]) assert.equal(cell.filter(trial => trial.picture.id === picture.id && trial.block === block).length, 2);
+  }
   assert.equal(new Set(cell.map(trial => trial.picture.id)).size, 3);
 }
 const pwiContext = harness();
 const pwiResult = await tasks.get('picture-word-interference').run(pwiContext);
-assert.equal(pwiContext.rows.length, 20);
+assert.equal(tasks.get('picture-word-interference').trialCount, 72);
+assert.equal(pwiContext.rows.length, 72);
 assert.ok(pwiContext.rows.every(row => row.phase === 'formal' && row.correct));
-assert.ok(pwiContext.stats.fixations.every(ms => ms === 500));
-assert.equal(pwiContext.stats.waits.filter(ms => ms === 200).length, 20);
-assert.equal(pwiContext.stats.waits.filter(ms => ms === 100).length, 10);
+assert.ok(pwiContext.stats.fixations.every((ms, i) => ms === (i % 36 === 0 ? 2000 : 500)));
+assert.ok(pwiContext.rows.every((row, i) => row.fixation_ms === (i % 36 === 0 ? 2000 : 500)));
+assert.equal(pwiContext.stats.waits.filter(ms => ms === 200).length, 72);
+assert.equal(pwiContext.stats.waits.filter(ms => ms === 100).length, 36);
 assert.ok(pwiContext.stats.choices.every(choice => choice.settings.timeout === 1500));
 assert.ok(pwiContext.rows.every(row => row.measured_soa_estimate_ms === row.soa));
 assert.ok(pwiContext.rows.every(row => row.response_mode === 'manual_picture_name_choice'));
@@ -163,4 +175,4 @@ assert.equal(pwiResult.metrics.find(metric => metric.label === 'SOA -100 ms · �
 const noCorrect = helpers.pwiSummary(pwiContext, pwiContext.rows.map(row => ({ ...row, correct: false })));
 assert.equal(noCorrect.metrics.find(metric => metric.label === 'SOA -100 ms · 语义干扰').value, '数据不足');
 
-console.log('language self-check passed: moving-window final word and masking, 20 sentence trials, comprehension filtering, six PWI cells, SOA timing and manual response scoring');
+console.log('language self-check passed: moving-window final word and masking, 20 sentence trials, comprehension filtering, 72 balanced PWI trials, 2s block starts, six PWI cells, SOA timing and manual response scoring');

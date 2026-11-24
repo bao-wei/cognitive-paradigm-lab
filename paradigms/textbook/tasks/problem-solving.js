@@ -29,13 +29,13 @@
   T.register({
     id:'water-jug',name:'Luchins 水罐与思维定势',chapter:'第九章',code:'9-2',category:'推理与问题解决',taskType:'解题策略与转换',trialCount:'5 次准备；20 次正式解题',
     shortDescription:'利用三种容量量出目标水量，观察熟悉方法是否妨碍发现简便解法。',
-    instructions:['把水罐 A、B、C 的容量组合成指定水量。可装满、倒去一整罐对应容量；用 A、B、C 的加减和整数倍记录方法。', '系统随机安排准备活动，然后完成 20 道解题任务。每题可输入方法，或选择没有解出。不会在正式题之间提示简便方法。', '输入例如 A+B、B-A-C 或 2*A-C；只填最终数字不算操作方法。电脑输入和手机屏幕输入均可使用。'],
+    instructions:['把水罐 A、B、C 的容量组合成指定水量。可装满、倒去一整罐对应容量；用 A、B、C 的加减和整数倍记录方法。', '系统随机安排准备活动，然后完成 20 道解题任务，每 10 题可休息。每题可输入方法，或选择没有解出。不会在正式题之间提示简便方法。', '输入例如 A+B、B-A-C 或 2*A-C；只填最终数字不算操作方法。电脑输入和手机屏幕输入均可使用。'],
     description:'# Luchins 水罐与思维定势\n\n## 与教材的联系\n对应第九章第二节“思维定势”及图9-13。保留河内塔9-1，补充水罐9-2，分别展示子目标搜索和成功经验对策略转换的影响。\n\n## 任务流程\n每次会话随机进入定势准备或对照准备组，先完成5次准备。定势组反复用 B−A−2C 解题并得到反馈；对照组只做不涉及水罐规则的计算。正式阶段20题，前10题可用熟悉规则或 A−C；后10题原规则不再得到目标水量，但仍有直接解法。正式测验不逐题揭示解法，以免把提示混入定势效果。\n\n## 记录与指标\n记录输入公式、实际组合结果、正确性、反应时、用罐次数，以及是否使用熟悉公式或直接解法。分别汇总可用双解题与规则改变题的表现，在结果页解释实际策略。用罐次数按化简后的净用量计，不等同于真实倒水动作数。\n\n## 教学边界\n20题是扩展教学版，不是原始研究题表，也不是智力或创造力测验。单人只进入一个组，不能凭个人结果宣称组间因果效应；教师可本地导入班级CSV比较真实分组。\n\n## 来源\nLuchins (1942), Mechanization in problem solving: The effect of Einstellung；依照本书第四稿“水罐实验”段落与图9-13改编。后续实验参考 Ellis & Reingold (2014), The Einstellung effect in anagram problem solving（此处仅用于说明认知定势概念）；[水罐直接实验研究](https://escholarship.org/uc/item/1976z9q8)。',
     async run(ctx) {
       const group=ctx.shuffle(['set','control'])[0],practice=[{A:21,B:127,C:3},{A:14,B:163,C:25},{A:18,B:43,C:10},{A:9,B:42,C:6},{A:20,B:59,C:4}];
       await ctx.note('<h2>开始前的准备活动</h2><p>请按接下来屏幕上的要求完成。正式题开始后，不再提供解法反馈。</p>');
       for(let i=0;i<5;i++){
-        ctx.progress(i+1,5,'准备活动');
+        await ctx.trialStart(i,5,{label:'准备活动'});
         if(group==='set'){
           const p={...practice[i],target:practice[i].B-practice[i].A-2*practice[i].C};
           const response=await ctx.input(`<h2>准备题 ${i+1}</h2>${jars(p)}<p>目标：${p.target} 单位。请使用 B−A−2C 这一方法，写出操作式。</p>`,{label:'用 A、B、C 写出方法',minLength:1,validate:value=>{try{parseJarFormula(value,p);return true;}catch(e){return e.message;}}});
@@ -48,7 +48,7 @@
       await ctx.note('<h2>正式解题</h2><p>请独立寻找一种能量出目标水量的方法。题目没有限制必须使用全部水罐；没有解出也可以如实记录。</p>');
       const problems=makeJarProblems();
       for(let i=0;i<problems.length;i++){
-        ctx.progress(i+1,20,'正式解题');const p=problems[i];
+        await ctx.trialStart(i,problems.length,{blockSize:10,label:'正式解题'});const p=problems[i];
         const response=await ctx.input(`<h2>量出 ${p.target} 单位的水</h2>${jars(p)}<p>写出操作方法；没有解出可填“不知道”。</p>`,{label:'操作方法',minLength:1,validate:value=>{if(/^(不知道|未解出|跳过)$/.test(value))return true;try{parseJarFormula(value,p);return true;}catch(e){return e.message;}}});
         const parsed=/^(不知道|未解出|跳过)$/.test(response.value)?null:parseJarFormula(response.value,p);
         ctx.record({phase:'formal',trial:i+1,condition:group,problem_type:p.type,...p,response:response.value,correct:parsed?.value===p.target,computed:parsed?.value??null,strategy:parsed?.strategy||'unsolved',net_jar_uses:parsed?.uses??null,rt:response.rt});

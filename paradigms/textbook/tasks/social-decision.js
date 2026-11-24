@@ -39,7 +39,7 @@
       "本任务包含虚构的拿走物品事件，不含暴力。你可以随时退出，结果不用于能力评估。",
       "每轮观看短动画，阅读事件后的文字材料，再进行人物指认。事件中的人可能在列队中，也可能不在。",
       "请独立作答；不确定时可以选择没有此人。随后报告确信度和一个事件细节。",
-      "系统随机分配一种文字材料、列队方式和目标状态，全程保持这一分组。20 轮结束后提供事后解释。",
+      "系统随机分配一种文字材料、列队方式和目标状态，全程保持这一分组。20 轮结束后提供事后解释，每 5 轮可休息。",
     ],
     description: "# 学习目标\n体验事件后信息与列队方式如何影响事件记忆和指认。\n\n# 实验操作\n先知情同意，再完成 20 轮原创商店动画、文字阅读、列队指认、确信度和细节报告。系统按 3 种信息 × 2 种列队方式 × 2 种目标状态随机分组；个人只进入一个组，不把不同组串成连续阶段。人物是原创示意头像。\n\n# 指标与解释\n记录人物选择、目标是否在场、正确拒绝或误认、决策反应时、确信度及事件细节报告。在顺序列队中逐人决定，选择后终止列队，不返回重选。没有真实班级数据时不绘制班级均值。\n\n# 注意事项\n动画和头像未经司法辨认材料标准化，重复练习也会改变记忆策略。本任务只用于体验研究操作，不用于评价证人或作司法判断。\n\n# 来源与参考\n教材 6-3 要求；[列队程序研究原文](https://pmc.ncbi.nlm.nih.gov/articles/PMC5256444/)。",
     async run(ctx) {
@@ -54,7 +54,7 @@
       const rows = [];
       const details = [];
       for (let trial = 0; trial < 20; trial += 1) {
-        ctx.progress(trial + 1, 20, "事件与指认");
+        await ctx.trialStart(trial, 20, {blockSize: 5, label: "事件与指认"});
         const identity = trial * 7 + 2;
         const jacket = trial % 2 ? "#4c7195" : "#a04f4a";
         const jacketName = trial % 2 ? "蓝色" : "红色";
@@ -119,10 +119,9 @@
       let studyIndex = 0;
       for (const list of lists) {
         for (const word of list.words) {
-          ctx.progress(++studyIndex, 20, "词语学习");
+          await ctx.trialStart(studyIndex++, 20, {label: "词语学习", fixationMs: 250});
           ctx.stage(`<h2>请记住这个词</h2><div style="font-size:clamp(36px,10vw,64px);padding:50px">${ctx.escape(word)}</div>`);
           await ctx.wait(1500);
-          ctx.stage("<p>＋</p>"); await ctx.wait(250);
         }
       }
       if (delayed) await arithmeticFiller(ctx, 30000);
@@ -137,7 +136,7 @@
       ]));
       const rows = [];
       for (let i = 0; i < probes.length; i += 1) {
-        ctx.progress(i + 1, 20, "新旧词判断");
+        await ctx.trialStart(i, probes.length, {label: "新旧词判断", fixationMs: 400});
         const probe = probes[i];
         const answer = await ctx.choose(`<h2>刚才是否学过这个词？</h2><div style="font-size:42px;padding:30px">${ctx.escape(probe.word)}</div>`, [{ value: "old", label: "学过", key: "f" }, { value: "new", label: "没有学过", key: "j" }]);
         const sure = await confidence(ctx);
@@ -172,8 +171,8 @@
   function wasonItem(index) {
     const type = index % 3;
     if (type === 0) {
-      const vowel = ["A", "E", "I", "O", "U", "A", "E"][Math.floor(index / 3)];
-      const consonant = ["K", "T", "R", "M", "N", "S", "P"][Math.floor(index / 3)];
+      const vowel = ["A", "E", "I", "O", "U", "A", "E", "I"][Math.floor(index / 3)];
+      const consonant = ["K", "T", "R", "M", "N", "S", "P", "L"][Math.floor(index / 3)];
       const even = 2 + (Math.floor(index / 3) % 4) * 2;
       const odd = even + 1;
       return { type: "abstract", rule: "如果卡片一面是元音字母，那么另一面是偶数。", cards: [{ label: vowel, role: "p" }, { label: consonant, role: "notp" }, { label: String(even), role: "q" }, { label: String(odd), role: "notq" }], rationale: "必须查看元音卡片背面是否为偶数，也要查看奇数卡片背面是否为元音。辅音和偶数不违反这个单向条件。" };
@@ -216,21 +215,20 @@
 
   register({
     id: "wason", name: "Wason 选择任务", chapter: "第八章", code: "8-1",
-    category: "推理与问题解决", taskType: "条件推理", trialCount: 20,
+    category: "推理与问题解决", taskType: "条件推理", trialCount: 24,
     shortDescription: "在字母数字、信封邮票和饮酒年龄情境中，选择必须翻看的卡片检验规则。",
-    instructions: ["每题四张卡片，各自只显示一面。请选出检验规则必须查看的最少卡片。", "点击卡片可选择或取消，多选后提交。电脑和手机均可直接点击。", "共 20 题，包含三类相同逻辑结构的任务，每题提交后提供反馈。", "题目中的饮酒年龄是题设条件；连续反馈会产生学习迁移，成绩不能视为未经练习的能力测量。"],
-    description: "# 学习目标\n比较抽象内容与具体内容下的条件推理，理解证真偏向和内容效应。\n\n# 实验操作\n20 题依次完成字母数字、信封邮票、饮酒年龄三类（7、7、6 题），逻辑结构均为“若 P 则 Q”。每类题目及卡片随机排序，选择后立即反馈。\n\n# 指标与解释\n记录各题选择、反应时及三种情境的正确率。逻辑上必须检验 P 和非 Q；不能只寻找支持规则的例子。平台只展示真实个人记录；如需班级比较，应由教师收集导出的数据，不填入虚构班级均值。\n\n# 注意事项\n即时反馈与重复题目会产生练习和迁移，三类题目差异只供课堂讨论。\n\n# 来源与参考\n教材 8-1；[Gorilla Wason 教学说明](https://support.gorilla.sc/support/educational-resources/classic-psychology-tasks/wason-selection-task)。",
+    instructions: ["每题四张卡片，各自只显示一面。请选出检验规则必须查看的最少卡片。", "点击卡片可选择或取消，多选后提交。电脑和手机均可直接点击。", "共 24 题，三类相同逻辑结构各 8 题，分两段各 12 题，中间可休息；每题提交后提供反馈。", "题目中的饮酒年龄是题设条件；连续反馈会产生学习迁移，成绩不能视为未经练习的能力测量。"],
+    description: "# 学习目标\n比较抽象内容与具体内容下的条件推理，理解证真偏向和内容效应。\n\n# 实验操作\n24 题包含字母数字、信封邮票、饮酒年龄三类各 8 题，分两段各 12 题；每段每类各 4 题，段内随机呈现。逻辑结构均为“若 P 则 Q”。每类题目及卡片随机排序，选择后立即反馈。\n\n# 指标与解释\n记录各题选择、反应时及三种情境的正确率。逻辑上必须检验 P 和非 Q；不能只寻找支持规则的例子。平台只展示真实个人记录；如需班级比较，应由教师收集导出的数据，不填入虚构班级均值。\n\n# 注意事项\n即时反馈与重复题目会产生练习和迁移，三类题目差异只供课堂讨论。\n\n# 来源与参考\n教材 8-1；[Gorilla Wason 教学说明](https://support.gorilla.sc/support/educational-resources/classic-psychology-tasks/wason-selection-task)。",
     async run(ctx) {
-      const indices = Array.from({ length: 20 }, (_, index) => index);
-      const order = [0, 1, 2].flatMap((type) => ctx.shuffle(indices.filter((index) => index % 3 === type)));
+      const order = [0, 1].flatMap(block => ctx.shuffle(Array.from({length: 12}, (_, i) => block * 12 + i)));
       const rows = [];
       for (let i = 0; i < order.length; i += 1) {
-        ctx.progress(i + 1, 20, "条件推理");
+        await ctx.trialStart(i, order.length, {blockSize: 12, label: "条件推理"});
         const item = wasonItem(order[i]);
         const answer = await selectWasonCards(ctx, item);
         const row = { phase: "formal", trial: i + 1, condition: item.type, rule: item.rule, selected_cards: answer.labels.join(" | "), selected_roles: answer.roles.join(" | "), correct: answer.correct, rt: Math.round(answer.rt) };
         ctx.record(row); rows.push(row);
-        await ctx.note(`<h2>${answer.correct ? "判断正确" : "再想一想"}</h2>${htmlText(ctx, item.rationale)}<p>这道题需要查看“P”和“非 Q”。</p>`, i === 19 ? "查看结果" : "下一题");
+        await ctx.note(`<h2>${answer.correct ? "判断正确" : "再想一想"}</h2>${htmlText(ctx, item.rationale)}<p>这道题需要查看“P”和“非 Q”。</p>`, i === order.length - 1 ? "查看结果" : "下一题");
       }
       const scored = rows.filter((row) => row.valid !== false);
       const metrics = [metric("总体正确率", ctx.percent(scored.filter((row) => row.correct).length, scored.length)), metric("平均判断时间", mean(ctx, scored.map((row) => row.rt), " ms"))];
@@ -244,15 +242,15 @@
 
   register({
     id: "bart", name: "BART 气球模拟风险任务", chapter: "第八章", code: "8-2",
-    category: "决策与奖赏", taskType: "连续风险决策", trialCount: 20,
+    category: "决策与奖赏", taskType: "连续风险决策", trialCount: 30,
     shortDescription: "在继续充气获得收益和及时保存收益之间权衡，体验动态风险决策。",
-    instructions: ["共 20 个气球，每充气一次获得 1 个模拟积分；充得越多，气球越可能爆炸。", "按空格或点击“充气”继续；按回车或点击“保存”保留本轮积分并进入下一个气球。", "爆炸会失去本轮未保存积分，不影响此前已保存的积分。没有真实金钱。", "各气球爆炸点随机分布，不会提前显示。"],
-    description: "# 学习目标\n体验在不确定条件下权衡收益与爆炸风险。\n\n# 实验操作\n20 个气球，每次充气获得 1 个模拟积分。每个气球的爆炸阈值独立从 1—32 次中等概率抽取，达到阈值即爆炸；这一缩短参数用于课堂体验，不是临床常模。可随时保存本轮收益。\n\n# 指标与解释\n调整后平均充气次数只统计未爆炸气球；另记录爆炸比例、总收益、每轮充气次数和选择时间。爆炸概率在生存至后一次充气时随剩余阈值数减少而升高。\n\n# 注意事项\n没有真实奖金，20 轮任务不能用于判断人格、冲动性或现实冒险倾向。全部爆炸时调整后均值显示数据不足。\n\n# 来源与参考\nLejuez 等（2002）；[Gorilla BART 教学说明](https://support.gorilla.sc/support/educational-resources/classic-psychology-tasks/BART)。",
+    instructions: ["共 30 个气球，每 10 个为一段，中间可休息。每充气一次获得 1 个模拟积分；充得越多，气球越可能爆炸。", "按空格或点击“充气”继续；按回车或点击“保存”保留本轮积分并进入下一个气球。", "爆炸会失去本轮未保存积分，不影响此前已保存的积分。没有真实金钱。", "各气球爆炸点随机分布，不会提前显示。"],
+    description: "# 学习目标\n体验在不确定条件下权衡收益与爆炸风险。\n\n# 实验操作\n30 个气球，每 10 个为一段；每次充气获得 1 个模拟积分。每个气球的爆炸阈值独立从 1—32 次中等概率抽取，达到阈值即爆炸；这一缩短参数用于课堂体验，不是临床常模。可随时保存本轮收益。\n\n# 指标与解释\n调整后平均充气次数只统计未爆炸气球；另记录爆炸比例、总收益、每轮充气次数和选择时间。爆炸概率在生存至后一次充气时随剩余阈值数减少而升高。\n\n# 注意事项\n没有真实奖金，30 轮教学任务不能用于判断人格、冲动性或现实冒险倾向。全部爆炸时调整后均值显示数据不足。\n\n# 来源与参考\nLejuez 等（2002）；[Gorilla BART 教学说明](https://support.gorilla.sc/support/educational-resources/classic-psychology-tasks/BART)。",
     async run(ctx) {
       let total = 0;
       const rows = [];
-      for (let trial = 0; trial < 20; trial += 1) {
-        ctx.progress(trial + 1, 20, "气球充气");
+      for (let trial = 0; trial < 30; trial += 1) {
+        await ctx.trialStart(trial, 30, {blockSize: 10, label: "气球充气"});
         const threshold = 1 + Math.floor(Math.random() * 32);
         let pumps = 0;
         let popped = false;
@@ -283,7 +281,7 @@
     id: "hanoi", name: "河内塔中的子目标与搜索", chapter: "第九章", code: "9-1",
     category: "推理与问题解决", taskType: "三盘问题解决", trialCount: 20,
     shortDescription: "遵守大小盘规则移动三盘河内塔，观察子目标提示与搜索过程。",
-    instructions: ["把 A 柱上的三个盘全部移到 C 柱。每次只移动最上方一个盘，不能把大盘放到小盘上。", "先点击来源柱，再点击目标柱；电脑可按 A、B、C，手机直接点按钮。", "共 20 轮，每轮起点与目标相同。可结束当前轮并记录未完成。", "系统随机分配提示组或无提示组，保留全部移动、违例和回退记录。重复练习本身也会改变表现。"],
+    instructions: ["把 A 柱上的三个盘全部移到 C 柱。每次只移动最上方一个盘，不能把大盘放到小盘上。", "先点击来源柱，再点击目标柱；电脑可按 A、B、C，手机直接点按钮。", "共 20 轮，每 5 轮可休息，每轮起点与目标相同。可结束当前轮并记录未完成。", "系统随机分配提示组或无提示组，保留全部移动、违例和回退记录。重复练习本身也会改变表现。"],
     description: "# 学习目标\n观察子目标提示与搜索、回退之间的关系。\n\n# 实验操作\n系统随机分配提示或无提示条件，完成 20 轮三盘河内塔。每轮 A 柱按大、中、小顺序放盘，目标是全部移至 C 柱；只允许移动顶盘，大盘不能压小盘。每轮最长 120 秒，可主动结束并保留未完成记录。最少合法移动是 7 步。\n\n# 指标与解释\n记录每次选择、合法移动、违例、立即逆向回退、完成时间和是否完成。不能只依据速度评价策略。相同问题的重复练习具有明显学习效应，随机提示组和无提示组应结合首轮表现及既有经验讨论。\n\n# 注意事项\n这是操作过程演示，不是智力测试，不会显示未实际收集的组间差异。\n\n# 来源与参考\n教材实验探究 9-1。",
     async run(ctx) {
       const hinted = ctx.shuffle([true, false])[0];
@@ -291,7 +289,7 @@
       await ctx.note(`<h2>本次任务</h2><p>每次移动一个顶盘，不能把大盘放在小盘上，目标为 C 柱。</p>${hinted ? '<p>请先思考：移动最大盘之前，上面的两个小盘应放在哪里？</p>' : '<p>请按规则自行探索完成方法。</p>'}`);
       const rows = [];
       for (let trial = 0; trial < 20; trial += 1) {
-        ctx.progress(trial + 1, 20, "三盘河内塔");
+        await ctx.trialStart(trial, 20, {blockSize: 5, label: "三盘河内塔"});
         const pegs = [[3, 2, 1], [], []];
         const began = performance.now();
         let selected = null, moves = 0, violations = 0, backtracks = 0, lastMove = null, completed = false;
@@ -374,13 +372,13 @@
       const group = ctx.shuffle(["us", "china", "neutral"])[0];
       const primeOrder = ctx.shuffle([0, 1, 2, 3, 4, 5]);
       for (let i = 0; i < primeOrder.length; i += 1) {
-        ctx.progress(i + 1, 6, "图片命名与描述");
+        await ctx.trialStart(i, 6, {label: "图片命名与描述"});
         const answer = await ctx.input(`<h2>图片 ${i + 1} / 6</h2>${primeSvg(group, primeOrder[i])}<p>请为图片命名，并写一句描述。</p>`, { label: "名称与描述", placeholder: "名称：……；描述：……", minLength: 8 });
         ctx.record({ phase: "prime", trial: i + 1, condition: group, picture: primeOrder[i] + 1, response: answer.value, correct: null, rt: answer.rt });
       }
       const rows = [];
       for (let trial = 0; trial < 20; trial += 1) {
-        ctx.progress(trial + 1, 20, "场景解释");
+        await ctx.trialStart(trial, 20, {label: "场景解释"});
         const answer = await ctx.input(`<h2>这条鱼为什么游在最前面？</h2>${fishScene(trial)}<p>请依据自己的想法写一段解释，至少 40 个字。</p>`, { label: "你的解释", minLength: 40, validate: (value) => value.replace(/\s/g, "").length >= 40 || "请至少写 40 个字，再继续。" });
         const row = { phase: "formal", trial: trial + 1, condition: group, response: answer.value, characters: answer.value.replace(/\s/g, "").length, correct: null, rt: answer.rt };
         ctx.record(row);

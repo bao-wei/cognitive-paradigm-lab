@@ -29,6 +29,7 @@
   function makeContext(task) {
     const root=document.querySelector('#stage');
     const controller=new AbortController();let stageController=new AbortController(),visibilityVersion=0,recordVersion=0,audio=null;
+    let firstFixation=true,preparationFixationMs=null,blockNumber=1;
     const rows=[];const session=`${task.id}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
     function check(){if(controller.signal.aborted)throw new DOMException('实验已退出','AbortError');}
     function stage(html){check();stageController.abort();stageController=new AbortController();root.innerHTML=html;}
@@ -55,9 +56,26 @@
     }
     const ctx={root,rows,stage,wait,choose,input,escape,shuffle,mean,percent,signal:controller.signal,
       asset:relative=>global.TEXTBOOK_ASSETS?.[relative]||relative,
-      fixation:async(ms=500)=>{stage('<div class="fixation" aria-label="请注视中央">+</div>');await wait(ms);},
+      fixation:async(ms=500)=>{const duration=firstFixation?Math.max(2000,ms):ms;firstFixation=false;preparationFixationMs=duration;stage('<div class="fixation" aria-label="请注视中央">+</div>');await wait(duration);return duration;},
+      async trialStart(index,total,{blockSize=0,label='正式实验',fixationMs=500,renderFixation}={}) {
+        check();
+        const afterBreak=index>0&&blockSize>0&&index%blockSize===0;
+        blockNumber=blockSize>0?Math.floor(index/blockSize)+1:1;
+        if(afterBreak){
+          ctx.progress(index,total,label+' · 休息');
+          await ctx.note(`<section data-rest-break><h2>休息一下</h2><p>已完成 ${index} / ${total} 个试次。可以放松眼睛和手指，准备好后再继续。</p><p>继续后先注视中央加号 2 秒，再开始下一段任务。</p></section>`,'休息好了，继续');
+        }
+        // Leaving the page during a break must not invalidate a later, fully visible trial.
+        recordVersion=visibilityVersion;
+        ctx.progress(index+1,total,label);
+        const duration=firstFixation||index===0||afterBreak?Math.max(2000,fixationMs):fixationMs;
+        firstFixation=false;preparationFixationMs=duration;
+        if(renderFixation)await renderFixation(duration);
+        else await ctx.fixation(duration);
+        check();return duration;
+      },
       note:async(html,buttonLabel='继续')=>choose(html,[{value:'continue',label:buttonLabel,key:'space'}]),
-      record(row){check();row.valid=row.valid!==false&&visibilityVersion===recordVersion;recordVersion=visibilityVersion;rows.push({paradigm:task.id,session,trial:rows.length+1,...row});},
+      record(row){check();row.valid=row.valid!==false&&visibilityVersion===recordVersion;recordVersion=visibilityVersion;rows.push({paradigm:task.id,session,trial:rows.length+1,block_number:blockNumber,preparation_fixation_ms:preparationFixationMs,...row});},
       progress(index,total,label='正式实验'){document.querySelector('#progress-text').textContent=`${label} · ${index} / ${total}`;const p=document.querySelector('#progress');p.max=total||1;p.value=index;},
       async tone(hz=600,duration=200){try{audio||=new(global.AudioContext||global.webkitAudioContext)();await audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.frequency.value=hz;g.gain.value=.08;o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration/1000);return true;}catch{return false;}},
       abort(){controller.abort();stageController.abort();rows.length=0;if(ctx.exportUrl){URL.revokeObjectURL(ctx.exportUrl);ctx.exportUrl=null;}if(audio)audio.close().catch(()=>{});},
@@ -68,7 +86,7 @@
   function taskId(){return global.TEXTBOOK_OFFLINE_ID||new URLSearchParams(location.search).get('id')||'';}
   function describe(task) {
     const details=task.description||'';
-    return `<div class="instructions"><p class="eyebrow">PARADIGM EXPERIENCE</p><h1>${escape(task.name)}</h1><p>${escape(task.shortDescription)}</p><ul>${(task.instructions||[]).map(v=>`<li>${escape(v)}</li>`).join('')}</ul><p class="result-note">${task.trialCount?`本次${escape(task.trialCount)}${typeof task.trialCount==='number'?'个正式试次':''}。`:''}仅供教学；结果只保留在当前页面，离开前可导出 CSV。</p><button id="begin" type="button">开始实验</button><details><summary>了解范式原理与指标</summary><div class="description-text">${escape(details).replaceAll('\n','<br>')}</div></details></div>`;
+    return `<div class="instructions"><p class="eyebrow">PARADIGM EXPERIENCE</p><h1>${escape(task.name)}</h1><p>${escape(task.shortDescription)}</p><ul>${(task.instructions||[]).map(v=>`<li>${escape(v)}</li>`).join('')}</ul><p class="result-note">${task.trialCount?`本次${escape(task.trialCount)}${typeof task.trialCount==='number'?'个正式试次':''}。`:''}首个试次及休息后先呈现至少 2 秒固视点，请准备好再反应。仅供教学；结果只保留在当前页面，离开前可导出 CSV。</p><button id="begin" type="button">开始实验</button><details><summary>了解范式原理与指标</summary><div class="description-text">${escape(details).replaceAll('\n','<br>')}</div></details></div>`;
   }
   async function launch() {
     if(current){current.abort();current=null;}

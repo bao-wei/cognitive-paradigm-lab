@@ -11,6 +11,7 @@ window.IMPORTED_PARADIGMS = [
       "刺激辨别时间",
       "反应选择时间"
     ],
+    "trialCount": 72,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -43,6 +44,7 @@ window.IMPORTED_PARADIGMS = [
       "Stroop 干扰效应",
       "相对中性条件干扰"
     ],
+    "trialCount": 72,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -75,6 +77,7 @@ window.IMPORTED_PARADIGMS = [
       "局部干扰",
       "整体干扰"
     ],
+    "trialCount": 80,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -107,6 +110,7 @@ window.IMPORTED_PARADIGMS = [
       "语音识别率",
       "融合性报告比例"
     ],
+    "trialCount": 48,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -139,6 +143,7 @@ window.IMPORTED_PARADIGMS = [
       "识别反应时",
       "复杂度差异"
     ],
+    "trialCount": 20,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -171,6 +176,7 @@ window.IMPORTED_PARADIGMS = [
       "操作正确率",
       "主观难度"
     ],
+    "trialCount": 48,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -203,6 +209,7 @@ window.IMPORTED_PARADIGMS = [
       "平均反应时",
       "冲突效应"
     ],
+    "trialCount": 80,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -235,6 +242,7 @@ window.IMPORTED_PARADIGMS = [
       "Go 反应时",
       "抑制成功率"
     ],
+    "trialCount": 100,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -267,6 +275,7 @@ window.IMPORTED_PARADIGMS = [
       "部分报告估计容量",
       "延迟条件差异"
     ],
+    "trialCount": 48,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -299,6 +308,7 @@ window.IMPORTED_PARADIGMS = [
       "各负荷反应时",
       "工作记忆容量 K"
     ],
+    "trialCount": 96,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -331,6 +341,7 @@ window.IMPORTED_PARADIGMS = [
       "记得比例",
       "新词虚报率"
     ],
+    "trialCount": "学习 20 词；测验 30 词",
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -363,6 +374,7 @@ window.IMPORTED_PARADIGMS = [
       "启动效应",
       "错误率"
     ],
+    "trialCount": 72,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -395,6 +407,7 @@ window.IMPORTED_PARADIGMS = [
       "新位置侵入比例",
       "新配对学习表现"
     ],
+    "trialCount": "原配对 20 组；原记忆测验 20 题",
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -427,6 +440,7 @@ window.IMPORTED_PARADIGMS = [
       "RP− 回忆率",
       "NPP 基线回忆率"
     ],
+    "trialCount": "学习 20 项；最终测验 20 题",
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -459,6 +473,7 @@ window.IMPORTED_PARADIGMS = [
       "确信度",
       "事件后信息条件"
     ],
+    "trialCount": 20,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -491,6 +506,7 @@ window.IMPORTED_PARADIGMS = [
       "关键诱饵虚报",
       "确信度校准"
     ],
+    "trialCount": 20,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -523,6 +539,7 @@ window.IMPORTED_PARADIGMS = [
       "选择与反应时",
       "课堂比较"
     ],
+    "trialCount": 24,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -555,6 +572,7 @@ window.IMPORTED_PARADIGMS = [
       "爆炸比例",
       "累计收益"
     ],
+    "trialCount": 30,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -587,6 +605,7 @@ window.IMPORTED_PARADIGMS = [
       "回退次数",
       "完成时间"
     ],
+    "trialCount": 20,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -619,6 +638,7 @@ window.IMPORTED_PARADIGMS = [
       "人工编码比例",
       "文化启动分组"
     ],
+    "trialCount": 20,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -651,6 +671,7 @@ window.IMPORTED_PARADIGMS = [
       "定向效应",
       "冲突效应"
     ],
+    "trialCount": 144,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -683,6 +704,7 @@ window.IMPORTED_PARADIGMS = [
       "T2 检测正确率",
       "T2 随间隔变化曲线"
     ],
+    "trialCount": 80,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -715,6 +737,7 @@ window.IMPORTED_PARADIGMS = [
       "正确反应时",
       "大小一致性效应"
     ],
+    "trialCount": 72,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -747,6 +770,7 @@ window.IMPORTED_PARADIGMS = [
       "角度—反应时曲线",
       "角度与 RT 描述性斜率"
     ],
+    "trialCount": 72,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -779,6 +803,7 @@ window.IMPORTED_PARADIGMS = [
       "花园路径效应",
       "消歧后溢出效应"
     ],
+    "trialCount": 20,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -811,6 +836,7 @@ window.IMPORTED_PARADIGMS = [
       "语义干扰效应",
       "语音促进效应"
     ],
+    "trialCount": 72,
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",
@@ -843,6 +869,7 @@ window.IMPORTED_PARADIGMS = [
       "熟悉策略使用率",
       "规则改变后表现"
     ],
+    "trialCount": "5 次准备；20 次正式解题",
     "tags": [],
     "platform": "Textbook HTML5",
     "mode": "package",

@@ -19,20 +19,19 @@
   const table = (headers, rows) => `<div style="overflow:auto"><table><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((v) => `<td>${v}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 
   T.register({
-    id: "donders", name: "Donders 减法反应时", chapter: "第一章", code: "1-1", category: "基础反应", taskType: "简单、辨别与选择反应", trialCount: 20,
+    id: "donders", name: "Donders 减法反应时", chapter: "第一章", code: "1-1", category: "基础反应", taskType: "简单、辨别与选择反应", trialCount: 72,
     shortDescription: "体验简单反应、辨别反应和选择反应，用反应时差估计不同加工阶段。",
-    instructions: ["共 20 个正式试次，分为三类任务。每一类开始前会说明按键规则。", "简单反应：看到圆形就按空格或点击反应；辨别反应：只对蓝色圆形反应，灰色圆形不反应；选择反应：按蓝／灰对应按钮。", "空白等待期不要提前作答；触屏按钮与键盘按键等效。"],
-    description: "# 学习目标\n理解 Donders 减法反应时法如何通过任务差异估计加工时间。\n\n# 实验原理\n简单反应、辨别反应和选择反应包含不同的刺激辨别与反应选择要求。辨别反应 RT 减去简单反应 RT 为刺激辨别时间估计，选择反应 RT 减去辨别反应 RT 为反应选择时间估计。\n\n# 任务流程\n20 个正式试次：简单反应 6 次、辨别反应 8 次（目标与非目标各 4 次）、选择反应 6 次。三个任务区组顺序随机，每次刺激前等待 700–1400 ms；反应窗口 2000 ms。\n\n# 记录指标与结果解读\n分任务报告正确率、正确反应平均 RT 和两种减法值。不反应试次不进入 RT 平均。减法法依赖纯插入等假设，短体验可能得到负差值，不能据此推断个人加工能力。\n\n# 注意事项与来源\n仅供教学，不保存数据。参考 Donders（1868）的经典心理过程测时方法。",
+    instructions: ["共 72 个正式试次，简单、辨别和选择反应各 24 次。每类开始前说明按键规则，类间可休息。", "简单反应：看到圆形就按空格或点击反应；辨别反应：只对蓝色圆形反应，灰色圆形不反应；选择反应：按蓝／灰对应按钮。", "每组首试次及休息后预备注视至少 2 秒；其余注视等待 700–1400 ms，不要提前作答。触屏按钮与键盘按键等效。"],
+    description: "# 学习目标\n理解 Donders 减法反应时法如何通过任务差异估计加工时间。\n\n# 实验原理\n简单反应、辨别反应和选择反应包含不同的刺激辨别与反应选择要求。辨别反应 RT 减去简单反应 RT 为刺激辨别时间估计，选择反应 RT 减去辨别反应 RT 为反应选择时间估计。\n\n# 任务流程\n72 个正式试次：简单反应 24 次、辨别反应 24 次（目标与非目标各 12 次）、选择反应 24 次（蓝／灰各 12 次）。三个任务区组顺序随机，区组之间可休息。每组首试次及休息后注视至少 2000 ms，其余试次注视 700–1400 ms；反应窗口 2000 ms。\n\n# 记录指标与结果解读\n分任务报告正确率、正确反应平均 RT 和两种减法值。不反应试次不进入 RT 平均。减法法依赖纯插入等假设，教学任务仍可能得到负差值，不能据此推断个人加工能力。\n\n# 注意事项与来源\n仅供教学，不保存数据。参考 Donders（1868）的经典心理过程测时方法。",
     async run(c) {
       const blocks = c.shuffle(["simple", "discrimination", "choice"]);
       const labels = { simple: "简单反应", discrimination: "辨别反应", choice: "选择反应" };
       let index = 0;
       for (const condition of blocks) {
         await c.note(`<h2>${labels[condition]}</h2><p>${condition === "simple" ? "看到蓝色圆形，立即按空格或点击反应。" : condition === "discrimination" ? "仅对蓝色圆形按空格／点击；灰色圆形出现时等待，不作反应。" : "蓝色圆形按 F 或点击蓝色；灰色圆形按 J 或点击灰色。"}</p>`);
-        const stimuli = condition === "simple" ? Array(6).fill("blue") : c.shuffle(Array.from({ length: condition === "choice" ? 6 : 8 }, (_, i) => i % 2 ? "gray" : "blue"));
+        const stimuli = condition === "simple" ? Array(24).fill("blue") : c.shuffle(Array.from({ length: 24 }, (_, i) => i % 2 ? "gray" : "blue"));
         for (const stimulus of stimuli) {
-          c.progress(++index, 20, labels[condition]);
-          await c.fixation(700 + Math.floor(Math.random() * 701));
+          await c.trialStart(index++, 72, { blockSize: 24, label: labels[condition], fixationMs: 700 + Math.floor(Math.random() * 701) });
           const options = condition === "choice" ? [{ value: "blue", label: "F · 蓝色", key: "f" }, { value: "gray", label: "J · 灰色", key: "j" }] : [{ value: "go", label: "空格 · 反应", key: " " }];
           const r = await c.choose(big(`<span style="color:${stimulus === "blue" ? "#285eaa" : "#737373"}">●</span>`), options, { timeout: 2000 });
           const expected = condition === "choice" ? stimulus : condition === "discrimination" && stimulus === "gray" ? null : "go";
@@ -49,19 +48,16 @@
   });
 
   T.register({
-    id: "stroop", name: "Stroop 色词干扰", chapter: "第一章", code: "1-2", category: "注意与执行控制", taskType: "颜色判断", trialCount: 20,
+    id: "stroop", name: "Stroop 色词干扰", chapter: "第一章", code: "1-2", category: "注意与执行控制", taskType: "颜色判断", trialCount: 72,
     shortDescription: "比较一致、不一致和中性条件，体验自动阅读与颜色判断之间的竞争。",
-    instructions: ["忽略文字含义，只判断字体的颜色。", "1＝红、2＝绿、3＝蓝、4＝黄，也可以点击对应颜色按钮。", "先完成 3 次练习，再完成 20 次正式试次。尽量又快又准。"],
-    description: "# 学习目标与原理\n体验自动词义加工对颜色判断的影响。\n\n# 任务流程\n练习 3 次，正式 20 次。一致条件 7 次、不一致条件 7 次、中性条件 6 次。中性刺激为没有颜色意义的 XXX。注视点 500 ms，反应窗口 2500 ms。按 1、2、3、4 或触屏按钮判断红、绿、蓝、黄。\n\n# 指标与结果解读\n报告各条件正确率、正确反应平均 RT；Stroop 干扰量＝不一致 RT−一致 RT；相对中性的干扰量＝不一致 RT−中性 RT。正差值与干扰相符，但小样本不保证出现效应。\n\n# 注意事项与来源\n颜色辨识困难时不宜解释结果。本任务仅为教学体验，不作心理诊断。参考 Stroop（1935）。",
+    instructions: ["忽略文字含义，只判断字体的颜色。", "1＝红、2＝绿、3＝蓝、4＝黄，也可以点击对应颜色按钮。", "先完成 3 次练习，再完成 72 次正式试次，每 24 次可休息。首试次及休息后预备注视至少 2 秒；尽量又快又准。"],
+    description: "# 学习目标与原理\n体验自动词义加工对颜色判断的影响。\n\n# 任务流程\n练习 3 次，正式 72 次。一致、不一致和中性条件各 24 次，每种条件中红绿蓝黄各 6 次。不一致词义与字体颜色的 12 种配对各 2 次。分为 3 个随机区组，每组 24 次，每种条件与颜色组合在每组各 2 次；组间可休息。中性刺激为没有颜色意义的 XXX。首试次及休息后注视至少 2000 ms，其余注视 500 ms；反应窗口 2500 ms。按 1、2、3、4 或触屏按钮判断红、绿、蓝、黄。\n\n# 指标与结果解读\n报告各条件正确率、正确反应平均 RT；Stroop 干扰量＝不一致 RT−一致 RT；相对中性的干扰量＝不一致 RT−中性 RT。正差值与干扰相符，但教学短测不保证出现效应。\n\n# 注意事项与来源\n颜色辨识困难时不宜解释结果。本任务仅为教学体验，不作心理诊断。参考 Stroop（1935）。",
     async run(c) {
-      const formal = c.shuffle([...Array(7).fill("congruent"), ...Array(7).fill("incongruent"), ...Array(6).fill("neutral")]);
+      const formal = Array.from({ length: 3 }, (_, block) => c.shuffle(["congruent", "incongruent", "neutral"].flatMap((condition) => colors.flatMap((target, colorIndex) => Array.from({ length: 2 }, (_, repeat) => ({ condition, target, word: condition === "neutral" ? "XXX" : condition === "congruent" ? target.name : colors[(colorIndex + (block * 2 + repeat) % 3 + 1) % 4].name })))))).flat();
       const choices = colors.map((color) => ({ value: color.name, label: `${color.key} · ${color.name}`, key: color.key }));
-      for (let i = -3; i < 20; i += 1) {
-        const condition = i < 0 ? ["congruent", "incongruent", "neutral"][i + 3] : formal[i];
-        const target = colors[(i + 24) % 4];
-        const word = condition === "neutral" ? "XXX" : condition === "congruent" ? target.name : colors[(i + 25) % 4].name;
-        c.progress(i < 0 ? i + 4 : i + 1, i < 0 ? 3 : 20, i < 0 ? "练习" : "正式实验");
-        await c.fixation(500);
+      for (let i = -3; i < formal.length; i += 1) {
+        const {condition, target, word} = i < 0 ? { condition: ["congruent", "incongruent", "neutral"][i + 3], target: colors[i + 3], word: i === -3 ? colors[0].name : i === -2 ? colors[2].name : "XXX" } : formal[i];
+        await c.trialStart(i < 0 ? i + 3 : i, i < 0 ? 3 : formal.length, { blockSize: i < 0 ? 0 : 24, label: i < 0 ? "练习" : "正式实验", fixationMs: 500 });
         const r = await c.choose(big(`<span style="color:${target.ink}">${word}</span>`), choices, { timeout: 2500 });
         const correct = r.value === target.name;
         if (i < 0) await c.note(`<h2>${correct ? "正确" : `正确颜色是${target.name}`}</h2>`, i === -1 ? "开始正式实验" : "下一次练习");
@@ -79,20 +75,18 @@
   }
 
   T.register({
-    id: "navon", name: "Navon 整体优势效应", chapter: "第二章", code: "2-1", category: "知觉", taskType: "整体与局部字母判断", trialCount: 20,
+    id: "navon", name: "Navon 整体优势效应", chapter: "第二章", code: "2-1", category: "知觉", taskType: "整体与局部字母判断", trialCount: 80,
     shortDescription: "在复合字母中判断整体或局部，比较整体优先和跨层级干扰。",
-    instructions: ["刺激由许多小字母排成一个大字母。每次先看提示“整体”或“局部”。", "整体＝判断大字母；局部＝判断组成图形的小字母。H 按 F，S 按 J，或点击按钮。", "20 次正式试次中，两个层级与一致／不一致条件各 5 次。"],
-    description: "# 学习目标与实验原理\n采用 Navon 复合字母，比较整体与局部加工，以及不相关层级的干扰。\n\n# 任务流程\n每次提示目标层级 800 ms，注视 400 ms，然后呈现复合 H/S。整体／局部 × 一致／不一致共四种条件，每种 5 次，合计 20 次随机呈现。按 F＝H、J＝S，或点击按钮。\n\n# 指标与含义\n整体优势＝局部正确 RT−整体正确 RT；整体对局部干扰＝局部不一致 RT−局部一致 RT；局部对整体干扰＝整体不一致 RT−整体一致 RT。报告各条件正确率和 RT，不保证每人出现经典方向。\n\n# 注意事项与来源\n图形大小和屏幕会影响视觉层级加工，结果仅供课堂讨论。参考 Navon（1977）。",
+    instructions: ["刺激由许多小字母排成一个大字母。每次先看提示“整体”或“局部”。", "整体＝判断大字母；局部＝判断组成图形的小字母。H 按 F，S 按 J，或点击按钮。", "80 次正式试次，每种层级与一致性组合 20 次，H/S 各半。第 40 次后可休息；首试次及休息后预备注视至少 2 秒。"],
+    description: "# 学习目标与实验原理\n采用 Navon 复合字母，比较整体与局部加工，以及不相关层级的干扰。\n\n# 任务流程\n每次提示目标层级 800 ms，注视 400 ms，然后呈现复合 H/S；首试次及休息后注视至少 2000 ms。整体／局部 × 一致／不一致 × 大字母 H/S 共 8 种组合，各 10 次，合计 80 次。分为 2 个各 40 次的区组，每组每种组合各 5 次，组内随机，组间可休息。按 F＝H、J＝S，或点击按钮。\n\n# 指标与含义\n整体优势＝局部正确 RT−整体正确 RT；整体对局部干扰＝局部不一致 RT−局部一致 RT；局部对整体干扰＝整体不一致 RT−整体一致 RT。报告各条件正确率和 RT，不保证每人出现经典方向。\n\n# 注意事项与来源\n图形大小和屏幕会影响视觉层级加工，结果仅供课堂讨论。参考 Navon（1977）。",
     async run(c) {
-      const trials = c.shuffle(["global", "local"].flatMap((level) => ["congruent", "incongruent"].flatMap((condition) => Array.from({ length: 5 }, (_, i) => {
-        const globalLetter = i % 2 ? "S" : "H";
-        return { level, condition, globalLetter, localLetter: condition === "congruent" ? globalLetter : globalLetter === "H" ? "S" : "H" };
-      }))));
+      const trials = Array.from({ length: 2 }, () => c.shuffle(["global", "local"].flatMap((level) => ["congruent", "incongruent"].flatMap((condition) => ["H", "S"].flatMap((globalLetter) => Array.from({ length: 5 }, () => ({ level, condition, globalLetter, localLetter: condition === "congruent" ? globalLetter : globalLetter === "H" ? "S" : "H" }))))))).flat();
       for (const [i, trial] of trials.entries()) {
-        c.progress(i + 1, 20, trial.level === "global" ? "判断整体" : "判断局部");
-        c.stage(`<h2>${trial.level === "global" ? "判断整体大字母" : "判断局部小字母"}</h2>`);
-        await c.wait(800);
-        await c.fixation(400);
+        await c.trialStart(i, trials.length, { blockSize: 40, label: trial.level === "global" ? "判断整体" : "判断局部", fixationMs: 400, renderFixation: async (ms) => {
+          c.stage(`<h2>${trial.level === "global" ? "判断整体大字母" : "判断局部小字母"}</h2>`);
+          await c.wait(800);
+          await c.fixation(ms);
+        } });
         const r = await c.choose(navonFigure(trial.globalLetter, trial.localLetter), [{ value: "H", label: "F · H", key: "f" }, { value: "S", label: "J · S", key: "j" }], { timeout: 3000 });
         const target = trial.level === "global" ? trial.globalLetter : trial.localLetter;
         c.record({ ...trial, target, response: r.value, correct: r.value === target, rt: r.timedOut ? null : r.rt });
@@ -147,11 +141,11 @@
   }
 
   T.register({
-    id: "mcgurk", name: "麦格克效应", chapter: "第二章", code: "2-2", category: "知觉", taskType: "视听言语整合", trialCount: 20,
+    id: "mcgurk", name: "麦格克效应", chapter: "第二章", code: "2-2", category: "知觉", taskType: "视听言语整合", trialCount: 48,
     assets: Array.from({ length: 8 }, (_, i) => [`assets/mcgurk-ba-${i + 1}.mp4`, `assets/mcgurk-fusion-${i + 1}.mp4`]).flat(),
     shortDescription: "观看真实说话者视频，比较听觉、视听一致与视听不一致时的音节知觉。",
-    instructions: ["请打开媒体音量，建议戴耳机。每次点击“播放本次语音”，播放结束后选择实际听到的音节。", "部分试次只听声音，部分试次同时呈现口型。不要按预期猜答案，也不需要刻意寻找某种错觉。", "共有 20 次。先做声音检查；未听清时不要继续正式任务。"],
-    description: "# 学习目标与实验原理\n考查可见口型如何参与言语知觉。听觉 /ba/ 与视觉 /ga/ 的不一致配对有时被报告为 /da/。\n\n# 任务流程\n使用真实说话者视频，听觉单通道 6 次、视听一致 6 次、视听不一致 8 次，共 20 次随机呈现。音频、视频均随本程序本地提供；不需要在线视频。每次播放后选择 ba、da、ga 或其他。先进行声音检查。\n\n# 指标与结果解读\n报告每种条件的 ba／da／ga／其他比例、听觉与一致条件识别率、以及不一致条件 da 融合报告率。不一致试次记录知觉报告，不把未出现错觉判为错误。未听清、设备静音时不宜解释结果。\n\n# 材料与来源\nMcGurk 与 MacDonald（1976）；视频来自 Beauchamp Lab 公开材料，Basu Mallick、Magnotti 与 Beauchamp（2015），Experiment 2。原作者在材料页面声明尽法律允许范围放弃版权及相关权利：\nhttps://openwetware.org/wiki/Beauchamp:Stimuli\n\n# 教学注意\n媒体播放和主观报告不构成听力或认知诊断；数据只保留在当前页面。",
+    instructions: ["请打开媒体音量，建议戴耳机。每次点击“播放本次语音”，播放结束后选择实际听到的音节。", "部分试次只听声音，部分试次同时呈现口型。不要按预期猜答案，也不需要刻意寻找某种错觉。", "共有 48 次，每种条件 16 次，第 24 次后可休息。首试次及休息后预备注视至少 2 秒。先做声音检查；未听清时不要继续正式任务。"],
+    description: "# 学习目标与实验原理\n考查可见口型如何参与言语知觉。听觉 /ba/ 与视觉 /ga/ 的不一致配对有时被报告为 /da/。\n\n# 任务流程\n使用真实说话者视频，听觉单通道、视听一致、视听不一致各 16 次，共 48 次。分为 2 个各 24 次的随机区组，每组每种条件使用 8 段说话者素材各一次，组间可休息；相同素材在第二组重复一次。首试次及休息后注视至少 2000 ms，其余注视 350 ms。音频、视频均随本程序本地提供；不需要在线视频。每次播放后选择 ba、da、ga 或其他。先进行声音检查，检查不计入正式试次。\n\n# 指标与结果解读\n报告每种条件的 ba／da／ga／其他比例、听觉与一致条件识别率、以及不一致条件 da 融合报告率。不一致试次记录知觉报告，不把未出现错觉判为错误。未听清、设备静音时不宜解释结果。\n\n# 材料与来源\nMcGurk 与 MacDonald（1976）；视频来自 Beauchamp Lab 公开材料，Basu Mallick、Magnotti 与 Beauchamp（2015），Experiment 2。原作者在材料页面声明尽法律允许范围放弃版权及相关权利：\nhttps://openwetware.org/wiki/Beauchamp:Stimuli\n\n# 教学注意\n媒体播放和主观报告不构成听力或认知诊断；数据只保留在当前页面。",
     async run(c) {
       await c.note("<h2>声音检查</h2><p>下一段是真人发音。请确认设备媒体音量已开启。</p>", "播放检查语音");
       await playSyllable(c, "assets/mcgurk-ba-1.mp4", true);
@@ -162,16 +156,13 @@
         const repeat = await c.choose("<h2>现在是否清楚听到了语音？</h2>", [{ value: "yes", label: "听到了，开始实验" }, { value: "no", label: "仍未听到，结束检查" }]);
         if (repeat.value !== "yes") throw new Error("没有通过声音检查，请检查设备后重新开始。未生成实验结果。");
       }
-      const trials = c.shuffle([...Array(6).fill("auditory"), ...Array(6).fill("congruent"), ...Array(8).fill("incongruent")]);
-      const seen = { auditory: 0, congruent: 0, incongruent: 0 };
-      for (const [i, condition] of trials.entries()) {
-        c.progress(i + 1, 20, "聆听与报告");
-        await c.fixation(350);
-        const speaker = ++seen[condition];
+      const trials = Array.from({ length: 2 }, (_, repetition) => c.shuffle(["auditory", "congruent", "incongruent"].flatMap((condition) => Array.from({ length: 8 }, (_, index) => ({ condition, speaker: index + 1, repetition: repetition + 1 }))))).flat();
+      for (const [i, {condition, speaker, repetition}] of trials.entries()) {
+        await c.trialStart(i, trials.length, { blockSize: 24, label: "聆听与报告", fixationMs: 350 });
         const source = `assets/mcgurk-${condition === "incongruent" ? "fusion" : "ba"}-${speaker}.mp4`;
         await playSyllable(c, source, condition === "auditory");
         const r = await c.choose("<h2>你实际听到了哪个音节？</h2>", [{ value: "ba", label: "1 · ba", key: "1" }, { value: "da", label: "2 · da", key: "2" }, { value: "ga", label: "3 · ga", key: "3" }, { value: "other", label: "4 · 其他", key: "4" }]);
-        c.record({ condition, speaker, auditory: "ba", visual: condition === "auditory" ? "none" : condition === "congruent" ? "ba" : "ga", response: r.value, correct: condition === "incongruent" ? null : r.value === "ba", fusion: condition === "incongruent" && r.value === "da", rt: r.rt });
+        c.record({ condition, speaker, repetition, auditory: "ba", visual: condition === "auditory" ? "none" : condition === "congruent" ? "ba" : "ga", response: r.value, correct: condition === "incongruent" ? null : r.value === "ba", fusion: condition === "incongruent" && r.value === "da", rt: r.rt });
       }
       const subset = (condition) => c.rows.filter((r) => r.valid !== false && r.condition === condition);
       return { metrics: [
@@ -277,17 +268,17 @@
   T.register({
     id: "embedded-figures", name: "镶嵌图形", chapter: "第十一章", code: "11-1", category: "知觉", taskType: "隐藏轮廓描画", trialCount: 20,
     shortDescription: "在复杂背景中找出简单图形，并用鼠标或触屏沿轮廓描画。",
-    instructions: ["先观察并记住目标形状及方向，随后从复杂背景中寻找同样的形状。", "按住鼠标或手指描画整个轮廓，可以分笔；点“清除重画”可重新描画，完成后提交。", "2 次练习有反馈；20 次正式任务不显示正确轮廓。"],
-    description: "# 学习目标\n体验从复杂知觉背景中分离目标轮廓的过程。\n\n# 任务与流程\n按文档流程先练习认识目标→寻找隐藏图形→反馈；正式阶段观察目标→寻找隐藏图形→描画轮廓。练习 2 次，正式 20 次。使用本项目原创的简单几何轮廓和不同密度线段背景，不复制标准测验受版权保护的题图。目标方向保持不变，位置改变。鼠标和触屏均可连续描画，允许分笔、清除重画。\n\n# 记录指标\n记录描画正确率、正确试次平均 RT、轮廓覆盖率、偏离比例、轨迹与复杂度。覆盖率至少 82% 且明显偏离的采样点不超过 22% 才记为正确。RT 从复杂图形出现至提交，包括重画时间。\n\n# 含义与注意\n本教材版体验知觉分离，不是标准 GEFT，不提供场独立／场依存人格分型。班级比较应通过主动导出数据后由教师汇总，平台不收集全班数据。参考 Witkin（1950）与 Witkin 等（1971）的镶嵌图形研究。",
+    instructions: ["先观察并记住目标形状及方向，随后从复杂背景中寻找同样的形状。", "按住鼠标或手指描画整个轮廓，可以分笔；点“清除重画”可重新描画，完成后提交。", "2 次练习有反馈；20 次正式任务不显示正确轮廓，每 10 次可休息。首试次及休息后预备注视至少 2 秒。"],
+    description: "# 学习目标\n体验从复杂知觉背景中分离目标轮廓的过程。\n\n# 任务与流程\n按文档流程先练习认识目标→寻找隐藏图形→反馈；正式阶段观察目标→寻找隐藏图形→描画轮廓。练习 2 次；描画单次耗时较长，正式保留 20 次，分为 2 个各 10 次的区组，组间可休息。首试次及休息后预备注视至少 2000 ms，其余注视 500 ms，再观察目标。使用本项目原创的简单几何轮廓和不同密度线段背景，不复制标准测验受版权保护的题图。目标方向保持不变，位置改变。鼠标和触屏均可连续描画，允许分笔、清除重画。\n\n# 记录指标\n记录描画正确率、正确试次平均 RT、轮廓覆盖率、偏离比例、轨迹与复杂度。覆盖率至少 82% 且明显偏离的采样点不超过 22% 才记为正确。RT 从复杂图形出现至提交，包括重画时间。\n\n# 含义与注意\n本教材版体验知觉分离，不是标准 GEFT，不提供场独立／场依存人格分型。班级比较应通过主动导出数据后由教师汇总，平台不收集全班数据。参考 Witkin（1950）与 Witkin 等（1971）的镶嵌图形研究。",
     async run(c) {
       for (let i = 0; i < 2; i += 1) {
-        c.progress(i + 1, 2, "练习");
+        await c.trialStart(i, 2, { label: "练习", fixationMs: 500 });
         const result = await traceTarget(c, i, true);
         const target = JSON.parse(result.target);
         await c.note(`<h2>${result.correct ? "轮廓描画正确" : "请对照红色正确轮廓"}</h2><div style="position:relative">${complexFigure(target, i, true).replace('<g data-trace-ink', `<polygon points="${pointString(target)}" fill="none" stroke="#c74b36" stroke-width="5"/><g data-trace-ink`)}</div><p>轮廓覆盖 ${Math.round(result.coverage * 100)}%，偏离 ${Math.round(result.offPath * 100)}%。应描出整个闭合轮廓。</p>`, i === 1 ? "进入正式实验" : "下一次练习");
       }
       for (let i = 0; i < 20; i += 1) {
-        c.progress(i + 1, 20, "正式描画");
+        await c.trialStart(i, 20, { blockSize: 10, label: "正式描画", fixationMs: 500 });
         const result = await traceTarget(c, i + 2, false);
         c.record({ condition: `complexity-${result.difficulty}`, ...result });
       }
@@ -324,19 +315,19 @@
   }
 
   T.register({
-    id: "interface-search", name: "界面信息分组与视觉搜索", chapter: "第十二章", code: "12-1", category: "注意与执行控制", taskType: "界面目标搜索", trialCount: 20,
+    id: "interface-search", name: "界面信息分组与视觉搜索", chapter: "第十二章", code: "12-1", category: "注意与执行控制", taskType: "界面目标搜索", trialCount: 48,
     shortDescription: "比较高密度界面和按功能分组的界面，观察搜索速度、误操作和主观难度。",
-    instructions: ["根据每次提示，在模拟界面中找到目标功能并点击。点错后继续寻找。", "两种界面功能相同，共 20 个搜索任务。每种界面结束后报告主观难度。", "系统记录点击和反应时；此网页不测量眼动，不把鼠标或手指轨迹当作注视。"],
-    description: "# 学习目标与原理\n体验功能分组、留白和标题层级对目标搜索的影响。\n\n# 任务流程\n两种界面各 10 个正式任务，共 20 次，区组顺序随机。两种界面均包含相同的 18 个功能；高密度界面无功能标题且功能随机排列，分组界面按文件与数据、账户与安全、工作与协作组织。任务包含导出数据、账户安全和保存状态等，错误点击后继续寻找目标。每区组结束报告 1–7 分主观难度。\n\n# 指标与含义\n记录目标发现 RT、首次操作正确率、错误点击数、点击顺序与主观难度。首次注视目标区域时间和无关区域注视次数需要眼动设备，本网页不测量，CSV 中明确记为未采集，不使用鼠标行为替代眼动。\n\n# 注意事项与来源\n两种界面的屏幕大小与操作设备应尽量一致；重复相同功能可能产生练习效应。本实验是信息组织与视觉搜索的人机交互教学演示，不评价个人能力。",
+    instructions: ["根据每次提示，在模拟界面中找到目标功能并点击。点错后继续寻找。", "两种界面功能相同，各完成 24 次搜索，共 48 次。界面切换时可休息，每种界面结束后报告主观难度。", "首试次及休息后预备注视至少 2 秒。系统记录点击和反应时；此网页不测量眼动，不把鼠标或手指轨迹当作注视。"],
+    description: "# 学习目标与原理\n体验功能分组、留白和标题层级对目标搜索的影响。\n\n# 任务流程\n两种界面各 24 个正式任务，共 48 次，区组顺序随机，切换界面时可休息。每种界面从文件、账户、协作三类功能中各选 4 项，共 12 个目标，各搜索 2 次；两种界面的目标与次数完全匹配。首试次及休息后注视至少 2000 ms，其余注视 500 ms。两种界面均包含相同的 18 个功能；高密度界面无功能标题且功能随机排列，分组界面按文件与数据、账户与安全、工作与协作组织。任务包含导出数据、账户安全和保存状态等，错误点击后继续寻找目标。每区组结束报告 1–7 分主观难度。\n\n# 指标与含义\n记录目标发现 RT、首次操作正确率、错误点击数、点击顺序与主观难度。首次注视目标区域时间和无关区域注视次数需要眼动设备，本网页不测量，CSV 中明确记为未采集，不使用鼠标行为替代眼动。\n\n# 注意事项与来源\n两种界面的屏幕大小与操作设备应尽量一致；重复相同功能可能产生练习效应。本实验是信息组织与视觉搜索的人机交互教学演示，不评价个人能力。",
     async run(c) {
-      const targets = ["导出数据", "修改密码", "查看保存状态", "隐私设置", "任务列表", "双重验证", "导入数据", "团队成员", "版本记录", "通知设置"];
+      const targets = ["导出数据", "查看保存状态", "导入数据", "版本记录", "修改密码", "隐私设置", "双重验证", "登录设备", "任务列表", "团队成员", "通知设置", "帮助中心"];
       const order = c.shuffle(Array.from({ length: 18 }, (_, i) => i));
       const difficulty = {};
       let index = 0;
       for (const condition of c.shuffle(["dense", "grouped"])) {
-        await c.note(`<h2>${condition === "dense" ? "界面 A" : "界面 B"}</h2><p>按提示寻找目标。功能与上一组相同，请尽量又快又准。</p>`);
-        for (const target of c.shuffle(targets)) {
-          c.progress(++index, 20, "搜索目标");
+        await c.note(`<h2>${condition === "dense" ? "界面 A" : "界面 B"}</h2><p>按提示寻找目标。两种界面包含相同功能，请尽量又快又准。</p>`);
+        for (const target of Array.from({ length: 2 }, () => c.shuffle(targets)).flat()) {
+          await c.trialStart(index++, 48, { blockSize: 24, label: "搜索目标", fixationMs: 500 });
           const r = await searchInterface(c, condition, target, order);
           c.record({ condition, target, ...r, first_fixation_ms: "not_collected", irrelevant_fixations: "not_collected" });
         }
@@ -355,19 +346,18 @@
   });
 
   T.register({
-    id: "flanker", name: "Flanker 侧抑制任务", chapter: "补充范式", code: "S-1", category: "注意与执行控制", taskType: "箭头方向判断", trialCount: 20,
+    id: "flanker", name: "Flanker 侧抑制任务", chapter: "补充范式", code: "S-1", category: "注意与执行控制", taskType: "箭头方向判断", trialCount: 80,
     shortDescription: "判断中央箭头的方向，忽略两侧无关箭头，体验反应冲突。",
-    instructions: ["只判断五个箭头中正中央的箭头。", "中央朝左按 F／左按钮；朝右按 J／右按钮。20 个正式试次。"],
-    description: "# 学习目标与原理\n体验无关侧翼刺激带来的反应冲突。\n\n# 任务流程\n先做 2 次练习，再完成 20 次正式试次。一致和不一致条件各 10 次，中央左／右方向各半。注视点 500 ms，反应窗口 2000 ms。键盘 F／J 和触屏按钮等效。\n\n# 指标与含义\n报告正确率、正确 RT 和冲突效应（不一致 RT−一致 RT）。小样本差值仅供教学讨论，不作能力判断。参考 Eriksen 与 Eriksen（1974）。",
+    instructions: ["只判断五个箭头中正中央的箭头。", "中央朝左按 F／左按钮；朝右按 J／右按钮。2 次练习后完成 80 个正式试次，第 40 次后可休息。首试次及休息后预备注视至少 2 秒。"],
+    description: "# 学习目标与原理\n体验无关侧翼刺激带来的反应冲突。\n\n# 任务流程\n先做 2 次练习，再完成 80 次正式试次。一致／不一致 × 中央左／右共 4 种组合，各 20 次。分为 2 个各 40 次的随机区组，每组每种组合各 10 次，组间可休息。首试次及休息后注视至少 2000 ms，其余注视 500 ms；反应窗口 2000 ms。键盘 F／J 和触屏按钮等效。\n\n# 指标与含义\n报告正确率、正确 RT 和冲突效应（不一致 RT−一致 RT）。教学短测差值仅供讨论，不作能力判断。参考 Eriksen 与 Eriksen（1974）。",
     async run(c) {
-      const trials = c.shuffle(Array.from({ length: 20 }, (_, i) => ({ condition: i < 10 ? "congruent" : "incongruent", target: i % 2 ? "left" : "right" })));
+      const trials = Array.from({ length: 2 }, () => c.shuffle(["congruent", "incongruent"].flatMap((condition) => ["left", "right"].flatMap((target) => Array.from({ length: 10 }, () => ({ condition, target })))))).flat();
       const choices = [{ value: "left", label: "F · ←", key: "f" }, { value: "right", label: "J · →", key: "j" }];
       for (let i = -2; i < trials.length; i += 1) {
         const t = i < 0 ? { condition: i === -2 ? "congruent" : "incongruent", target: "left" } : trials[i];
         const center = t.target === "left" ? "←" : "→";
         const side = t.condition === "congruent" ? center : t.target === "left" ? "→" : "←";
-        c.progress(i < 0 ? i + 3 : i + 1, i < 0 ? 2 : 20, i < 0 ? "练习" : "正式实验");
-        await c.fixation(500);
+        await c.trialStart(i < 0 ? i + 2 : i, i < 0 ? 2 : trials.length, { blockSize: i < 0 ? 0 : 40, label: i < 0 ? "练习" : "正式实验", fixationMs: 500 });
         const r = await c.choose(`<div style="min-height:200px;display:grid;place-items:center;font-size:clamp(28px,8vw,56px);letter-spacing:.05em">${side}${side}${center}${side}${side}</div>`, choices, { timeout: 2000 });
         if (i < 0) await c.note(`<h2>${r.value === t.target ? "正确" : "请只判断中央箭头"}</h2>`, i === -1 ? "开始正式实验" : "继续练习");
         else c.record({ ...t, response: r.value, correct: r.value === t.target, rt: r.timedOut ? null : r.rt });
@@ -377,22 +367,21 @@
   });
 
   T.register({
-    id: "gonogo", name: "Go / No-Go 反应抑制", chapter: "补充范式", code: "S-2", category: "注意与执行控制", taskType: "反应与抑制", trialCount: 20,
+    id: "gonogo", name: "Go / No-Go 反应抑制", chapter: "补充范式", code: "S-2", category: "注意与执行控制", taskType: "反应与抑制", trialCount: 100,
     shortDescription: "对频繁出现的 Go 信号作出反应，在 No-Go 信号出现时停止动作。",
-    instructions: ["看到绿色圆形立即按空格或点击反应；看到红色叉号时不要反应。", "先完成 2 次练习，再完成 20 次正式试次，反应窗口为 1200 ms。"],
-    description: "# 学习目标与原理\n体验高频反应形成的倾向，以及对不应反应信号的动作抑制。\n\n# 任务流程\n2 次练习，20 次正式试次，15 次 Go 和 5 次 No-Go 随机出现。注视点 500 ms，反应窗口 1200 ms。Go＝绿色圆形；No-Go＝红色叉号。空格或触屏按钮反应。\n\n# 指标与含义\n报告总正确率、正确 Go 平均 RT、No-Go 抑制成功率和 Go 漏报。不能把单次成绩视为冲动性或临床抑制控制评估。",
+    instructions: ["看到绿色圆形立即按空格或点击反应；看到红色叉号时不要反应。", "先完成 2 次练习，再完成 100 次正式试次，其中 80 次需要反应、20 次需要抑制，第 50 次后可休息。首试次及休息后预备注视至少 2 秒，反应窗口为 1200 ms。"],
+    description: "# 学习目标与原理\n体验高频反应形成的倾向，以及对不应反应信号的动作抑制。\n\n# 任务流程\n2 次练习，100 次正式试次。分为 2 个各 50 次的随机区组，每组 40 次 Go 和 10 次 No-Go，保持 80% 的高频反应比例，组间可休息。首试次及休息后注视至少 2000 ms，其余注视 500 ms；反应窗口 1200 ms。Go＝绿色圆形；No-Go＝红色叉号。空格或触屏按钮反应。\n\n# 指标与含义\n报告总正确率、正确 Go 平均 RT、No-Go 抑制成功率和 Go 漏报。不能把单次成绩视为冲动性或临床抑制控制评估。",
     async run(c) {
-      const trials = c.shuffle([...Array(15).fill("go"), ...Array(5).fill("nogo")]);
-      for (let i = -2; i < 20; i += 1) {
+      const trials = Array.from({ length: 2 }, () => c.shuffle([...Array(40).fill("go"), ...Array(10).fill("nogo")])).flat();
+      for (let i = -2; i < trials.length; i += 1) {
         const condition = i < 0 ? i === -2 ? "go" : "nogo" : trials[i];
-        c.progress(i < 0 ? i + 3 : i + 1, i < 0 ? 2 : 20, i < 0 ? "练习" : "正式实验");
-        await c.fixation(500);
+        await c.trialStart(i < 0 ? i + 2 : i, i < 0 ? 2 : trials.length, { blockSize: i < 0 ? 0 : 50, label: i < 0 ? "练习" : "正式实验", fixationMs: 500 });
         const r = await c.choose(big(`<span style="color:${condition === "go" ? "#287044" : "#c63832"}">${condition === "go" ? "●" : "×"}</span>`), [{ value: "go", label: "空格 · 反应", key: " " }], { timeout: 1200 });
         const correct = condition === "go" ? r.value === "go" : r.timedOut;
         if (i < 0) await c.note(`<h2>${correct ? "正确" : condition === "go" ? "绿色圆形需要反应" : "红色叉号不要反应"}</h2>`, i === -1 ? "开始正式实验" : "继续练习");
         else c.record({ condition, response: r.value, correct, rt: r.timedOut ? null : r.rt, commission: condition === "nogo" && !r.timedOut, omission: condition === "go" && r.timedOut });
       }
-      return { metrics: [...standardMetrics(c, c.rows), { label: "No-Go 抑制成功率", value: acc(c, c.rows.filter((r) => r.condition === "nogo")), note: "5 次 No-Go 中成功不反应的比例" }, { label: "Go 漏报", value: `${c.rows.filter((r) => r.omission).length} 次`, note: "15 次 Go 中未及时反应的次数" }], explanation: "No-Go 不作反应是正确行为，其 RT 不进入平均反应时。总正确率应结合 Go 漏报和 No-Go 误反应阅读。" };
+      return { metrics: [...standardMetrics(c, c.rows), { label: "No-Go 抑制成功率", value: acc(c, c.rows.filter((r) => r.condition === "nogo")), note: "20 次 No-Go 中成功不反应的比例" }, { label: "Go 漏报", value: `${c.rows.filter((r) => r.omission).length} 次`, note: "80 次 Go 中未及时反应的次数" }], explanation: "No-Go 不作反应是正确行为，其 RT 不进入平均反应时。总正确率应结合 Go 漏报和 No-Go 误反应阅读。" };
     },
   });
 
